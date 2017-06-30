@@ -1,0 +1,25 @@
+{
+  "name": "document-manager",
+  "version": "1.0.0",
+  "description": "A document management system",
+  "main": "server.js",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codejockie/document-manager.git"
+  },
+  "keywords": [
+    "Document",
+    "Docman",
+    "DocManager",
+    "DocumentManager"
+  ],
+  "author": "John Kennedy (codejockie)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/codejockie/document-manager/issues"
+  },
+  "homepage": "https://github.com/codejockie/document-manager#readme"
+}
