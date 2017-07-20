@@ -16,21 +16,13 @@ module.exports = {
       type: Sequelize.TEXT
     },
     author: {
+      allowNull: false,
       type: Sequelize.STRING
     },
     access: {
       allowNull: false,
       type: Sequelize.ENUM,
       values: ['private', 'public']
-    },
-    date_published: {
-      allowNull: false,
-      defaultValue: new Date(),
-      type: Sequelize.DATE
-    },
-    date_updated: {
-      allowNull: true,
-      type: Sequelize.DATE
     },
     userId: {
       type: Sequelize.INTEGER,
