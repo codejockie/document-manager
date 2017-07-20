@@ -19,7 +19,7 @@ export default (sequelize, DataTypes) => {
       values: ['private', 'public']
     },
     userId: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
     },
     roleId: {
       type: DataTypes.INTEGER,
