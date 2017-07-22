@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+  - "7"
+before_script:
+  - npm install -g gulp-cli
+after_script:
+ - ./node_modules/.bin/gulp coveralls
+after_success:
+  - npm install -g codeclimate-test-reporter
+  - codeclimate-test-reporter < ./coverage/lcov.info
+env:
+  global:
+    secure: dNoO3Vkh6g4IpO3jRODy1UKa1tr4wLtbAKWbWxGdRcnPcgvKlwCNlVD0T7YMQf8RTsGUoBPDE+kEO/0RXDyjf7VVnkqUOpfAy74fw7ZiOHdHJvfHMFUIoXdQYdYiwjSmyNScxrINngXt5fp8MGqeUCMmLAEqHnQT+qTcIjIfN2Oj+2XrDxH5XsJQLWbZDReANOpvVU/xgoOD01KdJP31H/UsH2xp1YVUdfkAWG8CpxmBmJhehrOAIN/pv2n87fKPugn24F64UAZrKYKKwt/T3PJ7Jyr0f3TXwl+jhZxvcIakxfhaMJfSZjHRBZ/AxnlbsIcfWZ+5nbbJ/ZpTJxgvChu0DVz5GYR2OfQoZxS32XnCPzsRaHSAvlGfkeDBBauSHuTE5LO87SIG8FhG2TUaCMFfwrhyrlCQ7/5JUWsBcxxIpoOWqkr9NKIU/CtXSEoat77u/2wQNTJf78PP1sFJfh2QdOgNRtbATET5JhLusSt5mgS/L8djpA87KLPITRM2wzEYK5nKek4rOli3Lbr3CEPhuhBuEjE9bGoTavQfyDCwIPY4ivGRLeuegYi3Fej0fttPKzg5zto2Yn5VAgoyvPZmg4c5WPeMtw/bVITeMZ//att+INoOZ3e+IfFKelxBDPfHWjfzOrLcg1205o8n0gGD9yTHNv1vBG8zPqptP9c=
