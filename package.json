@@ -5,10 +5,11 @@
   "main": "server/server.js",
   "scripts": {
     "start": "babel-node -- server/server.js",
-    "test": "gulp build",
+    "test": "gulp dev && gulp coverage",
     "dev": "nodemon -w server --exec babel-node -- server/server.js",
     "devtestmigrate": "NODE_ENV=devtest sequelize db:migrate",
-    "migrate": "sequelize db:migrate && npm run seed",
+    "localmigrate": "sequelize db:migrate && npm run seed",
+    "testmigrate": "DATABASE_URL=postgres://zugaowmw:5em2qn-RfrHG9wQn-G_6dK-tYwEci2O-@pellefant.db.elephantsql.com:5432/zugaowmw NODE_ENV=test sequelize db:migrate",
     "undo": "sequelize db:migrate:undo",
     "seed": "sequelize db:seed:all"
   },
