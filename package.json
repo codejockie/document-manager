@@ -7,9 +7,9 @@
     "start": "babel-node -- server/server.js",
     "test": "gulp dev && gulp coverage",
     "dev": "nodemon -w server --exec babel-node -- server/server.js",
-    "devtestmigrate": "NODE_ENV=devtest sequelize db:migrate",
-    "localmigrate": "sequelize db:migrate && npm run seed",
-    "testmigrate": "DATABASE_URL=postgres://zugaowmw:5em2qn-RfrHG9wQn-G_6dK-tYwEci2O-@pellefant.db.elephantsql.com:5432/zugaowmw NODE_ENV=test sequelize db:migrate",
+    "devmigrate": "sequelize db:migrate && npm run seed",
+    "localmigrate": "NODE_ENV=devtest sequelize db:migrate",
+    "testmigrate": "NODE_ENV=test sequelize db:migrate",
     "undo": "sequelize db:migrate:undo",
     "seed": "sequelize db:seed:all"
   },
@@ -49,6 +49,7 @@
   "devDependencies": {
     "chai": "^4.1.0",
     "chai-http": "^3.0.0",
+    "coveralls": "^2.13.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-coveralls": "^0.1.4",
