@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import Sequelize from 'sequelize';
-import config from '../config/config.json';
+import config from '../../server/config/config.json';
+
+require('dotenv').config();
 
 const basename = path.basename(module.filename);
 const env = process.env.NODE_ENV || 'development';
@@ -10,7 +12,7 @@ const db = {};
 let sequelize;
 const dbConfig = config[env];
 if (dbConfig.use_env_variable) {
-  sequelize = new Sequelize(process.env[dbConfig.use_env_variable]);
+  sequelize = new Sequelize(process.env[dbConfig.use_env_variable], { dialect: 'postgres' });
 } else {
   sequelize = new Sequelize(
     dbConfig.database,
