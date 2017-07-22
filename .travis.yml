@@ -1,13 +1,14 @@
 language: node_js
 node_js:
-  - "7"
+- '7'
 before_script:
-  - npm install -g gulp-cli
+- npm install -g gulp-cli
 after_script:
- - ./node_modules/.bin/gulp coveralls
+- "./node_modules/.bin/gulp coveralls"
 after_success:
-  - npm install -g codeclimate-test-reporter
-  - codeclimate-test-reporter < ./coverage/lcov.info
+- npm install -g codeclimate-test-reporter
+- codeclimate-test-reporter < ./coverage/lcov.info
+- cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
 env:
   global:
-    secure: dNoO3Vkh6g4IpO3jRODy1UKa1tr4wLtbAKWbWxGdRcnPcgvKlwCNlVD0T7YMQf8RTsGUoBPDE+kEO/0RXDyjf7VVnkqUOpfAy74fw7ZiOHdHJvfHMFUIoXdQYdYiwjSmyNScxrINngXt5fp8MGqeUCMmLAEqHnQT+qTcIjIfN2Oj+2XrDxH5XsJQLWbZDReANOpvVU/xgoOD01KdJP31H/UsH2xp1YVUdfkAWG8CpxmBmJhehrOAIN/pv2n87fKPugn24F64UAZrKYKKwt/T3PJ7Jyr0f3TXwl+jhZxvcIakxfhaMJfSZjHRBZ/AxnlbsIcfWZ+5nbbJ/ZpTJxgvChu0DVz5GYR2OfQoZxS32XnCPzsRaHSAvlGfkeDBBauSHuTE5LO87SIG8FhG2TUaCMFfwrhyrlCQ7/5JUWsBcxxIpoOWqkr9NKIU/CtXSEoat77u/2wQNTJf78PP1sFJfh2QdOgNRtbATET5JhLusSt5mgS/L8djpA87KLPITRM2wzEYK5nKek4rOli3Lbr3CEPhuhBuEjE9bGoTavQfyDCwIPY4ivGRLeuegYi3Fej0fttPKzg5zto2Yn5VAgoyvPZmg4c5WPeMtw/bVITeMZ//att+INoOZ3e+IfFKelxBDPfHWjfzOrLcg1205o8n0gGD9yTHNv1vBG8zPqptP9c=
+  - secure: XyRi4wHLXcjZdJ2vA+NKTAyZLvWxIu1OyjxDzhAM/fx2vQLVcFwV9s1d6H+J8JBokL/0//5UsCjzyjbeoZbxn/rLlCdAG4EeS7o4Ua4WFlssFUTaLvsuJQ0nF/RlOM7ztEkSroM5521jdnxqmli6GPBZexcqJCAIK+3GT0CxcP2w03ziQYsMa0F6qoEidzEVNYduK7a43yrlV2Ik56OEOPEYq/PBFl7pfwUR0w7iykn1Diy66HxYRqYGXko/ePE4p0J4bLzkE/wKqN6FtXcsRoGEG3x7S+uBvmPHBBd/WpMDTr9czMUL4a5CDReev+oJLzJyOvnl1qVU0XOOnkLB8GCYG4nPYxv7zvOs/Zktu4Hdh971oWvxxXozzjNz5dmQOSyM/Fp8Knjhzk80dbd/ytTnGThQuzmXVtO+VJm+snFw8HVIf2ZG0cQoUa6bh6PuBf9Njnzit410k0sdkwsXsdiO7DbACiF4deQ89kAGaYR6X6xpCuSciEbK4f0GrTAYIqatsNFcWTgA9eL5vYEPIcoHtILsZcaNfEeeKnk0qmDk6nO1BHZDAw2xlrKWzionNNJ2Skgi+1cGHE12CnX+ovJ8+P8Mr9ipxch355rWaSKh7uZBMFFJ4sn8reZVrpnMtzw4QVthZKkIJ6IoZ4wTWMi334wsNTgE2+hr2RsUq84=

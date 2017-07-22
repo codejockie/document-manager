@@ -10,9 +10,9 @@ const Role = require('../../build/models/index').Role;
 const request = supertest.agent(app);
 chai.use(chaiHttp);
 
-const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJrZW5uZWR5Lm53YW9yZ3VAYW5kZWxhLmNvbSIsInVzZXJuYW1lIjoiY29kZWpvY2tpZSIsImlhdCI6MTUwMDY2MTAwMywiZXhwIjoxNTAwOTIwMjAzfQ.8x36eu9hgEGkrWCYcH2ImA2z7N7OXtzOazVRM0GlaEA';
+const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJrZW5uZWR5Lm53YW9yZ3VAYW5kZWxhLmNvbSIsInVzZXJuYW1lIjoiY29kZWpvY2tpZSIsImlhdCI6MTUwMDcyODYxMCwiZXhwIjoxNTMyMjY0NjEwfQ.mn1ns_DZzP7vZKYR7_0EWm-8-HF_jk59jCQCmI0V6WY';
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJkZXZqY2tlbm5lZHlAZ21haWwuY29tIiwidXNlcm5hbWUiOiJhY2VkY29kZXIiLCJpYXQiOjE1MDA2MzI4OTYsImV4cCI6MTUwMDcxOTI5Nn0.Erx2eK5pyJ8Ct5HlRULOcRfoGSLGim-PrEmxk537Tmw';
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJkZXZqY2tlbm5lZHlAZ21haWwuY29tIiwidXNlcm5hbWUiOiJhY2VkY29kZXIiLCJpYXQiOjE1MDA3MjgyNDYsImV4cCI6MTUzMjI2NDI0Nn0.1_F20AvUfDV-HM-dZR-Qo28eozSqN_hEUDGZ_gvTHMs';
 
 describe('Documents endpoints', () => {
   beforeEach((done) => {
