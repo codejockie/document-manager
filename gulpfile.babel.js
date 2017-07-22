@@ -7,11 +7,7 @@ import injectModules from 'gulp-inject-modules';
 import exit from 'gulp-exit';
 import coveralls from 'gulp-coveralls';
 
-if (process.env.NODE_ENV === 'CONTINUOUS_INTEGRATION') {
-  process.env.NODE_ENV = 'test';
-} else {
-  process.env.NODE_ENV = 'devtest';
-}
+process.env.NODE_ENV = 'test';
 
 const jasmineNodeOpts = {
   timeout: 90000,
