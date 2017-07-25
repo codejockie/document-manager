@@ -1,5 +1,5 @@
 import express from 'express';
-import { isEqual } from '../helpers/helper';
+import { isAdmin, isUser } from '../helpers/helper';
 import { validateDocument } from '../helpers/middleware';
 
 const router = express.Router();
@@ -96,7 +96,7 @@ router.get('/:id', (req, res) => {
 
       // Checks if the document owner's ID is
       // equal to the logged in user's ID
-      if (!isEqual(document.userId, req.user.id)) {
+      if (!isUser(document.userId, req.user.id)) {
         return res.status(401).send({
           status: 'error',
           message: 'Unauthorised user. You don\'t have permission to access this document'
@@ -125,7 +125,7 @@ router.put('/:id', (req, res) => {
         });
       }
 
-      if (!isEqual(document.userId, req.user.id)) {
+      if (!isAdmin(req.user.id) && !isUser(document.userId, req.user.id)) {
         return res.status(401).send({
           status: 'error',
           message: 'Unauthorised user. You don\'t have permission to update this document'
@@ -186,7 +186,7 @@ router.delete('/:id', (req, res) => {
         });
       }
 
-      if (!isEqual(document.userId, req.user.id)) {
+      if (!isAdmin(req.user.id) && !isUser(document.userId, req.user.id)) {
         return res.status(401).send({
           status: 'error',
           message: 'Unauthorised user. You don\'t have permission to delete this document'
