@@ -23,13 +23,13 @@
 - **[<code>GET</code> documents/:id]()** - Get a document
 - **[<code>POST</code> documents]()** - Create a document
 - **[<code>PUT</code> documents/:id]()** - Update a document
-- **[<code>DELETE</code> documents/:id/]()** - Delete a document
+- **[<code>DELETE</code> documents/:id]()** - Delete a document
 
 #### User Resources
 
 - **[<code>GET</code> users]()** - Get all users
 - **[<code>GET</code> users/:id]()** - Get a user
-- **[<code>GET</code> users/:id/documents]()** - Get user's document
+- **[<code>GET</code> users/:id/documents]()** - Get user's documents
 - **[<code>POST</code> users]()** - Create a user
 - **[<code>POST</code> users/login]()** - Authenticate a user
 - **[<code>PUT</code> users/:id]()** - Update a user

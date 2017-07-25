@@ -45,7 +45,7 @@ export function findByToken(token) {
     decoded = jwt.verify(token, process.env.SECRET);
     return User.findOne({
       where: {
-        $and: [{
+        $or: [{
           id: decoded.id
         }, {
           email: decoded.email
