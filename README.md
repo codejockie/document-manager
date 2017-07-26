@@ -1,12 +1,11 @@
 [![npm](https://img.shields.io/npm/l/express.svg)](https://github.com/codejockie/document-manager)
 [![Build Status](https://travis-ci.org/codejockie/document-manager.svg?branch=master)](https://travis-ci.org/codejockie/document-manager)
 [![Code Climate](https://codeclimate.com/github/codejockie/document-manager/badges/gpa.svg)](https://codeclimate.com/github/codejockie/document-manager)
-[![Test Coverage](https://codeclimate.com/github/codejockie/document-manager/badges/coverage.svg)](https://codeclimate.com/github/codejockie/document-manager/coverage)
 [![Coverage Status](https://coveralls.io/repos/github/codejockie/document-manager/badge.svg?branch=master)](https://coveralls.io/github/codejockie/document-manager?branch=master)
 
 
 ## Introduction
-+  **`Document Manager`** is a RESTful API.
++  **`CJDocs`** is a document manager system that exposes endpoints using RESTful API.
 +  It has the following features:
    +  Login
    +  Signup
@@ -15,30 +14,7 @@
    +  Create documents
    +  Delete documents, users
    +  Update documents, users
-
-## Endpoints
-#### Document Resources
-
-- **[<code>GET</code> documents]()** - Get all documents
-- **[<code>GET</code> documents/:id]()** - Get a document
-- **[<code>POST</code> documents]()** - Create a document
-- **[<code>PUT</code> documents/:id]()** - Update a document
-- **[<code>DELETE</code> documents/:id]()** - Delete a document
-
-#### User Resources
-
-- **[<code>GET</code> users]()** - Get all users
-- **[<code>GET</code> users/:id]()** - Get a user
-- **[<code>GET</code> users/:id/documents]()** - Get user's documents
-- **[<code>POST</code> users]()** - Create a user
-- **[<code>POST</code> users/login]()** - Authenticate a user
-- **[<code>PUT</code> users/:id]()** - Update a user
-- **[<code>DELETE</code> users/:id]()** - Delete a user
-
-#### Search Resources
-
-- **[<code>GET</code> search/users]()** - Search for users
-- **[<code>GET</code> search/documents]()** - Search for documents
++ The API Documentation can be found at [here](http://cjdocs.herokuapp.com)
    
 ## Project Dependencies
 ### Dependencies
@@ -58,7 +34,6 @@
 
 ### Development Dependencies
 +  **[chai](https://www.npmjs.com/package/chai)** - Chai is a BDD / TDD assertion library for node and the browser that can be delightfully paired with any javascript testing framework.
-+  **[chai-http](https://www.npmjs.com/package/chai-http)** - 
 +  **[coveralls](https://www.npmjs.com/package/coveralls)** - Coveralls.io support for node.js. Get the great coverage reporting of coveralls.io and add a cool coverage button to your README.
 +  **[gulp](https://www.npmjs.com/package/gulp)** - gulp is a toolkit that helps you automate painful or time-consuming tasks in your development workflow.
 +  **[gulp-babel](https://www.npmjs.com/package/gulp-babel)** - Use next generation JavaScript, today, with Babel
