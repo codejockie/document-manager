@@ -1,4 +1,6 @@
 import express from 'express';
+import { formatDate } from '../helpers/helper';
+
 
 const router = express.Router();
 
@@ -87,7 +89,17 @@ router.get('/documents', (req, res) => {
       return res.status(200).send({
         status: 'ok',
         count: documents.length,
-        data: documents
+        data: documents.map(document => ({
+          id: document.id,
+          title: document.title,
+          content: document.content,
+          author: document.author,
+          access: document.access,
+          userId: document.userId,
+          roleId: document.roleId,
+          createdAt: formatDate(document.createdAt),
+          updatedAt: formatDate(document.updatedAt)
+        }))
       });
     })
     .catch(error => res.status(400).send({
