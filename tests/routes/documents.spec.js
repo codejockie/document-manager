@@ -1,5 +1,4 @@
-import chai, { expect } from 'chai';
-import chaiHttp from 'chai-http';
+import { expect } from 'chai';
 import supertest from 'supertest';
 import app from '../../build/server';
 
@@ -8,10 +7,8 @@ const User = require('../../build/models/index').User;
 const Role = require('../../build/models/index').Role;
 
 const request = supertest.agent(app);
-chai.use(chaiHttp);
 
 const authToken = process.env.AUTH_TOKEN;
-
 const token = process.env.TOKEN;
 
 describe('Documents endpoints', () => {

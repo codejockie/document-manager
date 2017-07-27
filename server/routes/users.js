@@ -1,6 +1,6 @@
 import express from 'express';
 import _ from 'lodash';
-import { hashPassword, isAdmin, isUser } from '../helpers/helper';
+import { formatDate, hashPassword, isAdmin, isUser } from '../helpers/helper';
 import { findByCredentials, generateAuthToken } from '../helpers/jwt';
 import { authenticate, validateUser } from '../helpers/middleware';
 
@@ -114,7 +114,7 @@ router.get('/', authenticate, (req, res) => {
             lastname: user.lastname,
             email: user.email,
             username: user.username,
-            created_at: user.createdAt
+            created_at: formatDate(user.createdAt)
           }))
       });
     })
@@ -144,7 +144,7 @@ router.get('/:id', authenticate, (req, res) => {
         lastname: user.lastname,
         email: user.email,
         username: user.username,
-        created_at: user.createdAt
+        created_at: formatDate(user.createdAt)
       });
     })
     .catch(error => res.status(400).send(error));
@@ -204,7 +204,7 @@ router.put('/:id', authenticate, (req, res) => {
         });
       }
 
-      if (!isAdmin(req.user.id) && !isUser(user.id, req.user.id)) {
+      if (!isUser(user.id, req.user.id) && !isAdmin(req.user.roleId)) {
         return res.status(401).send({
           status: 'error',
           message: 'Unauthorised user. You don\'t have permission to update this user'
@@ -240,7 +240,7 @@ router.put('/:id', authenticate, (req, res) => {
             firstname: req.body.firstname || user.firstname,
             lastname: req.body.lastname || user.lastname,
             password: password || user.password,
-            roleId: user.roleId
+            roleId: isAdmin(req.user.roleId) ? req.body.roleId : user.roleId
           })
             .then(() => res.status(200).send({
               id: user.id,
@@ -248,7 +248,7 @@ router.put('/:id', authenticate, (req, res) => {
               lastname: user.lastname,
               email: user.email,
               username: user.username,
-              created_at: user.createdAt,
+              created_at: formatDate(user.createdAt),
               role_id: user.roleId
             }))
             .catch(error => res.status(400).send(error));
@@ -274,7 +274,7 @@ router.delete('/:id', authenticate, (req, res) => {
         });
       }
 
-      if (!isAdmin(req.user.id) && !isUser(user.id, req.user.id)) {
+      if (!isAdmin(req.user.roleId) && !isUser(user.id, req.user.id)) {
         return res.status(401).send({
           status: 'error',
           message: 'Unauthorised user. You don\'t have permission to delete this user'

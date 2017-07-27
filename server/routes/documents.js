@@ -1,5 +1,5 @@
 import express from 'express';
-import { isAdmin, isUser } from '../helpers/helper';
+import { formatDate, isAdmin, isUser } from '../helpers/helper';
 import { validateDocument } from '../helpers/middleware';
 
 const router = express.Router();
@@ -31,18 +31,26 @@ router.post('/', validateDocument, (req, res) => {
         .then(newDoc => res.status(201).send({
           status: 'ok',
           message: 'Document created successfully',
-          data: newDoc
+          data: {
+            id: newDoc.id,
+            title: newDoc.title,
+            content: newDoc.content,
+            access: newDoc.access,
+            userId: newDoc.userId,
+            roleId: newDoc.roleId,
+            createdAt: formatDate(newDoc.createdAt),
+          }
         }))
         .catch(error => res.status(400).send(error));
     });
 });
 
 router.get('/', (req, res) => {
-  let options;
+  let limit, offset;
   if ((req.query.limit !== undefined && req.query.limit !== '')
     && (req.query.offset !== undefined && req.query.offset !== '')) {
-    const limit = parseInt(req.query.limit, 10);
-    const offset = parseInt(req.query.offset, 10);
+    limit = parseInt(req.query.limit, 10);
+    offset = parseInt(req.query.offset, 10);
 
     if (isNaN(limit) || isNaN(offset)) {
       return res.status(400).send({
@@ -50,16 +58,13 @@ router.get('/', (req, res) => {
         message: 'Limit and Offset params must be numbers'
       });
     }
-
-    options = {
-      offset,
-      limit,
-    };
-  } else {
-    options = {};
   }
 
-  Document.findAll(options)
+  Document.findAll({
+    where: { userId: req.user.id },
+    limit,
+    offset
+  })
     .then((documents) => {
       if (documents.length === 0) {
         return res.status(404).send({
@@ -71,7 +76,16 @@ router.get('/', (req, res) => {
       return res.status(200).send({
         status: 'ok',
         count: documents.length,
-        data: documents
+        data: documents.map(document => ({
+          id: document.id,
+          title: document.title,
+          content: document.content,
+          access: document.access,
+          userId: document.userId,
+          roleId: document.roleId,
+          createdAt: formatDate(document.createdAt),
+          updatedAt: formatDate(document.updatedAt),
+        }))
       });
     })
     .catch(error => res.status(400).send(error));
@@ -103,7 +117,16 @@ router.get('/:id', (req, res) => {
         });
       }
 
-      return res.status(200).send(document);
+      return res.status(200).send({
+        id: document.id,
+        title: document.title,
+        content: document.content,
+        access: document.access,
+        userId: document.userId,
+        roleId: document.roleId,
+        createdAt: formatDate(document.createdAt),
+        updatedAt: formatDate(document.updatedAt),
+      });
     })
     .catch(error => res.status(400).send(error));
 });
@@ -160,7 +183,16 @@ router.put('/:id', (req, res) => {
             .then(() => res.status(201).send({
               status: 'ok',
               message: 'Document updated successfully',
-              data: document
+              data: {
+                id: document.id,
+                title: document.title,
+                content: document.content,
+                access: document.access,
+                userId: document.userId,
+                roleId: document.roleId,
+                createdAt: formatDate(document.createdAt),
+                updatedAt: formatDate(document.updatedAt),
+              }
             }))
             .catch(error => res.status(400).send(error));
         })
