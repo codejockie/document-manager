@@ -1,17 +1,18 @@
 {
   "name": "document-manager",
   "version": "1.0.0",
-  "description": "A document management system",
+  "description": "A RESTful API based document management system",
   "main": "server/server.js",
   "scripts": {
-    "start": "babel-node -- server/server.js",
-    "test": "gulp dev && gulp coverage",
+    "postinstall": "gulp build",
+    "start": "node build/server.js",
+    "test": "gulp build && gulp test",
     "dev": "nodemon -w server --exec babel-node -- server/server.js",
     "devtest": "NODE_ENV=devtest mocha --timeout 90000 --compilers js:babel-register -- ./tests/**/*.spec.js",
     "devmigrate": "sequelize db:migrate && npm run seed",
     "localmigrate": "NODE_ENV=devtest sequelize db:migrate",
     "testmigrate": "NODE_ENV=test sequelize db:migrate",
-    "undo": "sequelize db:migrate:undo",
+    "undo": "sequelize db:migrate:undo:all",
     "seed": "sequelize db:seed:all"
   },
   "repository": {

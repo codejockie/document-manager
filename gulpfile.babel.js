@@ -8,36 +8,23 @@ import exit from 'gulp-exit';
 
 process.env.NODE_ENV = 'test';
 
-const jasmineNodeOpts = {
-  timeout: 90000,
-  includeStackTrace: false,
-  color: true
-};
-
-gulp.task('nodemon', () => {
+gulp.task('watch', () => {
   nodemon({
     script: 'build/server.js',
     ext: 'js',
-    ignore: ['README.md', 'node_modules/**', '.DS_Store'],
+    ignore: ['README.md', 'node_modules/**', '.DS_Store', 'LICENSE', '.*.yml'],
     watch: ['server']
   });
 });
 
-gulp.task('dev', () => gulp.src('server/**/*.js')
+gulp.task('build', () => gulp.src('server/**/*.js')
   .pipe(babel({
     presets: ['es2015', 'stage-0']
   }))
   .pipe(gulp.dest('build')));
 
-gulp.task('test', () => {
-  gulp.src('./tests/**/*.js')
-    .pipe(babel())
-    .pipe(jasmineNode(jasmineNodeOpts))
-    .pipe(exit());
-});
-
-gulp.task('coverage', (cb) => {
-  gulp.src('build/routes/*.js')
+gulp.task('test', (done) => {
+  gulp.src(['build/routes/*.js'])
     .pipe(istanbul())
     .pipe(istanbul.hookRequire())
     .on('finish', () => {
@@ -46,12 +33,12 @@ gulp.task('coverage', (cb) => {
         .pipe(injectModules())
         .pipe(jasmineNode())
         .pipe(istanbul.writeReports())
-        .pipe(istanbul.enforceThresholds({ thresholds: { global: 30 } }))
-        .on('end', cb)
+        .pipe(istanbul.enforceThresholds({ thresholds: { global: 90 } }))
+        .on('end', done)
         .pipe(exit());
     });
 });
 
-gulp.task('default', ['dev', 'nodemon'], () => {
-  gulp.watch('server/**/*.js', ['dev']);
+gulp.task('default', ['build', 'watch'], () => {
+  gulp.watch('server/**/*.js', ['build']);
 });
