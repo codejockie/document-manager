@@ -17,13 +17,9 @@
     "logging": false
   },
   "test": {
-    "use_env_variable": "DATABASE_URL",
-    "dialect": "postgres",
-    "logging": false
+    "use_env_variable": "DATABASE_URL"
   },
   "production": {
-    "use_env_variable": "DATABASE_URL",
-    "dialect": "postgres",
-    "logging": false
+    "use_env_variable": "DATABASE_URL"
   }
 }

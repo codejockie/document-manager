@@ -156,6 +156,20 @@ describe('Users endpoints', () => {
           done();
         });
     });
+
+    it('should return 401 status for non admins', (done) => {
+      request
+        .get('/v1/users')
+        .set('Accept', 'application/json')
+        .set('X-Auth', token)
+        .end((err, res) => {
+          if (!err) {
+            expect(res.status).to.equal(401);
+            expect(res.body.message).to.equal('This page is restricted to administrators only');
+          }
+          done();
+        });
+    });
   });
 
   // POST /v1/users route
@@ -228,7 +242,7 @@ describe('Users endpoints', () => {
         });
     });
 
-    it('POSTs a valid user data', (done) => {
+    it('should post a valid user data', (done) => {
       const user = {
         username: 'acedcoder',
         firstname: 'Kennedy',
@@ -247,6 +261,29 @@ describe('Users endpoints', () => {
             expect(res.body).to.have.property('message');
             expect(res.body).to.have.property('token');
             expect(res.body.message).to.equal('Registration was successful');
+          }
+          done();
+        });
+    });
+
+    it('given a non-existing role id, it should return a 400 status', (done) => {
+      const user = {
+        username: 'acedcoder',
+        firstname: 'Kennedy',
+        lastname: 'John',
+        password: hashPassword('test'),
+        email: 'devjckennedy@gmail.com',
+        roleId: 10
+      };
+
+      request
+        .post('/v1/users')
+        .send(user)
+        .end((err, res) => {
+          if (!err) {
+            expect(res.status).to.equal(400);
+            expect(res.body.message).to.equal('Registration failed');
+            expect(res.body.error.name).to.equal('SequelizeForeignKeyConstraintError');
           }
           done();
         });
@@ -273,6 +310,40 @@ describe('Users endpoints', () => {
       }]).then(() => {
         done();
       });
+    });
+
+    it('should validate login details', (done) => {
+      request
+        .post('/v1/users/login')
+        .send({
+          email: 'codejockie@',
+          password: ''
+        })
+        .end((err, res) => {
+          if (!err) {
+            expect(res.status).to.equal(400);
+            expect(isEmpty(res.body.errors)).to.equal(false);
+            expect(res.body.errors.email).to.equal('Email must be valid');
+            expect(res.body.errors.password).to.equal('Password is required');
+          }
+          done();
+        });
+    });
+
+    it('given non-existing account details, it returns a 404 status', (done) => {
+      request
+        .post('/v1/users/login')
+        .send({
+          email: 'codejockie@codes.com',
+          password: process.env.PASSWORD
+        })
+        .end((err, res) => {
+          if (!err) {
+            expect(res.status).to.equal(404);
+            expect(res.body.message).to.equal('Username or Password incorrect');
+          }
+          done();
+        });
     });
 
     it('successfully authenticates a user', (done) => {
@@ -397,6 +468,19 @@ describe('Users endpoints', () => {
           done();
         });
     });
+
+    it('given an invalid id, it returns a 400 status', (done) => {
+      request
+        .get('/v1/users/101243578787677678575645456674644646')
+        .set('X-Auth', authToken)
+        .end((err, res) => {
+          if (!err) {
+            expect(res.status).to.equal(400);
+            expect(res.body.name).to.equal('SequelizeDatabaseError');
+          }
+          done();
+        });
+    });
   });
 
   // GET /v1/users/:id/documents
@@ -477,7 +561,19 @@ describe('Users endpoints', () => {
         .end((err, res) => {
           if (!err) {
             expect(res.status).to.equal(200);
-            // expect(res.body.message).to.equal('No document found for this user');
+          }
+          done();
+        });
+    });
+
+    it('given an invalid id, it returns a 400 status', (done) => {
+      request
+        .get('/v1/users/101243578787677678575645456674644646/documents')
+        .set('X-Auth', authToken)
+        .end((err, res) => {
+          if (!err) {
+            expect(res.status).to.equal(400);
+            expect(res.body.name).to.equal('SequelizeDatabaseError');
           }
           done();
         });
@@ -529,6 +625,18 @@ describe('Users endpoints', () => {
     });
 
     it('returns a 401 status for unauthorised user', (done) => {
+      User.create({
+        username: 'acedcoder',
+        firstname: 'Kennedy',
+        lastname: 'John',
+        password: hashPassword('test'),
+        email: 'devjckennedy@gmail.com',
+        roleId: 2
+      })
+        .then(() => {
+          //
+        });
+
       request
         .put('/v1/users/1')
         .set('X-Auth', token)
@@ -539,8 +647,8 @@ describe('Users endpoints', () => {
         .end((err, res) => {
           if (!err) {
             expect(res.status).to.equal(401);
-            // expect(res.body.message).to
-            //   .equal('Unauthorised user. You don\'t have permission to update this user');
+            expect(res.body.message).to
+              .equal('Unauthorised user. You don\'t have permission to update this user');
           }
           done();
         });
@@ -597,6 +705,19 @@ describe('Users endpoints', () => {
           done();
         });
     });
+
+    it('given an invalid id, it returns a 400 status', (done) => {
+      request
+        .put('/v1/users/101243578787677678575645456674644646')
+        .set('X-Auth', authToken)
+        .end((err, res) => {
+          if (!err) {
+            expect(res.status).to.equal(400);
+            expect(res.body.name).to.equal('SequelizeDatabaseError');
+          }
+          done();
+        });
+    });
   });
 
   // DELETE /v1/users/:id route
@@ -644,14 +765,26 @@ describe('Users endpoints', () => {
     });
 
     it('returns a 401 status for unauthorised user', (done) => {
+      User.create({
+        username: 'acedcoder',
+        firstname: 'Kennedy',
+        lastname: 'John',
+        password: hashPassword('test'),
+        email: 'devjckennedy@gmail.com',
+        roleId: 2
+      })
+        .then(() => {
+          //
+        });
+
       request
-        .put('/v1/users/1')
+        .delete('/v1/users/1')
         .set('X-Auth', token)
         .end((err, res) => {
           if (!err) {
             expect(res.status).to.equal(401);
-            // expect(res.body.message).to
-            //   .equal('Unauthorised user. You don\'t have permission to update this user');
+            expect(res.body.message).to
+              .equal('Unauthorised user. You don\'t have permission to delete this user');
           }
           done();
         });
@@ -665,6 +798,32 @@ describe('Users endpoints', () => {
           if (!err) {
             expect(res.status).to.equal(200);
             expect(res.body.message).to.equal('User deleted successfully');
+          }
+          done();
+        });
+    });
+
+    it('given a non-existing user id, it returns a 404 status', (done) => {
+      request
+        .delete('/v1/users/10')
+        .set('X-Auth', authToken)
+        .end((err, res) => {
+          if (!err) {
+            expect(res.status).to.equal(404);
+            expect(res.body.message).to.equal('User not found');
+          }
+          done();
+        });
+    });
+
+    it('given an invalid id, it returns a 400 status', (done) => {
+      request
+        .delete('/v1/users/101243578787677678575645456674644646')
+        .set('X-Auth', authToken)
+        .end((err, res) => {
+          if (!err) {
+            expect(res.status).to.equal(400);
+            expect(res.body.name).to.equal('SequelizeDatabaseError');
           }
           done();
         });

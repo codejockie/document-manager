@@ -264,6 +264,34 @@ describe('Documents endpoints', () => {
           done();
         });
     });
+
+    it('given an invalid access type, it should return a 400 status', (done) => {
+      const document = {
+        title: 'Complete data',
+        content: 'Running Tests',
+        author: 'John Kennedy',
+        access: 'invalid',
+        userId: 1,
+        roleId: 1
+      };
+
+      Document.create(document).then(() => {
+        //
+      })
+        .catch(() => {
+          request
+            .post('/v1/documents')
+            .set('X-Auth', authToken)
+            .send(document)
+            .end((err, res) => {
+              if (!err) {
+                expect(res.status).to.equal(400);
+                expect(res.body.name).to.equal('SequelizeDatabaseError');
+              }
+              done();
+            });
+        });
+    });
   });
 
   // GET /v1/documents/:id route
@@ -368,10 +396,23 @@ describe('Documents endpoints', () => {
           done();
         });
     });
+
+    it('given an invalid id, it returns a 400 status', (done) => {
+      request
+        .get('/v1/documents/101243578787677678575645456674644646')
+        .set('X-Auth', authToken)
+        .end((err, res) => {
+          if (!err) {
+            expect(res.status).to.equal(400);
+            expect(res.body.name).to.equal('SequelizeDatabaseError');
+          }
+          done();
+        });
+    });
   });
 
   // PUT /v1/documents/:id route
-  describe('PUT /v1/users/:id', () => {
+  describe('PUT /v1/documents/:id', () => {
     beforeEach((done) => {
       User.bulkCreate([{
         username: process.env.USERNAME,
@@ -515,6 +556,60 @@ describe('Documents endpoints', () => {
             });
         });
     });
+
+    it('should throw an error with an invalid access type', (done) => {
+      const document = {
+        title: 'Complete data',
+        content: 'Running Tests',
+        author: 'John Kennedy',
+        access: 'private',
+        userId: 1,
+        roleId: 1
+      };
+
+      Document.create(document).then(() => {
+        request
+          .put('/v1/documents/1')
+          .set('X-Auth', authToken)
+          .send({
+            access: 'invalid',
+          })
+          .end((err, res) => {
+            if (!err) {
+              expect(res.status).to.equal(400);
+              expect(res.body.name).to.equal('SequelizeDatabaseError');
+            }
+            done();
+          });
+      });
+    });
+
+    it('given an invalid id, it returns a 400 status', (done) => {
+      const document = {
+        title: 'Complete data',
+        content: 'Running Tests',
+        author: 'John Kennedy',
+        access: 'private',
+        userId: 1,
+        roleId: 1
+      };
+
+      Document.create(document).then(() => {
+        request
+          .put('/v1/documents/101243578787677678575645456674644646')
+          .set('X-Auth', authToken)
+          .send({
+            access: 'public',
+          })
+          .end((err, res) => {
+            if (!err) {
+              expect(res.status).to.equal(400);
+              expect(res.body.name).to.equal('SequelizeDatabaseError');
+            }
+            done();
+          });
+      });
+    });
   });
 
   // DELETE /v1/documents/:id route
@@ -566,7 +661,7 @@ describe('Documents endpoints', () => {
         });
     });
 
-    it('should throw error for unauthorised user', (done) => {
+    it('returns a 401 status for unauthorised user', (done) => {
       Document.create({
         title: 'Hey DELETE',
         content: 'Running Tests',
@@ -610,6 +705,29 @@ describe('Documents endpoints', () => {
                 expect(res.status).to.equal(200);
                 expect(res.body.message).to
                   .equal('Document deleted successfully');
+              }
+              done();
+            });
+        });
+    });
+
+    it('given an invalid id, it returns a 400 status', (done) => {
+      Document.create({
+        title: 'Hey DELETE',
+        content: 'Running Tests',
+        author: 'John Kennedy',
+        userId: 1,
+        roleId: 1,
+        access: 'public',
+      })
+        .then(() => {
+          request
+            .delete('/v1/documents/101243578787677678575645456674644646')
+            .set('X-Auth', authToken)
+            .end((err, res) => {
+              if (!err) {
+                expect(res.status).to.equal(400);
+                expect(res.body.name).to.equal('SequelizeDatabaseError');
               }
               done();
             });

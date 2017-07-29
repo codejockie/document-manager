@@ -59,6 +59,31 @@ export function validateDocument(req, res, next) {
 }
 
 /**
+ * @description validates login fields
+ * @function
+ * @param {Object} req
+ * @param {Object} res
+ * @param {callback} next
+ * @returns {json} json response containing the errors if any
+ */
+export function validateLogin(req, res, next) {
+  req.checkBody('email', 'Email must be valid').isEmail();
+  req.checkBody('email', 'Email is required').notEmpty();
+  req.checkBody('password', 'Password is required').notEmpty();
+
+  const errors = req.validationErrors();
+  if (errors) {
+    const response = { errors: {} };
+    errors.forEach((error) => {
+      response.errors[error.param] = error.msg;
+    });
+
+    return res.status(400).json(response);
+  }
+  next();
+}
+
+/**
  * @description validates input param in the url
  * @function
  * @param {Object} req

@@ -3,7 +3,6 @@ import { formatDate, isAdmin, isUser } from '../helpers/helper';
 import { validateDocument } from '../helpers/middleware';
 
 const router = express.Router();
-
 const Document = require('../models').Document;
 
 router.post('/', validateDocument, (req, res) => {
@@ -36,9 +35,9 @@ router.post('/', validateDocument, (req, res) => {
             title: newDoc.title,
             content: newDoc.content,
             access: newDoc.access,
-            userId: newDoc.userId,
-            roleId: newDoc.roleId,
-            createdAt: formatDate(newDoc.createdAt),
+            user_id: newDoc.userId,
+            role_id: newDoc.roleId,
+            created_at: formatDate(newDoc.createdAt),
           }
         }))
         .catch(error => res.status(400).send(error));
@@ -81,14 +80,13 @@ router.get('/', (req, res) => {
           title: document.title,
           content: document.content,
           access: document.access,
-          userId: document.userId,
-          roleId: document.roleId,
-          createdAt: formatDate(document.createdAt),
-          updatedAt: formatDate(document.updatedAt),
+          user_id: document.userId,
+          role_id: document.roleId,
+          created_at: formatDate(document.createdAt),
+          updated_at: formatDate(document.updatedAt),
         }))
       });
-    })
-    .catch(error => res.status(400).send(error));
+    });
 });
 
 router.get('/:id', (req, res) => {
@@ -122,10 +120,10 @@ router.get('/:id', (req, res) => {
         title: document.title,
         content: document.content,
         access: document.access,
-        userId: document.userId,
-        roleId: document.roleId,
-        createdAt: formatDate(document.createdAt),
-        updatedAt: formatDate(document.updatedAt),
+        user_id: document.userId,
+        role_id: document.roleId,
+        created_at: formatDate(document.createdAt),
+        updated_at: formatDate(document.updatedAt),
       });
     })
     .catch(error => res.status(400).send(error));
@@ -188,15 +186,14 @@ router.put('/:id', (req, res) => {
                 title: document.title,
                 content: document.content,
                 access: document.access,
-                userId: document.userId,
-                roleId: document.roleId,
-                createdAt: formatDate(document.createdAt),
-                updatedAt: formatDate(document.updatedAt),
+                user_id: document.userId,
+                role_id: document.roleId,
+                created_at: formatDate(document.createdAt),
+                updated_at: formatDate(document.updatedAt),
               }
             }))
             .catch(error => res.status(400).send(error));
-        })
-        .catch(error => res.send(error));
+        });
     })
     .catch(error => res.status(400).send(error));
 });
@@ -229,8 +226,7 @@ router.delete('/:id', (req, res) => {
         .then(() => res.status(200).send({
           status: 'ok',
           message: 'Document deleted successfully'
-        }))
-        .catch(error => res.status(400).send(error));
+        }));
     })
     .catch(error => res.status(400).send(error));
 });
