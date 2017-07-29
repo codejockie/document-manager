@@ -2,13 +2,13 @@ import express from 'express';
 import _ from 'lodash';
 import { formatDate, hashPassword, isAdmin, isUser } from '../helpers/helper';
 import { findByCredentials, generateAuthToken } from '../helpers/jwt';
-import { authenticate, validateUser } from '../helpers/middleware';
+import { authenticate, validateLogin, validateUser } from '../helpers/middleware';
 
 const router = express.Router();
 const User = require('../models/index').User;
 const Document = require('../models/index').Document;
 
-router.post('/login', (req, res) => {
+router.post('/login', validateLogin, (req, res) => {
   const body = _.pick(req.body, ['email', 'password']);
 
   findByCredentials(body.email, body.password)
@@ -27,7 +27,10 @@ router.post('/login', (req, res) => {
         token
       });
     })
-    .catch(error => res.status(404).send(error));
+    .catch(() => res.status(404).send({
+      status: 'error',
+      message: 'Username or Password incorrect'
+    }));
 });
 
 router.post('/logout', (req, res) => {
@@ -69,7 +72,7 @@ router.post('/', validateUser, (req, res) => {
       })
       .catch(error => res.status(400).json({
         status: 'error',
-        message: 'Unable to save',
+        message: 'Registration failed',
         error
       }));
   });
@@ -96,29 +99,28 @@ router.get('/', authenticate, (req, res) => {
     options = {};
   }
 
+  if (!isAdmin(req.user.id)) {
+    return res.status(401).send({
+      status: 'error',
+      message: 'This page is restricted to administrators only'
+    });
+  }
+
+
   User.findAll(options)
-    .then((users) => {
-      if (users.length === 0) {
-        return res.status(200).send({
-          status: 'ok',
-          message: 'No users found'
-        });
-      }
-      return res.status(200).send({
-        status: 'ok',
-        count: users.length,
-        data: users.map(user => (
-          {
-            id: user.id,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            email: user.email,
-            username: user.username,
-            created_at: formatDate(user.createdAt)
-          }))
-      });
-    })
-    .catch(error => res.status(400).send(error));
+    .then(users => res.status(200).send({
+      status: 'ok',
+      count: users.length,
+      data: users.map(user => (
+        {
+          id: user.id,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          email: user.email,
+          username: user.username,
+          created_at: formatDate(user.createdAt)
+        }))
+    }));
 });
 
 router.get('/:id', authenticate, (req, res) => {
@@ -180,9 +182,20 @@ router.get('/:id/documents', (req, res) => {
               message: 'No document found for this user'
             });
           }
-          return res.status(200).json(documents);
-        })
-        .catch(error => res.status(400).send(error));
+          return res.status(200).json(documents.map(document => (
+            {
+              id: document.id,
+              title: document.title,
+              content: document.content,
+              author: document.author,
+              access: document.access,
+              userId: document.userId,
+              roleId: document.roleId,
+              created_at: formatDate(document.createdAt),
+              updated_at: formatDate(document.updatedAt)
+            }
+          )));
+        });
     })
     .catch(error => res.status(400).send(error));
 });
@@ -229,17 +242,12 @@ router.put('/:id', authenticate, (req, res) => {
             });
           }
 
-          let password;
-          if (req.body.password !== undefined && req.body.password !== '') {
-            password = hashPassword(req.body.password);
-          }
-
           return user.update({
             email: req.body.email || user.email,
             username: req.body.username || user.username,
             firstname: req.body.firstname || user.firstname,
             lastname: req.body.lastname || user.lastname,
-            password: password || user.password,
+            password: req.body.password ? hashPassword(req.body.password) : user.password,
             roleId: isAdmin(req.user.roleId) ? req.body.roleId : user.roleId
           })
             .then(() => res.status(200).send({
@@ -250,8 +258,7 @@ router.put('/:id', authenticate, (req, res) => {
               username: user.username,
               created_at: formatDate(user.createdAt),
               role_id: user.roleId
-            }))
-            .catch(error => res.status(400).send(error));
+            }));
         });
     })
     .catch(error => res.status(400).send(error));
@@ -285,8 +292,7 @@ router.delete('/:id', authenticate, (req, res) => {
         .then(() => res.status(200).json({
           status: 'ok',
           message: 'User deleted successfully'
-        }))
-        .catch(error => res.status(400).send(error));
+        }));
     })
     .catch(error => res.status(400).send(error));
 });

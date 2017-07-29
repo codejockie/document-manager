@@ -3,7 +3,6 @@ import { formatDate } from '../helpers/helper';
 
 
 const router = express.Router();
-
 const User = require('../models').User;
 const Document = require('../models').Document;
 
@@ -15,7 +14,7 @@ router.get('/users', (req, res) => {
     });
   }
 
-  const query = (req.query.q).toString();
+  const query = req.query.q.trim();
 
   User.findAll({
     where: {
@@ -47,11 +46,7 @@ router.get('/users', (req, res) => {
             username: user.username
           }))
       });
-    })
-    .catch(error => res.status(400).send({
-      status: 'error',
-      error
-    }));
+    });
 });
 
 router.get('/documents', (req, res) => {
@@ -62,7 +57,7 @@ router.get('/documents', (req, res) => {
     });
   }
 
-  const query = (req.query.q).toString();
+  const query = req.query.q.trim();
 
   Document.findAll({
     where: {
@@ -95,17 +90,13 @@ router.get('/documents', (req, res) => {
           content: document.content,
           author: document.author,
           access: document.access,
-          userId: document.userId,
-          roleId: document.roleId,
-          createdAt: formatDate(document.createdAt),
-          updatedAt: formatDate(document.updatedAt)
+          user_id: document.userId,
+          role_id: document.roleId,
+          created_at: formatDate(document.createdAt),
+          updated_at: formatDate(document.updatedAt)
         }))
       });
-    })
-    .catch(error => res.status(400).send({
-      status: 'error',
-      error
-    }));
+    });
 });
 
 export default router;
