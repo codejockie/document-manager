@@ -4,5 +4,6 @@ node_modules/
 .vscode/
 .env
 package-lock.json
-build/
+src/
+src/
 coverage/

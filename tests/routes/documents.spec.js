@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import supertest from 'supertest';
-import app from '../../build/server';
+import app from '../../src/server';
 
-const Document = require('../../build/models/index').Document;
-const User = require('../../build/models/index').User;
-const Role = require('../../build/models/index').Role;
+const Document = require('../../src/models/index').Document;
+const User = require('../../src/models/index').User;
+const Role = require('../../src/models/index').Role;
 
 const request = supertest.agent(app);
 
@@ -72,19 +72,6 @@ describe('Documents endpoints', () => {
       });
     });
 
-    it('should connect', (done) => {
-      request
-        .get('/v1/documents')
-        .set('Accept', 'application/json')
-        .set('X-Auth', authToken)
-        .end((err, res) => {
-          if (err) {
-            expect(res.status).to.equal(200);
-          }
-          done();
-        });
-    });
-
     it('retrieves all documents', (done) => {
       Document.create({
         title: 'Test GET',
@@ -106,7 +93,7 @@ describe('Documents endpoints', () => {
           if (!err) {
             expect(res.status).to.equal(200);
             expect(res.body).to.be.an('object');
-            expect(res.body.data).to.have.length.greaterThan(0);
+            expect(res.body.items).to.have.length.greaterThan(0);
           }
           done();
         });
@@ -160,8 +147,8 @@ describe('Documents endpoints', () => {
             expect(res.status).to.equal(200);
             expect(res.body.status).to.equal('ok');
             expect(res.body.count).to.equal(2);
-            expect(res.body.data).to.be.an('array');
-            expect(res.body.data[0].title).to.equal('Data 1');
+            expect(res.body.items).to.be.an('array');
+            expect(res.body.items[0].title).to.equal('Data 1');
           }
           done();
         });
@@ -517,7 +504,7 @@ describe('Documents endpoints', () => {
             .end((err, res) => {
               if (!err) {
                 expect(res.status).to.equal(201);
-                expect(res.body.data.content).to.equal('Tests Running');
+                expect(res.body.items.content).to.equal('Tests Running');
               }
               done();
             });

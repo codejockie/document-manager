@@ -30,7 +30,7 @@ router.post('/', validateDocument, (req, res) => {
         .then(newDoc => res.status(201).send({
           status: 'ok',
           message: 'Document created successfully',
-          data: {
+          items: {
             id: newDoc.id,
             title: newDoc.title,
             content: newDoc.content,
@@ -75,7 +75,7 @@ router.get('/', (req, res) => {
       return res.status(200).send({
         status: 'ok',
         count: documents.length,
-        data: documents.map(document => ({
+        items: documents.map(document => ({
           id: document.id,
           title: document.title,
           content: document.content,
@@ -181,7 +181,7 @@ router.put('/:id', (req, res) => {
             .then(() => res.status(201).send({
               status: 'ok',
               message: 'Document updated successfully',
-              data: {
+              items: {
                 id: document.id,
                 title: document.title,
                 content: document.content,

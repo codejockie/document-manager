@@ -1,37 +1,30 @@
 import gulp from 'gulp';
-import nodemon from 'gulp-nodemon';
 import babel from 'gulp-babel';
-import jasmineNode from 'gulp-jasmine-node';
-import istanbul from 'gulp-istanbul';
-import injectModules from 'gulp-inject-modules';
 import exit from 'gulp-exit';
+import injectModules from 'gulp-inject-modules';
+import istanbul from 'gulp-istanbul';
+import jasmine from 'gulp-jasmine';
+import nodemon from 'gulp-nodemon';
 
 process.env.NODE_ENV = 'test';
 
-gulp.task('watch', () => {
-  nodemon({
-    script: 'build/server.js',
-    ext: 'js',
-    ignore: ['README.md', 'node_modules/**', '.DS_Store', 'LICENSE', '.*.yml'],
-    watch: ['server']
-  });
-});
-
-gulp.task('build', () => gulp.src('server/**/*.js')
+gulp.task('compile', () => gulp.src('server/**/*.js')
   .pipe(babel({
     presets: ['es2015', 'stage-0']
   }))
-  .pipe(gulp.dest('build')));
+  .pipe(gulp.dest('src')));
 
-gulp.task('test', (done) => {
-  gulp.src(['build/routes/*.js'])
+gulp.task('test', ['compile'], (done) => {
+  gulp.src(['src/routes/*.js'])
     .pipe(istanbul())
     .pipe(istanbul.hookRequire())
     .on('finish', () => {
       gulp.src('./tests/**/*.js')
         .pipe(babel())
         .pipe(injectModules())
-        .pipe(jasmineNode())
+        .pipe(jasmine({
+          verbose: true
+        }))
         .pipe(istanbul.writeReports())
         .pipe(istanbul.enforceThresholds({ thresholds: { global: 90 } }))
         .on('end', done)
@@ -39,6 +32,13 @@ gulp.task('test', (done) => {
     });
 });
 
-gulp.task('default', ['build', 'watch'], () => {
-  gulp.watch('server/**/*.js', ['build']);
+gulp.task('watch', ['compile'], () => {
+  nodemon({
+    script: 'src/server.js',
+    ext: 'js',
+    env: { NODE_ENV: 'development' },
+    ignore: ['README.md', 'node_modules/**', '.DS_Store', 'LICENSE', '.*.yml'],
+    tasks: ['compile'],
+    watch: ['server']
+  });
 });

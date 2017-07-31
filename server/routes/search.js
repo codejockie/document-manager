@@ -33,14 +33,14 @@ router.get('/users', (req, res) => {
       if (users.length === 0) {
         return res.status(200).send({
           status: 'ok',
-          data: []
+          items: []
         });
       }
 
       return res.status(200).send({
         status: 'ok',
         count: users.length,
-        data: users.map(user => (
+        items: users.map(user => (
           {
             email: user.email,
             username: user.username
@@ -78,13 +78,13 @@ router.get('/documents', (req, res) => {
       if (documents.length === 0) {
         return res.status(200).send({
           status: 'ok',
-          data: []
+          items: []
         });
       }
       return res.status(200).send({
         status: 'ok',
         count: documents.length,
-        data: documents.map(document => ({
+        items: documents.map(document => ({
           id: document.id,
           title: document.title,
           content: document.content,
