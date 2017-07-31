@@ -111,7 +111,7 @@ router.get('/', authenticate, (req, res) => {
     .then(users => res.status(200).send({
       status: 'ok',
       count: users.length,
-      data: users.map(user => (
+      items: users.map(user => (
         {
           id: user.id,
           firstname: user.firstname,

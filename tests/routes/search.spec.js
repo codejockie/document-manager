@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import supertest from 'supertest';
-import app from '../../build/server';
+import app from '../../src/server';
 
-const User = require('../../build/models').User;
-const Role = require('../../build/models').Role;
-const Document = require('../../build/models').Document;
+const User = require('../../src/models').User;
+const Role = require('../../src/models').Role;
+const Document = require('../../src/models').Document;
 
 const request = supertest.agent(app);
 
@@ -83,7 +83,7 @@ describe('Search endpoints', () => {
         .end((err, res) => {
           if (!err) {
             expect(res.status).to.equal(200);
-            expect(res.body.data).to.eqls([]);
+            expect(res.body.items).to.eqls([]);
           }
           done();
         });
@@ -96,7 +96,7 @@ describe('Search endpoints', () => {
         .end((err, res) => {
           if (!err) {
             expect(res.status).to.equal(200);
-            expect(res.body.data.length).to.be.greaterThan(0);
+            expect(res.body.items.length).to.be.greaterThan(0);
           }
           done();
         });
@@ -141,7 +141,7 @@ describe('Search endpoints', () => {
         .end((err, res) => {
           if (!err) {
             expect(res.status).to.equal(200);
-            expect(res.body.data).to.eqls([]);
+            expect(res.body.items).to.eqls([]);
           }
           done();
         });
@@ -165,7 +165,7 @@ describe('Search endpoints', () => {
         .end((err, res) => {
           if (!err) {
             expect(res.status).to.equal(200);
-            expect(res.body.data.length).to.be.greaterThan(0);
+            expect(res.body.items.length).to.be.greaterThan(0);
           }
           done();
         });

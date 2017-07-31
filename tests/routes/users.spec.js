@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import supertest from 'supertest';
 import isEmpty from 'lodash/isEmpty';
-import app from '../../build/server';
+import app from '../../src/server';
 import { hashPassword } from '../../server/helpers/helper';
 
-const Document = require('../../build/models').Document;
-const Role = require('../../build/models').Role;
-const User = require('../../build/models').User;
+const Document = require('../../src/models').Document;
+const Role = require('../../src/models').Role;
+const User = require('../../src/models').User;
 
 const request = supertest.agent(app);
 
@@ -70,19 +70,6 @@ describe('Users endpoints', () => {
       });
     });
 
-    it('should connect', (done) => {
-      request
-        .get('/v1/users')
-        .set('Accept', 'application/json')
-        .set('X-Auth', authToken)
-        .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-          }
-          done();
-        });
-    });
-
     it('validates offset and limit query params', (done) => {
       request
         .get('/v1/users/?limit=cj&offset=0')
@@ -106,9 +93,9 @@ describe('Users endpoints', () => {
             expect(res.status).to.equal(200);
             expect(res.body.status).to.equal('ok');
             expect(res.body.count).to.equal(1);
-            expect(res.body.data).to.be.an('array');
-            expect(res.body.data[0].firstname).to.equal('Kennedy');
-            expect(res.body.data[0].email).to.equal(process.env.EMAIL);
+            expect(res.body.items).to.be.an('array');
+            expect(res.body.items[0].firstname).to.equal('Kennedy');
+            expect(res.body.items[0].email).to.equal(process.env.EMAIL);
           }
           done();
         });
@@ -151,7 +138,8 @@ describe('Users endpoints', () => {
         .set('X-Auth', authToken)
         .end((err, res) => {
           if (!err) {
-            expect(res.body.data).to.be.an('array');
+            expect(res.status).to.equal(200);
+            expect(res.body.items).to.be.an('array');
           }
           done();
         });
