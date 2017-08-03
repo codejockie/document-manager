@@ -5,7 +5,6 @@ import jasmineNode from 'gulp-jasmine-node';
 import istanbul from 'gulp-istanbul';
 import injectModules from 'gulp-inject-modules';
 import exit from 'gulp-exit';
-import coveralls from 'gulp-coveralls';
 
 process.env.NODE_ENV = 'test';
 
@@ -52,11 +51,6 @@ gulp.task('coverage', (cb) => {
         .pipe(exit());
     });
 });
-
-gulp.task('coveralls', () => gulp.src('./coverage/lcov')
-  .pipe(coveralls()));
-
-gulp.task('build', ['dev', 'coverage']);
 
 gulp.task('default', ['dev', 'nodemon'], () => {
   gulp.watch('server/**/*.js', ['dev']);

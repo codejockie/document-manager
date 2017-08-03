@@ -1,6 +1,6 @@
 import express from 'express';
 import _ from 'lodash';
-import { hashPassword, isEqual } from '../helpers/helper';
+import { hashPassword, isAdmin, isUser } from '../helpers/helper';
 import { findByCredentials, generateAuthToken } from '../helpers/jwt';
 import { authenticate, validateUser } from '../helpers/middleware';
 
@@ -15,7 +15,15 @@ router.post('/login', (req, res) => {
     .then((user) => {
       const token = generateAuthToken(user.id, user.email, user.username);
       res.header('X-Auth', token).send({
-        user,
+        user: {
+          id: user.id,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          email: user.email,
+          username: user.username,
+          created_at: user.createdAt,
+          role_id: user.roleId
+        },
         token
       });
     })
@@ -25,7 +33,7 @@ router.post('/login', (req, res) => {
 router.post('/logout', (req, res) => {
   req.user = null;
   req.token = null;
-  res.header('X-Auth', '');
+  res.header('X-Auth', '').status(200).send({ message: 'Logged out' });
 });
 
 router.post('/', validateUser, (req, res) => {
@@ -54,8 +62,8 @@ router.post('/', validateUser, (req, res) => {
     })
       .then((newUser) => {
         const token = generateAuthToken(newUser.id, newUser.email, newUser.username);
-        res.header('X-Auth', token).send({
-          data: newUser,
+        res.header('X-Auth', token).status(201).send({
+          message: 'Registration was successful',
           token
         });
       })
@@ -67,7 +75,7 @@ router.post('/', validateUser, (req, res) => {
   });
 });
 
-router.get('/', (req, res) => {
+router.get('/', authenticate, (req, res) => {
   let options;
   if ((req.query.limit !== undefined && req.query.limit !== '')
     && (req.query.offset !== undefined && req.query.offset !== '')) {
@@ -99,13 +107,21 @@ router.get('/', (req, res) => {
       return res.status(200).send({
         status: 'ok',
         count: users.length,
-        data: users
+        data: users.map(user => (
+          {
+            id: user.id,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            username: user.username,
+            created_at: user.createdAt
+          }))
       });
     })
     .catch(error => res.status(400).send(error));
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', authenticate, (req, res) => {
   if (isNaN(req.params.id)) {
     return res.status(400).send({
       status: 'error',
@@ -122,7 +138,14 @@ router.get('/:id', (req, res) => {
         });
       }
 
-      res.status(200).json(user);
+      res.status(200).json({
+        id: user.id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        username: user.username,
+        created_at: user.createdAt
+      });
     })
     .catch(error => res.status(400).send(error));
 });
@@ -146,7 +169,6 @@ router.get('/:id/documents', (req, res) => {
 
       Document.findAll({
         where: {
-          access: 'public',
           userId: req.params.id,
           roleId: user.roleId
         }
@@ -182,7 +204,7 @@ router.put('/:id', authenticate, (req, res) => {
         });
       }
 
-      if (!isEqual(user.id, req.user.id)) {
+      if (!isAdmin(req.user.id) && !isUser(user.id, req.user.id)) {
         return res.status(401).send({
           status: 'error',
           message: 'Unauthorised user. You don\'t have permission to update this user'
@@ -218,11 +240,16 @@ router.put('/:id', authenticate, (req, res) => {
             firstname: req.body.firstname || user.firstname,
             lastname: req.body.lastname || user.lastname,
             password: password || user.password,
-            roleId: req.body.roleId || user.roleId
+            roleId: user.roleId
           })
-            .then(() => res.status(201).send({
-              status: 'ok',
-              data: user
+            .then(() => res.status(200).send({
+              id: user.id,
+              firstname: user.firstname,
+              lastname: user.lastname,
+              email: user.email,
+              username: user.username,
+              created_at: user.createdAt,
+              role_id: user.roleId
             }))
             .catch(error => res.status(400).send(error));
         });
@@ -247,7 +274,7 @@ router.delete('/:id', authenticate, (req, res) => {
         });
       }
 
-      if (!isEqual(user.id, req.user.id)) {
+      if (!isAdmin(req.user.id) && !isUser(user.id, req.user.id)) {
         return res.status(401).send({
           status: 'error',
           message: 'Unauthorised user. You don\'t have permission to delete this user'

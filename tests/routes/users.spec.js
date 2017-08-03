@@ -12,9 +12,9 @@ const User = require('../../build/models').User;
 const request = supertest.agent(app);
 chai.use(chaiHttp);
 
-const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJrZW5uZWR5Lm53YW9yZ3VAYW5kZWxhLmNvbSIsInVzZXJuYW1lIjoiY29kZWpvY2tpZSIsImlhdCI6MTUwMDY2MTAwMywiZXhwIjoxNTAwOTIwMjAzfQ.8x36eu9hgEGkrWCYcH2ImA2z7N7OXtzOazVRM0GlaEA';
+const authToken = process.env.AUTH_TOKEN;
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJkZXZqY2tlbm5lZHlAZ21haWwuY29tIiwidXNlcm5hbWUiOiJhY2VkY29kZXIiLCJpYXQiOjE1MDA2MzI4OTYsImV4cCI6MTUwMDcxOTI5Nn0.Erx2eK5pyJ8Ct5HlRULOcRfoGSLGim-PrEmxk537Tmw';
+const token = process.env.TOKEN;
 
 describe('Users endpoints', () => {
   beforeEach((done) => {
@@ -73,7 +73,7 @@ describe('Users endpoints', () => {
       });
     });
 
-    it('successfully connects to the API', (done) => {
+    it('should connect', (done) => {
       request
         .get('/v1/users')
         .set('Accept', 'application/json')
@@ -110,13 +110,14 @@ describe('Users endpoints', () => {
             expect(res.body.status).to.equal('ok');
             expect(res.body.count).to.equal(1);
             expect(res.body.data).to.be.an('array');
-            expect(res.body.data[0].fullName).to.equal('John Kennedy');
+            expect(res.body.data[0].firstname).to.equal('Kennedy');
+            expect(res.body.data[0].email).to.equal(process.env.EMAIL);
           }
           done();
         });
     });
 
-    it('returns a 200 status if no users', (done) => {
+    it('should return a 401 status on header with no token set', (done) => {
       User.destroy({
         where: {},
         truncate: true,
@@ -138,11 +139,9 @@ describe('Users endpoints', () => {
       request
         .get('/v1/users')
         .set('Accept', 'application/json')
-        .set('X-Auth', authToken)
         .end((err, res) => {
           if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.message).to.equal('No users found');
+            expect(res.status).to.equal(401);
           }
           done();
         });
@@ -244,18 +243,13 @@ describe('Users endpoints', () => {
 
       request
         .post('/v1/users')
-        .set('X-Auth', authToken)
         .send(user)
         .end((err, res) => {
           if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body).to.have.property('data');
-            expect(res.body.data.username).to.equal('acedcoder');
-            expect(res.body.data.firstname).to.equal('Kennedy');
-            expect(res.body.data.lastname).to.equal('John');
-            expect(res.body.data.email).to.equal('devjckennedy@gmail.com');
-            expect(res.body.data).to.have.property('createdAt');
-            expect(res.body.data).to.have.property('updatedAt');
+            expect(res.status).to.equal(201);
+            expect(res.body).to.have.property('message');
+            expect(res.body).to.have.property('token');
+            expect(res.body.message).to.equal('Registration was successful');
           }
           done();
         });
@@ -328,6 +322,21 @@ describe('Users endpoints', () => {
           }
           done();
         });
+    });
+  });
+
+  // POST /v1/users/logout
+  describe('POST /v1/users/logout', () => {
+    it('clears the X-Auth header on logout', (done) => {
+      request
+        .post('/v1/users/logout')
+        .expect(200)
+        .end((err, res) => {
+          if (!err) {
+            expect(res.header['x-auth']).to.equal('');
+          }
+        });
+      done();
     });
   });
 
@@ -582,11 +591,11 @@ describe('Users endpoints', () => {
         })
         .end((err, res) => {
           if (!err) {
-            expect(res.status).to.equal(201);
-            expect(res.body.data.username).to.equal(process.env.USERNAME);
-            expect(res.body.data.firstname).to.equal(process.env.FIRSTNAME);
-            expect(res.body.data.lastname).to.equal('Nwaorgu');
-            expect(res.body.data.email).to.equal(process.env.EMAIL);
+            expect(res.status).to.equal(200);
+            expect(res.body.username).to.equal(process.env.USERNAME);
+            expect(res.body.firstname).to.equal(process.env.FIRSTNAME);
+            expect(res.body.lastname).to.equal('Nwaorgu');
+            expect(res.body.email).to.equal(process.env.EMAIL);
           }
           done();
         });

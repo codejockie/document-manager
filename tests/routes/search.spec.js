@@ -10,7 +10,7 @@ const Document = require('../../build/models').Document;
 const request = supertest.agent(app);
 chai.use(chaiHttp);
 
-const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJrZW5uZWR5Lm53YW9yZ3VAYW5kZWxhLmNvbSIsInVzZXJuYW1lIjoiY29kZWpvY2tpZSIsImlhdCI6MTUwMDYzMjcyMSwiZXhwIjoxNTAwNzE5MTIxfQ.A4A7NGBZggJjVjzcenB9RQ_pNfzqyYTssTmQtnfcQJ4';
+const authToken = process.env.AUTH_TOKEN;
 
 describe('Search endpoints', () => {
   beforeEach((done) => {
