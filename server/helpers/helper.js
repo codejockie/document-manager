@@ -15,6 +15,21 @@ export function formatDate(date) {
 }
 
 /**
+ * @description creates errors in Object format
+ * @function
+ * @param {Array} errors The caught errors during validation
+ * @returns {Object} errors
+ */
+export function generateErrors(errors) {
+  const response = { errors: {} };
+  errors.forEach((error) => {
+    response.errors[error.param] = error.msg;
+  });
+
+  return response;
+}
+
+/**
  * @description hashes supplied password
  * @function
  * @param {string} password The user's password to be hashed
@@ -38,10 +53,10 @@ export function isAdmin(userRoleId) {
 /**
  * @description checks for equality of two IDs
  * @function
- * @param {Object} objectId The object's id
+ * @param {Object} id The document/user stored in the database id
  * @param {Object} userId The user's id
  * @returns {boolean} true/false
  */
-export function isUser(objectId, userId) {
-  return objectId === userId;
+export function isUser(id, userId) {
+  return id === userId;
 }

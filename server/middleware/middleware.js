@@ -1,4 +1,5 @@
-import { findByToken } from './jwt';
+import { generateErrors } from '../helpers/helper';
+import { findByToken } from '../helpers/jwt';
 
 /**
  * @description checks if a user is authenticated
@@ -12,10 +13,7 @@ export function authenticate(req, res, next) {
   const token = req.headers['x-auth'];
 
   if (!token) {
-    return res.status(401).send({
-      status: 'error',
-      message: 'Unauthorised user'
-    });
+    return res.status(401).send({ message: 'Unauthorised user' });
   }
 
   findByToken(token)
@@ -32,6 +30,24 @@ export function authenticate(req, res, next) {
 }
 
 /**
+ * @description checks if an authenticated user is an admin
+ * @function
+ * @param {Object} req
+ * @param {Object} res
+ * @param {callback} next
+ * @returns {Response} message
+ */
+export function isAdministrator(req, res, next) {
+  if (req.user.roleId !== 1) {
+    return res.status(403).send({
+      message: 'The resource you are looking for does not exist'
+    });
+  }
+
+  next();
+}
+
+/**
  * @description validates inputs for document creation
  * @function
  * @param {Object} req
@@ -40,7 +56,7 @@ export function authenticate(req, res, next) {
  * @returns {json} json response containing the errors if any
  */
 export function validateDocument(req, res, next) {
-  req.checkBody('title', 'Title is required').notEmpty();
+  req.checkBody('title', 'Title must be at least five characters long').isLength({ min: 5 });
   req.checkBody('content', 'Content is required').notEmpty();
   req.checkBody('access', 'Access is required').notEmpty();
   req.checkBody('access', 'Access must be a string').isAlpha();
@@ -48,12 +64,7 @@ export function validateDocument(req, res, next) {
   const errors = req.validationErrors();
 
   if (errors) {
-    const response = { errors: {} };
-    errors.forEach((error) => {
-      response.errors[error.param] = error.msg;
-    });
-
-    return res.status(400).json(response);
+    return res.status(400).json(generateErrors(errors));
   }
   next();
 }
@@ -73,12 +84,7 @@ export function validateLogin(req, res, next) {
 
   const errors = req.validationErrors();
   if (errors) {
-    const response = { errors: {} };
-    errors.forEach((error) => {
-      response.errors[error.param] = error.msg;
-    });
-
-    return res.status(400).json(response);
+    return res.status(400).json(generateErrors(errors));
   }
   next();
 }
@@ -92,16 +98,46 @@ export function validateLogin(req, res, next) {
  * @returns {json} json response containing the errors if any
  */
 export function validateParam(req, res, next) {
-  req.checkParams('id', 'Invalid url param').isNumeric();
+  if (isNaN(req.params.id)) {
+    return res.status(400).send({
+      message: 'Param must be a number'
+    });
+  }
+  next();
+}
+
+/**
+ * @description validates search query param in the url
+ * @function
+ * @param {Object} req
+ * @param {Object} res
+ * @param {callback} next
+ * @returns {json} json response containing the errors if any
+ */
+export function validateQuery(req, res, next) {
+  if (req.query.q === undefined || req.query.q === '') {
+    return res.status(400).send({
+      message: 'Query param is required'
+    });
+  }
+  next();
+}
+
+/**
+ * @description validates input for role creation
+ * @function
+ * @param {Object} req
+ * @param {Object} res
+ * @param {callback} next
+ * @returns {json} json response containing the errors if any
+ */
+export function validateRole(req, res, next) {
+  req.checkBody('name', 'Name can only contain letters').isAlpha();
+  req.checkBody('name', 'Name cannot be empty').notEmpty();
 
   const errors = req.validationErrors();
   if (errors) {
-    const response = { errors: {} };
-    errors.forEach((error) => {
-      response.errors[error.param] = error.msg;
-    });
-
-    return res.status(400).json(response);
+    return res.status(400).json(generateErrors(errors));
   }
   next();
 }
@@ -124,18 +160,10 @@ export function validateUser(req, res, next) {
   req.checkBody('lastname', 'Lastname cannot contain number').isAlpha();
   req.checkBody('lastname', 'Lastname is required').notEmpty();
   req.checkBody('password', 'Password is required').notEmpty();
-  req.checkBody('roleId', 'Role ID must be an integer').isNumeric();
-  req.checkBody('roleId', 'Role ID is required').notEmpty();
 
   const errors = req.validationErrors();
   if (errors) {
-    const response = { errors: {} };
-    errors.forEach((error) => {
-      response.errors[error.param] = error.msg;
-    });
-
-    return res.status(400).json(response);
+    return res.status(400).json(generateErrors(errors));
   }
   next();
 }
-
