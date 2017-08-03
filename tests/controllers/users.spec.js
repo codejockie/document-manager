@@ -79,12 +79,10 @@ describe('Users endpoints', () => {
           password: ''
         })
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(isEmpty(res.body.errors)).to.equal(false);
-            expect(res.body.errors.email).to.equal('Email must be valid');
-            expect(res.body.errors.password).to.equal('Password is required');
-          }
+          expect(res.status).to.equal(400);
+          expect(isEmpty(res.body.errors)).to.equal(false);
+          expect(res.body.errors.email).to.equal('Email must be valid');
+          expect(res.body.errors.password).to.equal('Password is required');
           done();
         });
     });
@@ -97,10 +95,8 @@ describe('Users endpoints', () => {
           password: process.env.PASSWORD
         })
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('Username or Password incorrect');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('Username or Password incorrect');
           done();
         });
     });
@@ -113,9 +109,7 @@ describe('Users endpoints', () => {
           password: process.env.PASSWORD
         })
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-          }
+          expect(res.status).to.equal(200);
           done();
         });
     });
@@ -128,10 +122,8 @@ describe('Users endpoints', () => {
           password: process.env.PASSWORD
         })
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.token).to.be.a('string');
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.token).to.be.a('string');
           done();
         });
     });
@@ -144,9 +136,7 @@ describe('Users endpoints', () => {
           password: process.env.PASSWORD
         })
         .end((err, res) => {
-          if (!err) {
-            expect(res.header['x-auth']).to.equal(res.body.token);
-          }
+          expect(res.header['x-auth']).to.equal(res.body.token);
           done();
         });
     });
@@ -173,11 +163,9 @@ describe('Users endpoints', () => {
         .post('/v1/users/logout')
         .expect(200)
         .end((err, res) => {
-          if (!err) {
-            expect(res.header['x-auth']).to.equal('');
-          }
+          expect(res.header['x-auth']).to.equal('');
+          done();
         });
-      done();
     });
   });
 
@@ -208,10 +196,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/?limit=cj&offset=0')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Limit and Offset params must be numbers');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Limit and Offset params must be numbers');
           done();
         });
     });
@@ -221,14 +207,12 @@ describe('Users endpoints', () => {
         .get('/v1/users/?limit=1&offset=0')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.metaData.pageSize).to.equal(1);
-            expect(res.body.metaData.totalCount).to.equal(2);
-            expect(res.body.users).to.be.an('array');
-            expect(res.body.users[0].fullName).to.equal('John Kennedy');
-            expect(res.body.users[0].email).to.equal(process.env.EMAIL);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.metaData.pageSize).to.equal(1);
+          expect(res.body.metaData.totalCount).to.equal(2);
+          expect(res.body.users).to.be.an('array');
+          expect(res.body.users[0].fullName).to.equal('John Kennedy');
+          expect(res.body.users[0].email).to.equal(process.env.EMAIL);
           done();
         });
     });
@@ -256,9 +240,7 @@ describe('Users endpoints', () => {
         .get('/v1/users')
         .set('Accept', 'application/json')
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(401);
-          }
+          expect(res.status).to.equal(401);
           done();
         });
     });
@@ -269,12 +251,10 @@ describe('Users endpoints', () => {
         .set('Accept', 'application/json')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.users).to.be.an('array');
-            expect(res.body.users[0].fullName).to.equal('John Kennedy');
-            expect(res.body.users[0].email).to.equal(process.env.EMAIL);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.users).to.be.an('array');
+          expect(res.body.users[0].fullName).to.equal('John Kennedy');
+          expect(res.body.users[0].email).to.equal(process.env.EMAIL);
           done();
         });
     });
@@ -285,10 +265,8 @@ describe('Users endpoints', () => {
         .set('Accept', 'application/json')
         .set('X-Auth', token)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(403);
-            expect(res.body.message).to.equal('The resource you are looking for does not exist');
-          }
+          expect(res.status).to.equal(403);
+          expect(res.body.message).to.equal('The resource you are looking for does not exist');
           done();
         });
     });
@@ -326,15 +304,13 @@ describe('Users endpoints', () => {
         .set('X-Auth', authToken)
         .send(user)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(isEmpty(res.body.errors)).to.equal(false);
-            expect(res.body.errors.username).to.equal('Username is required');
-            expect(res.body.errors.firstname).to.equal('Firstname is required');
-            expect(res.body.errors.lastname).to.equal('Lastname is required');
-            expect(res.body.errors.password).to.equal('Password is required');
-            expect(res.body.errors).to.not.have.property('email');
-          }
+          expect(res.status).to.equal(400);
+          expect(isEmpty(res.body.errors)).to.equal(false);
+          expect(res.body.errors.username).to.equal('Username is required');
+          expect(res.body.errors.firstname).to.equal('Firstname is required');
+          expect(res.body.errors.lastname).to.equal('Lastname is required');
+          expect(res.body.errors.password).to.equal('Password is required');
+          expect(res.body.errors).to.not.have.property('email');
           done();
         });
     });
@@ -354,11 +330,9 @@ describe('Users endpoints', () => {
         .set('X-Auth', authToken)
         .send(user)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(422);
-            expect(res.body.message).to
-              .equal('username and email must be unique');
-          }
+          expect(res.status).to.equal(422);
+          expect(res.body.message).to
+            .equal('username and email must be unique');
           done();
         });
     });
@@ -377,13 +351,11 @@ describe('Users endpoints', () => {
         .post('/v1/users')
         .send(user)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(201);
-            expect(res.body).to.have.property('user');
-            expect(res.body).to.have.property('token');
-            expect(res.body.user.email).to.equal('devjckennedy@gmail.com');
-            expect(res.body.user.username).to.equal('acedcoder');
-          }
+          expect(res.status).to.equal(201);
+          expect(res.body).to.have.property('user');
+          expect(res.body).to.have.property('token');
+          expect(res.body.user.email).to.equal('devjckennedy@gmail.com');
+          expect(res.body.user.username).to.equal('acedcoder');
           done();
         });
     });
@@ -412,14 +384,12 @@ describe('Users endpoints', () => {
         .get('/v1/users/1')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.id).to.equal(1);
-            expect(res.body.username).to.equal(process.env.USERNAME);
-            expect(res.body.firstname).to.equal(process.env.FIRSTNAME);
-            expect(res.body.lastname).to.equal(process.env.LASTNAME);
-            expect(res.body.email).to.equal(process.env.EMAIL);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.id).to.equal(1);
+          expect(res.body.username).to.equal(process.env.USERNAME);
+          expect(res.body.firstname).to.equal(process.env.FIRSTNAME);
+          expect(res.body.lastname).to.equal(process.env.LASTNAME);
+          expect(res.body.email).to.equal(process.env.EMAIL);
           done();
         });
     });
@@ -429,10 +399,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/10')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('User not found');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('User not found');
           done();
         });
     });
@@ -442,10 +410,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/cj')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Param must be a number');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Param must be a number');
           done();
         });
     });
@@ -455,10 +421,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/101243578787677678575645456674644646')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Invalid ID');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Invalid ID');
           done();
         });
     });
@@ -483,7 +447,7 @@ describe('Users endpoints', () => {
         roleId: 2
       }]).then(() => {
         Document.create({
-          title: 'PUT test',
+          title: 'GET User Doc',
           content: 'Running Tests',
           author: 'John Kennedy',
           userId: 1,
@@ -501,10 +465,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/cj/documents')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Param must be a number');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Param must be a number');
           done();
         });
     });
@@ -514,10 +476,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/10/documents')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('User not found');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('User not found');
           done();
         });
     });
@@ -527,10 +487,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/2/documents')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('No document found for this user');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('No document found for this user');
           done();
         });
     });
@@ -540,9 +498,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/1/documents')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body[0].title).to.equal('GET User Doc');
           done();
         });
     });
@@ -552,10 +509,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/101243578787677678575645456674644646/documents')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Invalid ID');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Invalid ID');
           done();
         });
     });
@@ -584,10 +539,8 @@ describe('Users endpoints', () => {
         .put('/v1/users/cj')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Param must be a number');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Param must be a number');
           done();
         });
     });
@@ -597,10 +550,8 @@ describe('Users endpoints', () => {
         .put('/v1/users/10')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('User not found');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('User not found');
           done();
         });
     });
@@ -626,11 +577,9 @@ describe('Users endpoints', () => {
           username: 'acedcoder'
         })
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(401);
-            expect(res.body.message).to
-              .equal('Unauthorised user. You don\'t have permission to update this user');
-          }
+          expect(res.status).to.equal(401);
+          expect(res.body.message).to
+            .equal("Unauthorised user. You don't have permission to update this user");
           done();
         });
     });
@@ -659,10 +608,8 @@ describe('Users endpoints', () => {
               email: 'kennedy20000@yahoo.com',
             })
             .end((err, res) => {
-              if (!err) {
-                expect(res.status).to.equal(422);
-                expect(res.body.message).to.equal('A user exist with same email or username');
-              }
+              expect(res.status).to.equal(422);
+              expect(res.body.message).to.equal('A user exist with same email or username');
               done();
             });
         });
@@ -676,13 +623,11 @@ describe('Users endpoints', () => {
           lastname: 'Nwaorgu',
         })
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.username).to.equal(process.env.USERNAME);
-            expect(res.body.firstname).to.equal(process.env.FIRSTNAME);
-            expect(res.body.lastname).to.equal('Nwaorgu');
-            expect(res.body.email).to.equal(process.env.EMAIL);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.username).to.equal(process.env.USERNAME);
+          expect(res.body.firstname).to.equal(process.env.FIRSTNAME);
+          expect(res.body.lastname).to.equal('Nwaorgu');
+          expect(res.body.email).to.equal(process.env.EMAIL);
           done();
         });
     });
@@ -692,10 +637,8 @@ describe('Users endpoints', () => {
         .put('/v1/users/101243578787677678575645456674644646')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Invalid ID');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Invalid ID');
           done();
         });
     });
@@ -724,10 +667,8 @@ describe('Users endpoints', () => {
         .delete('/v1/users/cj')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Param must be a number');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Param must be a number');
           done();
         });
     });
@@ -737,10 +678,8 @@ describe('Users endpoints', () => {
         .put('/v1/users/10')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('User not found');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('User not found');
           done();
         });
     });
@@ -762,11 +701,9 @@ describe('Users endpoints', () => {
         .delete('/v1/users/1')
         .set('X-Auth', token)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(401);
-            expect(res.body.message).to
-              .equal('Unauthorised user. You don\'t have permission to delete this user');
-          }
+          expect(res.status).to.equal(401);
+          expect(res.body.message).to
+            .equal("Unauthorised user. You don't have permission to delete this user");
           done();
         });
     });
@@ -776,10 +713,8 @@ describe('Users endpoints', () => {
         .delete('/v1/users/1')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.message).to.equal('User deleted successfully');
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.message).to.equal('User deleted successfully');
           done();
         });
     });
@@ -789,10 +724,8 @@ describe('Users endpoints', () => {
         .delete('/v1/users/10')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('User not found');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('User not found');
           done();
         });
     });
@@ -802,10 +735,8 @@ describe('Users endpoints', () => {
         .delete('/v1/users/101243578787677678575645456674644646')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Invalid ID');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Invalid ID');
           done();
         });
     });

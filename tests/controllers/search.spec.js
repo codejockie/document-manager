@@ -139,19 +139,33 @@ describe('Search endpoints', () => {
     });
 
     it('returns an array of documents if found', (done) => {
-      Document.create({
-        title: 'Search docs',
-        content: 'Search documents route test',
+      Document.bulkCreate([{
+        title: 'Data 1',
+        content: 'Running Tests',
         author: 'John Kennedy',
         access: 'public',
         userId: 1,
         roleId: 1
-      }).then(() => {
+      }, {
+        title: 'Data 2',
+        content: 'Tests Running',
+        author: 'John Kennedy',
+        access: 'public',
+        userId: 1,
+        roleId: 1,
+      }, {
+        title: 'Data 3',
+        content: 'Tests Running!!!',
+        author: 'John Kennedy',
+        access: 'public',
+        userId: 1,
+        roleId: 1,
+      }]).then(() => {
         //
       });
 
       request
-        .get('/v1/search/documents/?q=Search')
+        .get('/v1/search/documents/?q=data')
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);

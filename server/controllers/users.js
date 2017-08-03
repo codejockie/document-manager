@@ -173,7 +173,7 @@ export default {
 
         if (!isUser(user.id, req.user.id) && !isAdmin(req.user.roleId)) {
           return res.status(401).send({
-            message: 'Unauthorised user. You don\'t have permission to update this user'
+            message: "Unauthorised user. You don't have permission to update this user"
           });
         }
 
@@ -228,7 +228,7 @@ export default {
 
         if (!isAdmin(req.user.roleId) && !isUser(user.id, req.user.id)) {
           return res.status(401).send({
-            message: 'Unauthorised user. You don\'t have permission to delete this user'
+            message: "Unauthorised user. You don't have permission to delete this user"
           });
         }
 
