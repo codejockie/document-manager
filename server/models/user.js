@@ -1,3 +1,5 @@
+import { formatDate } from '../helpers/helper';
+
 export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     email: {
@@ -25,20 +27,23 @@ export default (sequelize, DataTypes) => {
     roleId: {
       type: DataTypes.INTEGER
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      get() {
+        return formatDate(this.getDataValue('createdAt'));
+      },
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      get() {
+        return formatDate(this.getDataValue('updatedAt'));
+      },
+    }
   }, {
     getterMethods: {
       fullName() {
         return `${this.lastname} ${this.firstname}`;
       }
-    },
-
-    setterMethods: {
-      fullName(value) {
-        const names = value.split(' ');
-
-        this.setDataValue('firstname', names.slice(0, -1).join(' '));
-        this.setDataValue('lastname', names.slice(-1).join(' '));
-      },
     }
   });
 

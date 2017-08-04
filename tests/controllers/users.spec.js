@@ -2,11 +2,12 @@ import { expect } from 'chai';
 import supertest from 'supertest';
 import isEmpty from 'lodash/isEmpty';
 import app from '../../src/server';
+import models from '../../server/models';
 import { hashPassword } from '../../server/helpers/helper';
 
-const Document = require('../../src/models').Document;
-const Role = require('../../src/models').Role;
-const User = require('../../src/models').User;
+const Document = models.Document;
+const User = models.User;
+const Role = models.Role;
 
 const request = supertest.agent(app);
 
@@ -48,6 +49,126 @@ describe('Users endpoints', () => {
       });
   });
 
+  // POST /v1/users/login
+  describe('POST /v1/users/login', () => {
+    beforeEach((done) => {
+      User.bulkCreate([{
+        username: process.env.USERNAME,
+        firstname: process.env.FIRSTNAME,
+        lastname: process.env.LASTNAME,
+        password: hashPassword(process.env.PASSWORD),
+        email: process.env.EMAIL,
+        roleId: 1
+      }, {
+        username: 'acedcoder',
+        firstname: 'Kennedy',
+        lastname: 'John',
+        password: hashPassword('test'),
+        email: 'devjckennedy@gmail.com',
+        roleId: 2
+      }]).then(() => {
+        done();
+      });
+    });
+
+    it('should validate login details', (done) => {
+      request
+        .post('/v1/users/login')
+        .send({
+          email: 'codejockie@',
+          password: ''
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(isEmpty(res.body.errors)).to.equal(false);
+          expect(res.body.errors.email).to.equal('Email must be valid');
+          expect(res.body.errors.password).to.equal('Password is required');
+          done();
+        });
+    });
+
+    it('given non-existing account details, it returns a 404 status', (done) => {
+      request
+        .post('/v1/users/login')
+        .send({
+          email: 'codejockie@codes.com',
+          password: process.env.PASSWORD
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('Username or Password incorrect');
+          done();
+        });
+    });
+
+    it('successfully authenticates a user', (done) => {
+      request
+        .post('/v1/users/login')
+        .send({
+          email: process.env.EMAIL,
+          password: process.env.PASSWORD
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          done();
+        });
+    });
+
+    it('generates a token on successful authentication', (done) => {
+      request
+        .post('/v1/users/login')
+        .send({
+          email: process.env.EMAIL,
+          password: process.env.PASSWORD
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body.token).to.be.a('string');
+          done();
+        });
+    });
+
+    it('sets the token on the header with a key of  X-Auth', (done) => {
+      request
+        .post('/v1/users/login')
+        .send({
+          email: process.env.EMAIL,
+          password: process.env.PASSWORD
+        })
+        .end((err, res) => {
+          expect(res.header['x-auth']).to.equal(res.body.token);
+          done();
+        });
+    });
+
+    it('given a wrong password, it throws an error', (done) => {
+      request
+        .post('/v1/users/login')
+        .send({
+          email: process.env.EMAIL,
+          password: 'test'
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('Username or Password incorrect');
+          done();
+        });
+    });
+  });
+
+  // POST /v1/users/logout
+  describe('POST /v1/users/logout', () => {
+    it('clears the X-Auth header on logout', (done) => {
+      request
+        .post('/v1/users/logout')
+        .expect(200)
+        .end((err, res) => {
+          expect(res.header['x-auth']).to.equal('');
+          done();
+        });
+    });
+  });
+
   // GET /v1/users route
   describe('GET /v1/users', () => {
     beforeEach((done) => {
@@ -75,11 +196,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/?limit=cj&offset=0')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.status).to.equal('error');
-            expect(res.body.message).to.equal('Limit and Offset params must be numbers');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Limit and Offset params must be numbers');
           done();
         });
     });
@@ -89,14 +207,12 @@ describe('Users endpoints', () => {
         .get('/v1/users/?limit=1&offset=0')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.status).to.equal('ok');
-            expect(res.body.count).to.equal(1);
-            expect(res.body.items).to.be.an('array');
-            expect(res.body.items[0].firstname).to.equal('Kennedy');
-            expect(res.body.items[0].email).to.equal(process.env.EMAIL);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.metaData.pageSize).to.equal(1);
+          expect(res.body.metaData.totalCount).to.equal(2);
+          expect(res.body.users).to.be.an('array');
+          expect(res.body.users[0].firstname).to.equal('Kennedy');
+          expect(res.body.users[0].email).to.equal(process.env.EMAIL);
           done();
         });
     });
@@ -124,9 +240,7 @@ describe('Users endpoints', () => {
         .get('/v1/users')
         .set('Accept', 'application/json')
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(401);
-          }
+          expect(res.status).to.equal(401);
           done();
         });
     });
@@ -137,24 +251,22 @@ describe('Users endpoints', () => {
         .set('Accept', 'application/json')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.items).to.be.an('array');
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.users).to.be.an('array');
+          expect(res.body.users[0].firstname).to.equal('Kennedy');
+          expect(res.body.users[0].email).to.equal(process.env.EMAIL);
           done();
         });
     });
 
-    it('should return 401 status for non admins', (done) => {
+    it('should return 403 status for non admins', (done) => {
       request
         .get('/v1/users')
         .set('Accept', 'application/json')
         .set('X-Auth', token)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(401);
-            expect(res.body.message).to.equal('This page is restricted to administrators only');
-          }
+          expect(res.status).to.equal(403);
+          expect(res.body.message).to.equal('The resource you are looking for does not exist');
           done();
         });
     });
@@ -192,21 +304,18 @@ describe('Users endpoints', () => {
         .set('X-Auth', authToken)
         .send(user)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(isEmpty(res.body.errors)).to.equal(false);
-            expect(res.body.errors.username).to.equal('Username is required');
-            expect(res.body.errors.firstname).to.equal('Firstname is required');
-            expect(res.body.errors.lastname).to.equal('Lastname is required');
-            expect(res.body.errors.password).to.equal('Password is required');
-            expect(res.body.errors.roleId).to.equal('Role ID is required');
-            expect(res.body.errors).to.not.have.property('email');
-          }
+          expect(res.status).to.equal(400);
+          expect(isEmpty(res.body.errors)).to.equal(false);
+          expect(res.body.errors.username).to.equal('Username is required');
+          expect(res.body.errors.firstname).to.equal('Firstname is required');
+          expect(res.body.errors.lastname).to.equal('Lastname is required');
+          expect(res.body.errors.password).to.equal('Password is required');
+          expect(res.body.errors).to.not.have.property('email');
           done();
         });
     });
 
-    it('should return 400 status message for duplicate user', (done) => {
+    it('should return 422 status message for duplicate user', (done) => {
       const user = {
         username: process.env.USERNAME,
         firstname: process.env.FIRSTNAME,
@@ -221,11 +330,9 @@ describe('Users endpoints', () => {
         .set('X-Auth', authToken)
         .send(user)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to
-              .equal('username and email must be unique');
-          }
+          expect(res.status).to.equal(422);
+          expect(res.body.message).to
+            .equal('username and email must be unique');
           done();
         });
     });
@@ -244,155 +351,13 @@ describe('Users endpoints', () => {
         .post('/v1/users')
         .send(user)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(201);
-            expect(res.body).to.have.property('message');
-            expect(res.body).to.have.property('token');
-            expect(res.body.message).to.equal('Registration was successful');
-          }
+          expect(res.status).to.equal(201);
+          expect(res.body).to.have.property('user');
+          expect(res.body).to.have.property('token');
+          expect(res.body.user.email).to.equal('devjckennedy@gmail.com');
+          expect(res.body.user.username).to.equal('acedcoder');
           done();
         });
-    });
-
-    it('given a non-existing role id, it should return a 400 status', (done) => {
-      const user = {
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword('test'),
-        email: 'devjckennedy@gmail.com',
-        roleId: 10
-      };
-
-      request
-        .post('/v1/users')
-        .send(user)
-        .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Registration failed');
-            expect(res.body.error.name).to.equal('SequelizeForeignKeyConstraintError');
-          }
-          done();
-        });
-    });
-  });
-
-  // POST /v1/users/login
-  describe('POST /v1/users/login', () => {
-    beforeEach((done) => {
-      User.bulkCreate([{
-        username: process.env.USERNAME,
-        firstname: process.env.FIRSTNAME,
-        lastname: process.env.LASTNAME,
-        password: hashPassword(process.env.PASSWORD),
-        email: process.env.EMAIL,
-        roleId: 1
-      }, {
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword('test'),
-        email: 'devjckennedy@gmail.com',
-        roleId: 2
-      }]).then(() => {
-        done();
-      });
-    });
-
-    it('should validate login details', (done) => {
-      request
-        .post('/v1/users/login')
-        .send({
-          email: 'codejockie@',
-          password: ''
-        })
-        .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(isEmpty(res.body.errors)).to.equal(false);
-            expect(res.body.errors.email).to.equal('Email must be valid');
-            expect(res.body.errors.password).to.equal('Password is required');
-          }
-          done();
-        });
-    });
-
-    it('given non-existing account details, it returns a 404 status', (done) => {
-      request
-        .post('/v1/users/login')
-        .send({
-          email: 'codejockie@codes.com',
-          password: process.env.PASSWORD
-        })
-        .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('Username or Password incorrect');
-          }
-          done();
-        });
-    });
-
-    it('successfully authenticates a user', (done) => {
-      request
-        .post('/v1/users/login')
-        .send({
-          email: process.env.EMAIL,
-          password: process.env.PASSWORD
-        })
-        .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-          }
-          done();
-        });
-    });
-
-    it('generates a token on successful authentication', (done) => {
-      request
-        .post('/v1/users/login')
-        .send({
-          email: process.env.EMAIL,
-          password: process.env.PASSWORD
-        })
-        .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.token).to.be.a('string');
-          }
-          done();
-        });
-    });
-
-    it('sets the token on the header with a key of  X-Auth', (done) => {
-      request
-        .post('/v1/users/login')
-        .send({
-          email: process.env.EMAIL,
-          password: process.env.PASSWORD
-        })
-        .end((err, res) => {
-          if (!err) {
-            expect(res.header['x-auth']).to.equal(res.body.token);
-          }
-          done();
-        });
-    });
-  });
-
-  // POST /v1/users/logout
-  describe('POST /v1/users/logout', () => {
-    it('clears the X-Auth header on logout', (done) => {
-      request
-        .post('/v1/users/logout')
-        .expect(200)
-        .end((err, res) => {
-          if (!err) {
-            expect(res.header['x-auth']).to.equal('');
-          }
-        });
-      done();
     });
   });
 
@@ -419,14 +384,12 @@ describe('Users endpoints', () => {
         .get('/v1/users/1')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.id).to.equal(1);
-            expect(res.body.username).to.equal(process.env.USERNAME);
-            expect(res.body.firstname).to.equal(process.env.FIRSTNAME);
-            expect(res.body.lastname).to.equal(process.env.LASTNAME);
-            expect(res.body.email).to.equal(process.env.EMAIL);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.id).to.equal(1);
+          expect(res.body.username).to.equal(process.env.USERNAME);
+          expect(res.body.firstname).to.equal(process.env.FIRSTNAME);
+          expect(res.body.lastname).to.equal(process.env.LASTNAME);
+          expect(res.body.email).to.equal(process.env.EMAIL);
           done();
         });
     });
@@ -436,10 +399,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/10')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('User not found');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('User not found');
           done();
         });
     });
@@ -449,10 +410,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/cj')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Param must be a number');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Param must be a number');
           done();
         });
     });
@@ -462,10 +421,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/101243578787677678575645456674644646')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.name).to.equal('SequelizeDatabaseError');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Invalid ID');
           done();
         });
     });
@@ -490,7 +447,7 @@ describe('Users endpoints', () => {
         roleId: 2
       }]).then(() => {
         Document.create({
-          title: 'PUT test',
+          title: 'GET User Doc',
           content: 'Running Tests',
           author: 'John Kennedy',
           userId: 1,
@@ -508,10 +465,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/cj/documents')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Param must be a number');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Param must be a number');
           done();
         });
     });
@@ -521,10 +476,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/10/documents')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('User not found');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('User not found');
           done();
         });
     });
@@ -534,10 +487,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/2/documents')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('No document found for this user');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('No document found for this user');
           done();
         });
     });
@@ -547,9 +498,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/1/documents')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body[0].title).to.equal('GET User Doc');
           done();
         });
     });
@@ -559,10 +509,8 @@ describe('Users endpoints', () => {
         .get('/v1/users/101243578787677678575645456674644646/documents')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.name).to.equal('SequelizeDatabaseError');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Invalid ID');
           done();
         });
     });
@@ -591,10 +539,8 @@ describe('Users endpoints', () => {
         .put('/v1/users/cj')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Param must be a number');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Param must be a number');
           done();
         });
     });
@@ -604,10 +550,8 @@ describe('Users endpoints', () => {
         .put('/v1/users/10')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('User not found');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('User not found');
           done();
         });
     });
@@ -633,16 +577,14 @@ describe('Users endpoints', () => {
           username: 'acedcoder'
         })
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(401);
-            expect(res.body.message).to
-              .equal('Unauthorised user. You don\'t have permission to update this user');
-          }
+          expect(res.status).to.equal(401);
+          expect(res.body.message).to
+            .equal("Unauthorised user. You don't have permission to update this user");
           done();
         });
     });
 
-    it('returns a 400 status for duplicate email or username', (done) => {
+    it('returns a 422 status for duplicate email or username', (done) => {
       User.bulkCreate([{
         username: 'acedcoder',
         firstname: 'Kennedy',
@@ -666,10 +608,8 @@ describe('Users endpoints', () => {
               email: 'kennedy20000@yahoo.com',
             })
             .end((err, res) => {
-              if (!err) {
-                expect(res.status).to.equal(400);
-                expect(res.body.message).to.equal('A user exist with same email or username');
-              }
+              expect(res.status).to.equal(422);
+              expect(res.body.message).to.equal('A user exist with same email or username');
               done();
             });
         });
@@ -683,13 +623,11 @@ describe('Users endpoints', () => {
           lastname: 'Nwaorgu',
         })
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.username).to.equal(process.env.USERNAME);
-            expect(res.body.firstname).to.equal(process.env.FIRSTNAME);
-            expect(res.body.lastname).to.equal('Nwaorgu');
-            expect(res.body.email).to.equal(process.env.EMAIL);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.username).to.equal(process.env.USERNAME);
+          expect(res.body.firstname).to.equal(process.env.FIRSTNAME);
+          expect(res.body.lastname).to.equal('Nwaorgu');
+          expect(res.body.email).to.equal(process.env.EMAIL);
           done();
         });
     });
@@ -699,10 +637,8 @@ describe('Users endpoints', () => {
         .put('/v1/users/101243578787677678575645456674644646')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.name).to.equal('SequelizeDatabaseError');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Invalid ID');
           done();
         });
     });
@@ -731,10 +667,8 @@ describe('Users endpoints', () => {
         .delete('/v1/users/cj')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Param must be a number');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Param must be a number');
           done();
         });
     });
@@ -744,10 +678,8 @@ describe('Users endpoints', () => {
         .put('/v1/users/10')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('User not found');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('User not found');
           done();
         });
     });
@@ -769,11 +701,9 @@ describe('Users endpoints', () => {
         .delete('/v1/users/1')
         .set('X-Auth', token)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(401);
-            expect(res.body.message).to
-              .equal('Unauthorised user. You don\'t have permission to delete this user');
-          }
+          expect(res.status).to.equal(401);
+          expect(res.body.message).to
+            .equal("Unauthorised user. You don't have permission to delete this user");
           done();
         });
     });
@@ -783,10 +713,8 @@ describe('Users endpoints', () => {
         .delete('/v1/users/1')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.message).to.equal('User deleted successfully');
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.message).to.equal('User deleted successfully');
           done();
         });
     });
@@ -796,10 +724,8 @@ describe('Users endpoints', () => {
         .delete('/v1/users/10')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('User not found');
-          }
+          expect(res.status).to.equal(404);
+          expect(res.body.message).to.equal('User not found');
           done();
         });
     });
@@ -809,10 +735,8 @@ describe('Users endpoints', () => {
         .delete('/v1/users/101243578787677678575645456674644646')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.name).to.equal('SequelizeDatabaseError');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Invalid ID');
           done();
         });
     });

@@ -10,7 +10,7 @@
   "devtest": {
     "username": null,
     "password": null,
-    "database": "testdm",
+    "database": "doc-man-test",
     "host": "127.0.0.1",
     "port": 5432,
     "dialect": "postgres",

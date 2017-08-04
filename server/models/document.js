@@ -1,9 +1,11 @@
+import { formatDate } from '../helpers/helper';
+
 export default (sequelize, DataTypes) => {
   const Document = sequelize.define('Document', {
     title: {
       allowNull: false,
       type: DataTypes.STRING,
-      unique: true
+      unique: true,
     },
     content: {
       allowNull: false,
@@ -22,7 +24,20 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
     },
     roleId: {
+      allowNull: false,
       type: DataTypes.INTEGER,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      get() {
+        return formatDate(this.getDataValue('createdAt'));
+      },
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      get() {
+        return formatDate(this.getDataValue('updatedAt'));
+      },
     },
   });
 
@@ -32,8 +47,7 @@ export default (sequelize, DataTypes) => {
       onDelete: 'CASCADE'
     });
     Document.belongsTo(models.Role, {
-      foreignKey: 'roleId',
-      onDelete: 'CASCADE'
+      foreignKey: 'roleId'
     });
   };
   return Document;

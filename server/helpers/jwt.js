@@ -1,7 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import models from '../models';
 
-const User = require('../models/index').User;
+const User = models.User;
 
 /**
  * @description finds a user by supplied credentials
@@ -10,7 +11,7 @@ const User = require('../models/index').User;
  * @param {string} password The user's password
  * @returns {Object} user
  */
-export function findByCredentials(email, password) {
+export function findByEmailAndPassword(email, password) {
   return User.findOne({
     where: {
       email
@@ -36,7 +37,7 @@ export function findByCredentials(email, password) {
 /**
  * @description finds a user by token
  * @function
- * @param {string} token The user's token stored in the DB
+ * @param {string} token The user's token stored in the database
  * @returns {Object} user
  */
 export function findByToken(token) {
@@ -62,9 +63,9 @@ export function findByToken(token) {
 /**
  * @description generates a jwt token for authentication
  * @function
- * @param {string} id User's id stored in the DB
- * @param {string} email User's email stored in the DB
- * @param {string} username User's username stored in the DB
+ * @param {string} id User's id stored in the database
+ * @param {string} email User's email stored in the database
+ * @param {string} username User's username stored in the database
  * @returns {string} jwt token
  */
 export function generateAuthToken(id, email, username) {

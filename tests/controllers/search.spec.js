@@ -1,10 +1,11 @@
 import { expect } from 'chai';
 import supertest from 'supertest';
 import app from '../../src/server';
+import models from '../../server/models';
 
-const User = require('../../src/models').User;
-const Role = require('../../src/models').Role;
-const Document = require('../../src/models').Document;
+const Document = models.Document;
+const User = models.User;
+const Role = models.Role;
 
 const request = supertest.agent(app);
 
@@ -68,10 +69,8 @@ describe('Search endpoints', () => {
         .get('/v1/search/users?q=')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Query param is required');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Query param is required');
           done();
         });
     });
@@ -81,10 +80,8 @@ describe('Search endpoints', () => {
         .get('/v1/search/users?q=adeleke')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.items).to.eqls([]);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.user).to.eqls([]);
           done();
         });
     });
@@ -94,10 +91,8 @@ describe('Search endpoints', () => {
         .get('/v1/search/users?q=codejockie')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.items.length).to.be.greaterThan(0);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.users).to.have.lengthOf(1);
           done();
         });
     });
@@ -126,10 +121,8 @@ describe('Search endpoints', () => {
         .get('/v1/search/documents?q=')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(400);
-            expect(res.body.message).to.equal('Query param is required');
-          }
+          expect(res.status).to.equal(400);
+          expect(res.body.message).to.equal('Query param is required');
           done();
         });
     });
@@ -139,34 +132,44 @@ describe('Search endpoints', () => {
         .get('/v1/search/documents/?q=oldsanden')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.items).to.eqls([]);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.document).to.eqls([]);
           done();
         });
     });
 
     it('returns an array of documents if found', (done) => {
-      Document.create({
-        title: 'Search docs',
-        content: 'Search documents routes test',
+      Document.bulkCreate([{
+        title: 'Data 1',
+        content: 'Running Tests',
         author: 'John Kennedy',
         access: 'public',
         userId: 1,
         roleId: 1
-      }).then(() => {
+      }, {
+        title: 'Data 2',
+        content: 'Tests Running',
+        author: 'John Kennedy',
+        access: 'public',
+        userId: 1,
+        roleId: 1,
+      }, {
+        title: 'Data 3',
+        content: 'Tests Running!!!',
+        author: 'John Kennedy',
+        access: 'public',
+        userId: 1,
+        roleId: 1,
+      }]).then(() => {
         //
       });
 
       request
-        .get('/v1/search/documents/?q=Search')
+        .get('/v1/search/documents/?q=data')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          if (!err) {
-            expect(res.status).to.equal(200);
-            expect(res.body.items.length).to.be.greaterThan(0);
-          }
+          expect(res.status).to.equal(200);
+          expect(res.body.documents).to.have.lengthOf(3);
           done();
         });
     });

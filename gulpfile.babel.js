@@ -15,7 +15,7 @@ gulp.task('compile', () => gulp.src('server/**/*.js')
   .pipe(gulp.dest('src')));
 
 gulp.task('test', ['compile'], (done) => {
-  gulp.src(['src/routes/*.js'])
+  gulp.src(['src/controllers/*.js', 'src/helpers/*.js', 'src/middleware/*.js'])
     .pipe(istanbul())
     .pipe(istanbul.hookRequire())
     .on('finish', () => {
