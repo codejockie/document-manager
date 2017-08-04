@@ -1,5 +1,10 @@
+import models from '../models';
 import { generateErrors } from '../helpers/helper';
 import { findByToken } from '../helpers/jwt';
+
+const Document = models.Document;
+const Role = models.Role;
+const User = models.User;
 
 /**
  * @description checks if a user is authenticated
@@ -27,6 +32,78 @@ export function authenticate(req, res, next) {
       next();
     })
     .catch(() => res.status(401).send({ error: 'Unauthorised user' }));
+}
+
+/**
+ * @description checks if a document can be found by its id
+ * @function
+ * @param {Object} req
+ * @param {Object} res
+ * @param {callback} next
+ * @returns {void}
+ */
+export function findDocumentById(req, res, next) {
+  Document.findById(req.params.id)
+    .then((document) => {
+      if (!document) {
+        return res.status(404).send({
+          message: 'Document not found'
+        });
+      }
+
+      next();
+    })
+    .catch(() => res.status(400).send({
+      message: 'Invalid ID'
+    }));
+}
+
+/**
+ * @description checks if a role can be found by its id
+ * @function
+ * @param {Object} req
+ * @param {Object} res
+ * @param {callback} next
+ * @returns {void}
+ */
+export function findRoleById(req, res, next) {
+  Role.findById(req.params.id)
+    .then((role) => {
+      if (!role) {
+        return res.status(404).send({
+          message: 'Role not found'
+        });
+      }
+
+      next();
+    })
+    .catch(() => res.status(400).send({
+      message: 'Invalid ID'
+    }));
+}
+
+/**
+ * @description checks if a user can be found by its id
+ * @function
+ * @param {Object} req
+ * @param {Object} res
+ * @param {callback} next
+ * @returns {void}
+ */
+export function findUserById(req, res, next) {
+  User.findById(req.params.id)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({
+          message: 'User not found'
+        });
+      }
+
+      next();
+    })
+    .catch(() => res.status(400).send({
+      message: 'Invalid ID'
+    }));
 }
 
 /**

@@ -1,4 +1,5 @@
 import models from '../models';
+import { documentCreator } from '../helpers/helper';
 
 const Document = models.Document;
 const User = models.User;
@@ -61,17 +62,7 @@ export default {
           });
         }
         return res.status(200).send({
-          documents: documents.map(document => ({
-            id: document.id,
-            title: document.title,
-            content: document.content,
-            author: document.author,
-            access: document.access,
-            userId: document.userId,
-            roleId: document.roleId,
-            createdAt: document.createdAt,
-            updatedAt: document.updatedAt
-          }))
+          documents: documents.map(document => documentCreator(document))
         });
       });
   }

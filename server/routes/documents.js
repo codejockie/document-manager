@@ -1,5 +1,5 @@
 import documentController from '../controllers/documents';
-import { authenticate, validateDocument, validateParam } from '../middleware/middleware';
+import { authenticate, findDocumentById, validateDocument, validateParam } from '../middleware/middleware';
 
 const documentRoutes = (router) => {
   router.route('/documents')
@@ -7,9 +7,9 @@ const documentRoutes = (router) => {
     .post(authenticate, validateDocument, documentController.create);
 
   router.route('/documents/:id')
-    .get(authenticate, validateParam, documentController.getOne)
-    .put(authenticate, validateParam, documentController.update)
-    .delete(authenticate, validateParam, documentController.delete);
+    .get(authenticate, validateParam, findDocumentById, documentController.getOne)
+    .put(authenticate, validateParam, findDocumentById, documentController.update)
+    .delete(authenticate, validateParam, findDocumentById, documentController.delete);
 };
 
 export default documentRoutes;

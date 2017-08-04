@@ -1,6 +1,7 @@
 import usersController from '../controllers/users';
 import {
   authenticate,
+  findUserById,
   isAdministrator,
   validateLogin,
   validateParam,
@@ -19,12 +20,12 @@ const userRoutes = (router) => {
     .get(authenticate, isAdministrator, usersController.getAll);
 
   router.route('/users/:id')
-    .get(validateParam, authenticate, usersController.getOne)
-    .put(validateParam, authenticate, usersController.update)
-    .delete(validateParam, authenticate, usersController.delete);
+    .get(authenticate, validateParam, findUserById, usersController.getOne)
+    .put(authenticate, validateParam, findUserById, usersController.update)
+    .delete(authenticate, validateParam, findUserById, usersController.delete);
 
   router.route('/users/:id/documents')
-    .get(validateParam, usersController.getUserDocuments);
+    .get(validateParam, findUserById, usersController.getUserDocuments);
 };
 
 export default userRoutes;

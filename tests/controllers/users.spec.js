@@ -211,7 +211,7 @@ describe('Users endpoints', () => {
           expect(res.body.metaData.pageSize).to.equal(1);
           expect(res.body.metaData.totalCount).to.equal(2);
           expect(res.body.users).to.be.an('array');
-          expect(res.body.users[0].fullName).to.equal('John Kennedy');
+          expect(res.body.users[0].firstname).to.equal('Kennedy');
           expect(res.body.users[0].email).to.equal(process.env.EMAIL);
           done();
         });
@@ -253,7 +253,7 @@ describe('Users endpoints', () => {
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.users).to.be.an('array');
-          expect(res.body.users[0].fullName).to.equal('John Kennedy');
+          expect(res.body.users[0].firstname).to.equal('Kennedy');
           expect(res.body.users[0].email).to.equal(process.env.EMAIL);
           done();
         });

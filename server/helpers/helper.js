@@ -11,7 +11,6 @@ export function formatDate(date) {
   if (date) {
     return moment(date).format('ddd, MMM Do YYYY, h:mm:ss a');
   }
-  return '';
 }
 
 /**
@@ -59,4 +58,67 @@ export function isAdmin(userRoleId) {
  */
 export function isUser(id, userId) {
   return id === userId;
+}
+
+/**
+ * @description generates document object response
+ * @function
+ * @param {Object} document The document sent from the controller
+ * @returns {Object} response
+ */
+export function documentCreator(document) {
+  const documentData = {
+    id: document.id,
+    title: document.title,
+    content: document.content,
+    author: document.author,
+    access: document.access,
+    userId: document.userId,
+    roleId: document.roleId,
+    createdAt: document.createdAt,
+  };
+
+  if (document.updatedAt) {
+    documentData.updatedAt = document.updatedAt;
+  }
+
+  return documentData;
+}
+
+/**
+ * @description generates role object response
+ * @function
+ * @param {Object} role The role sent from the controller
+ * @returns {Object} response
+ */
+export function roleCreator(role) {
+  return {
+    id: role.id,
+    name: role.name,
+    createdAt: role.createdAt
+  };
+}
+
+/**
+ * @description generates user object response
+ * @function
+ * @param {Object} user The user sent from the controller
+ * @returns {Object} response
+ */
+export function userCreator(user) {
+  const userData = {
+    id: user.id,
+    firstname: user.firstname,
+    lastname: user.lastname,
+    email: user.email,
+    username: user.username,
+    roleId: user.roleId,
+    createdAt: user.createdAt,
+  };
+
+  if (user.updatedAt) {
+    userData.updatedAt = user.updatedAt;
+  }
+
+  return userData;
 }

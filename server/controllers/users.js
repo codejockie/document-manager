@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import models from '../models';
-import { hashPassword, isAdmin, isUser } from '../helpers/helper';
+import { documentCreator, hashPassword, isAdmin, isUser, userCreator } from '../helpers/helper';
 import { findByEmailAndPassword, generateAuthToken } from '../helpers/jwt';
 import paginate from '../helpers/paginate';
 
@@ -15,15 +15,7 @@ export default {
       .then((user) => {
         const token = generateAuthToken(user.id, user.email, user.username);
         res.header('X-Auth', token).send({
-          user: {
-            id: user.id,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            email: user.email,
-            username: user.username,
-            createdAt: user.createdAt,
-            roleId: user.roleId
-          },
+          user: userCreator(user),
           token
         });
       })
@@ -62,15 +54,7 @@ export default {
         .then((newUser) => {
           const token = generateAuthToken(newUser.id, newUser.email, newUser.username);
           res.header('X-Auth', token).status(201).send({
-            user: {
-              id: newUser.id,
-              firstname: newUser.firstname,
-              lastname: newUser.lastname,
-              email: newUser.email,
-              username: newUser.username,
-              createdAt: newUser.createdAt,
-              roleId: newUser.roleId
-            },
+            user: userCreator(newUser),
             token
           });
         });
@@ -94,23 +78,16 @@ export default {
         return User.findAll({
           offset,
           limit,
-          attributes: ['id', 'firstname', 'lastname', 'email', 'username', 'createdAt']
         })
           .then(users => res.status(200).send({
             metaData: paginate(limit, offset, totalCount),
-            users,
+            users: users.map(user => userCreator(user)),
           }));
       });
   },
   getOne(req, res) {
     User.findById(req.params.id)
       .then((user) => {
-        if (!user) {
-          return res.status(404).json({
-            message: 'User not found'
-          });
-        }
-
         res.status(200).json({
           id: user.id,
           firstname: user.firstname,
@@ -119,58 +96,26 @@ export default {
           username: user.username,
           createdAt: user.createdAt
         });
-      })
-      .catch(() => res.status(400).send({
-        message: 'Invalid ID'
-      }));
+      });
   },
   getUserDocuments(req, res) {
-    User.findById(req.params.id)
-      .then((user) => {
-        if (!user) {
+    Document.findAll({
+      where: {
+        userId: req.params.id
+      }
+    })
+      .then((documents) => {
+        if (documents.length === 0) {
           return res.status(404).send({
-            message: 'User not found'
+            message: 'No document found for this user'
           });
         }
-
-        Document.findAll({
-          where: {
-            userId: req.params.id
-          }
-        })
-          .then((documents) => {
-            if (documents.length === 0) {
-              return res.status(404).send({
-                message: 'No document found for this user'
-              });
-            }
-            return res.status(200).json(documents.map(document => (
-              {
-                id: document.id,
-                title: document.title,
-                content: document.content,
-                author: document.author,
-                access: document.access,
-                userId: document.userId,
-                roleId: document.roleId,
-                createdAt: document.createdAt,
-              }
-            )));
-          });
-      })
-      .catch(() => res.status(400).send({
-        message: 'Invalid ID'
-      }));
+        return res.status(200).json(documents.map(document => documentCreator(document)));
+      });
   },
   update(req, res) {
     User.findById(req.params.id)
       .then((user) => {
-        if (!user) {
-          return res.status(404).send({
-            message: 'User not found'
-          });
-        }
-
         if (!isUser(user.id, req.user.id) && !isAdmin(req.user.roleId)) {
           return res.status(401).send({
             message: "Unauthorised user. You don't have permission to update this user"
@@ -202,30 +147,13 @@ export default {
               password: req.body.password ? hashPassword(req.body.password) : user.password,
               roleId: isAdmin(req.user.roleId) ? req.body.roleId : user.roleId
             })
-              .then(() => res.status(200).send({
-                id: user.id,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                email: user.email,
-                username: user.username,
-                createdAt: user.createdAt,
-                roleId: user.roleId
-              }));
+              .then(() => res.status(200).send(userCreator(user)));
           });
-      })
-      .catch(() => res.status(400).send({
-        message: 'Invalid ID'
-      }));
+      });
   },
   delete(req, res) {
     User.findById(req.params.id)
       .then((user) => {
-        if (!user) {
-          return res.status(404).send({
-            message: 'User not found'
-          });
-        }
-
         if (!isAdmin(req.user.roleId) && !isUser(user.id, req.user.id)) {
           return res.status(401).send({
             message: "Unauthorised user. You don't have permission to delete this user"
@@ -236,9 +164,6 @@ export default {
           .then(() => res.status(200).json({
             message: 'User deleted successfully'
           }));
-      })
-      .catch(() => res.status(400).send({
-        message: 'Invalid ID'
-      }));
+      });
   }
 };

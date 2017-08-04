@@ -378,7 +378,7 @@ describe('Documents endpoints', () => {
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body.message).to
-            .equal('Unauthorised user. You don\'t have permission to access this document');
+            .equal("Unauthorised user. You don't have permission to access this document");
           done();
         });
     });

@@ -1,5 +1,5 @@
 import models from '../models';
-import { isAdmin, isUser } from '../helpers/helper';
+import { documentCreator, isAdmin, isUser } from '../helpers/helper';
 import paginate from '../helpers/paginate';
 
 const Document = models.Document;
@@ -26,16 +26,7 @@ export default {
           userId: req.user.id,
           roleId: req.user.roleId
         })
-          .then(newDoc => res.status(201).send({
-            id: newDoc.id,
-            title: newDoc.title,
-            content: newDoc.content,
-            author: newDoc.author,
-            access: newDoc.access,
-            userId: newDoc.userId,
-            roleId: newDoc.roleId,
-            createdAt: newDoc.createdAt,
-          }))
+          .then(newDoc => res.status(201).send(documentCreator(newDoc)))
           .catch(() => res.status(400).send({ message: "Access field must be any of 'public' or 'private'" }));
       });
   },
@@ -77,17 +68,7 @@ export default {
 
             return res.status(200).send({
               metaData: paginate(limit, offset, totalCount),
-              documents: documents.map(document => ({
-                id: document.id,
-                title: document.title,
-                content: document.content,
-                access: document.access,
-                author: document.author,
-                userId: document.userId,
-                roleId: document.roleId,
-                createdAt: document.createdAt,
-                updatedAt: document.updatedAt,
-              }))
+              documents: documents.map(document => (documentCreator(document)))
             });
           });
       });
@@ -95,43 +76,20 @@ export default {
   getOne(req, res) {
     Document.findById(req.params.id)
       .then((document) => {
-        if (!document) {
-          return res.status(404).send({
-            message: 'Document not found'
-          });
-        }
-
         // Checks if the document owner's ID is
         // equal to the logged in user's ID
         if (!isUser(document.userId, req.user.id)) {
           return res.status(401).send({
-            message: 'Unauthorised user. You don\'t have permission to access this document'
+            message: "Unauthorised user. You don't have permission to access this document"
           });
         }
 
-        return res.status(200).send({
-          id: document.id,
-          title: document.title,
-          content: document.content,
-          access: document.access,
-          author: document.author,
-          userId: document.userId,
-          roleId: document.roleId,
-          createdAt: document.createdAt,
-          updatedAt: document.updatedAt,
-        });
-      })
-      .catch(() => res.status(400).send({ message: 'Invalid ID' }));
+        return res.status(200).send(documentCreator(document));
+      });
   },
   update(req, res) {
     Document.findById(req.params.id)
       .then((document) => {
-        if (!document) {
-          return res.status(404).send({
-            message: 'Document not found'
-          });
-        }
-
         if (!isAdmin(req.user.id) && !isUser(document.userId, req.user.id)) {
           return res.status(401).send({
             message: "Unauthorised user. You don't have permission to update this document"
@@ -163,32 +121,15 @@ export default {
               updatedAt: req.body.updatedAt || document.updatedAt
             })
               .then(() => res.status(201).send({
-                document: {
-                  id: document.id,
-                  title: document.title,
-                  content: document.content,
-                  access: document.access,
-                  author: document.author,
-                  userId: document.userId,
-                  roleId: document.roleId,
-                  createdAt: document.createdAt,
-                  updatedAt: document.updatedAt,
-                }
+                document: documentCreator(document)
               }))
               .catch(() => res.status(400).send({ message: "Access field must be any of 'public' or 'private'" }));
           });
-      })
-      .catch(() => res.status(400).send({ message: 'Invalid ID' }));
+      });
   },
   delete(req, res) {
     Document.findById(req.params.id)
       .then((document) => {
-        if (!document) {
-          return res.status(404).send({
-            message: 'Document not found'
-          });
-        }
-
         if (!isAdmin(req.user.id) && !isUser(document.userId, req.user.id)) {
           return res.status(401).send({
             message: "Unauthorised user. You don't have permission to delete this document"
@@ -199,7 +140,6 @@ export default {
           .then(() => res.status(200).send({
             message: 'Document deleted successfully'
           }));
-      })
-      .catch(() => res.status(400).send({ message: 'Invalid ID' }));
+      });
   }
 };

@@ -92,7 +92,7 @@ describe('Search endpoints', () => {
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.users.length).to.be.greaterThan(0);
+          expect(res.body.users).to.have.lengthOf(1);
           done();
         });
     });
@@ -169,7 +169,7 @@ describe('Search endpoints', () => {
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.documents.length).to.be.greaterThan(0);
+          expect(res.body.documents).to.have.lengthOf(3);
           done();
         });
     });
