@@ -147,6 +147,27 @@ export function validateDocument(req, res, next) {
 }
 
 /**
+ * @description validates limit and offset if they are provided
+ * @function
+ * @param {Object} req
+ * @param {Object} res
+ * @param {callback} next
+ * @returns {json} json error response
+ */
+export function validateLimitAndOffset(req, res, next) {
+  if (req.query.limit || req.query.offset) {
+    if (!Number.isInteger(Number(req.query.limit))
+      || !Number.isInteger(Number(req.query.offset))) {
+      return res.status(400).send({
+        message: 'Limit and Offset params must be numbers'
+      });
+    }
+  }
+
+  next();
+}
+
+/**
  * @description validates login fields
  * @function
  * @param {Object} req

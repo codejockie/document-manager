@@ -8,7 +8,6 @@
     "start": "node src/server.js",
     "test": "NODE_ENV=test gulp test",
     "dev": "nodemon -w server --exec babel-node -- server/server.js",
-    "localtest": "NODE_ENV=test gulp test",
     "migrate": "sequelize db:migrate && npm run seed",
     "mocha": "NODE_ENV=test nyc --reporter=lcov --reporter=text --reporter=html mocha --timeout 90000 --compilers js:babel-register -- ./tests/**/*.spec.js",
     "seed": "sequelize db:seed:all",
