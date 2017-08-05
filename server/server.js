@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
   res.status(200).render('index.html');
 });
 
-app.get('/v1', (req, res) => {
+app.get('*', (req, res) => {
   res.redirect(302, '/');
 });
 

@@ -6,14 +6,14 @@
   "scripts": {
     "postinstall": "gulp compile",
     "start": "node src/server.js",
-    "test": "gulp test",
+    "test": "NODE_ENV=test gulp test",
     "dev": "nodemon -w server --exec babel-node -- server/server.js",
-    "devtest": "NODE_ENV=devtest mocha --timeout 90000 --compilers js:babel-register -- ./tests/**/*.spec.js",
-    "devmigrate": "sequelize db:migrate && npm run seed",
-    "localmigrate": "NODE_ENV=devtest sequelize db:migrate",
+    "localtest": "NODE_ENV=test gulp test",
+    "migrate": "sequelize db:migrate && npm run seed",
+    "mocha": "NODE_ENV=test nyc --reporter=lcov --reporter=text --reporter=html mocha --timeout 90000 --compilers js:babel-register -- ./tests/**/*.spec.js",
+    "seed": "sequelize db:seed:all",
     "testmigrate": "NODE_ENV=test sequelize db:migrate",
-    "undo": "sequelize db:migrate:undo:all",
-    "seed": "sequelize db:seed:all"
+    "undo": "sequelize db:migrate:undo:all"
   },
   "repository": {
     "type": "git",
@@ -59,7 +59,17 @@
     "chai": "^4.1.0",
     "coveralls": "^2.13.1",
     "mocha": "^3.4.2",
+    "nyc": "^11.1.0",
     "sequelize-cli": "^2.7.0",
     "supertest": "^3.0.0"
+  },
+  "nyc": {
+    "exclude": [
+      "server",
+      "tests",
+      "src/models/index.js",
+      "src/routes",
+      "src/server.js"
+    ]
   }
 }
