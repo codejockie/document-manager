@@ -7,17 +7,14 @@
     "port": 5432,
     "dialect": "postgres"
   },
-  "devtest": {
-    "username": null,
+  "test": {
+    "username": "postgres",
     "password": null,
-    "database": "doc-man-test",
+    "database": "doc_man_test",
     "host": "127.0.0.1",
     "port": 5432,
     "dialect": "postgres",
     "logging": false
-  },
-  "test": {
-    "use_env_variable": "DATABASE_URL"
   },
   "production": {
     "use_env_variable": "DATABASE_URL"

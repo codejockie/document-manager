@@ -6,8 +6,6 @@ import istanbul from 'gulp-istanbul';
 import jasmine from 'gulp-jasmine';
 import nodemon from 'gulp-nodemon';
 
-process.env.NODE_ENV = 'test';
-
 gulp.task('compile', () => gulp.src('server/**/*.js')
   .pipe(babel({
     presets: ['es2015', 'stage-0']
