@@ -5,6 +5,9 @@ engines:
       config: .eslintrc
   duplication:
     enabled: true
+    checks:
+      Similar code:
+        enabled: false
     config:
       languages:
       - javascript
@@ -18,3 +21,5 @@ ratings:
 exclude_paths:
 - node_modules/**/*
 - tests/*
+- server/models
+- server/migrations
