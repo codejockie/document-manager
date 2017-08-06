@@ -1,68 +1,58 @@
 import documentController from '../controllers/documents';
-import rolesController from '../controllers/roles';
+import roleController from '../controllers/roles';
 import searchController from '../controllers/search';
-import usersController from '../controllers/users';
-import {
-  authenticate,
-  findDocumentById,
-  findRoleById,
-  findUserById,
-  isAdministrator,
-  validateDocument,
-  validateLimitAndOffset,
-  validateLogin,
-  validateParam,
-  validateQuery,
-  validateRole,
-  validateUser
-} from '../middleware/middleware';
+import userController from '../controllers/users';
+import m from '../middleware/middleware';
 
 const routes = (router) => {
   // Document routes
   router.route('/documents')
-    .get(authenticate, validateLimitAndOffset, documentController.getAll)
-    .post(authenticate, validateDocument, documentController.create);
+    .get(m.authenticate, m.validateLimitAndOffset, documentController.getAll)
+    .post(m.authenticate, m.validateDocument, documentController.create);
 
   router.route('/documents/:id')
-    .get(authenticate, validateParam, findDocumentById, documentController.getOne)
-    .put(authenticate, validateParam, findDocumentById, documentController.update)
-    .delete(authenticate, validateParam, findDocumentById, documentController.delete);
+    .get(m.authenticate, m.validateParam, m.findDocumentById, documentController.getOne)
+    .put(m.authenticate, m.validateParam, m.findDocumentById, documentController.update)
+    .delete(m.authenticate, m.validateParam, m.findDocumentById, documentController.delete);
 
   // Role routes
   router.route('/roles')
-    .get(authenticate, isAdministrator, rolesController.getAll)
-    .post(authenticate, isAdministrator, validateRole, rolesController.create);
+    .get(m.authenticate, m.isAdministrator, roleController.getAll)
+    .post(m.authenticate, m.isAdministrator, m.validateRole, roleController.create);
 
   router.route('/roles/:id')
-    .get(authenticate, isAdministrator, validateParam, findRoleById, rolesController.getOne)
-    .put(authenticate, isAdministrator, validateParam, findRoleById, rolesController.update)
-    .delete(authenticate, isAdministrator, validateParam, findRoleById, rolesController.delete);
+    .get(m.authenticate, m.isAdministrator,
+      m.validateParam, m.findRoleById, roleController.getOne)
+    .put(m.authenticate, m.isAdministrator,
+      m.validateParam, m.findRoleById, roleController.update)
+    .delete(m.authenticate, m.isAdministrator,
+      m.validateParam, m.findRoleById, roleController.delete);
 
   // Search route
   router.route('/search/users')
-    .get(validateQuery, searchController.searchUser);
+    .get(m.validateQuery, searchController.searchUser);
 
   router.route('/search/documents')
-    .get(validateQuery, searchController.searchDocument);
+    .get(m.validateQuery, searchController.searchDocument);
 
   // User routes
   router.route('/users/login')
-    .post(validateLogin, usersController.login);
+    .post(m.validateLogin, userController.login);
 
   router.route('/users/logout')
-    .post(usersController.logout);
+    .post(userController.logout);
 
   router.route('/users')
-    .get(authenticate, isAdministrator, validateLimitAndOffset, usersController.getAll)
-    .post(validateUser, usersController.signup);
+    .get(m.authenticate, m.isAdministrator, m.validateLimitAndOffset, userController.getAll)
+    .post(m.validateUser, userController.signup);
 
   router.route('/users/:id')
-    .get(authenticate, validateParam, findUserById, usersController.getOne)
-    .put(authenticate, validateParam, findUserById, usersController.update)
-    .delete(authenticate, validateParam, findUserById, usersController.delete);
+    .get(m.authenticate, m.validateParam, m.findUserById, userController.getOne)
+    .put(m.authenticate, m.validateParam, m.findUserById, userController.update)
+    .delete(m.authenticate, m.validateParam, m.findUserById, userController.delete);
 
   router.route('/users/:id/documents')
-    .get(authenticate, validateParam, findUserById, usersController.getUserDocuments);
+    .get(m.authenticate, m.validateParam, m.findUserById, userController.getUserDocuments);
 };
 
 export default routes;

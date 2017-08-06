@@ -18,3 +18,5 @@ ratings:
 exclude_paths:
 - node_modules/**/*
 - tests/*
+- server/models
+- server/migrations

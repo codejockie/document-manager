@@ -1,5 +1,5 @@
 import models from '../models';
-import { documentCreator, isAdmin, isUser } from '../helpers/helper';
+import { documentCreator, isUser } from '../helpers/helper';
 import paginate from '../helpers/paginate';
 
 const Document = models.Document;
@@ -81,7 +81,7 @@ export default {
   update(req, res) {
     Document.findById(req.params.id)
       .then((document) => {
-        if (!isAdmin(req.user.id) && !isUser(document.userId, req.user.id)) {
+        if (!isUser(document.userId, req.user.id)) {
           return res.status(401).send({
             message: "Unauthorised user. You don't have permission to update this document"
           });
@@ -121,7 +121,7 @@ export default {
   delete(req, res) {
     Document.findById(req.params.id)
       .then((document) => {
-        if (!isAdmin(req.user.id) && !isUser(document.userId, req.user.id)) {
+        if (!isUser(document.userId, req.user.id)) {
           return res.status(401).send({
             message: "Unauthorised user. You don't have permission to delete this document"
           });
