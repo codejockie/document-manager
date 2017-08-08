@@ -88,11 +88,12 @@ describe('Search endpoints', () => {
 
     it('returns an array of users if found', (done) => {
       request
-        .get('/v1/search/users?q=codejockie')
+        .get('/v1/search/users?q=code')
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.users).to.have.lengthOf(1);
+          expect(res.body.users[0].username).to.equal(process.env.USERNAME);
           done();
         });
     });
@@ -157,7 +158,7 @@ describe('Search endpoints', () => {
         title: 'Data 3',
         content: 'Tests Running!!!',
         author: 'John Kennedy',
-        access: 'public',
+        access: 'private',
         userId: 1,
         roleId: 1,
       }]).then(() => {
@@ -169,7 +170,9 @@ describe('Search endpoints', () => {
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.documents).to.have.lengthOf(3);
+          expect(res.body.documents).to.have.lengthOf(2);
+          expect(res.body.documents[0].title).to.equal('Data 1');
+          expect(res.body.documents[1].content).to.equal('Tests Running');
           done();
         });
     });

@@ -4,6 +4,13 @@ import { roleCreator } from '../helpers/helper';
 const Role = models.Role;
 
 export default {
+  /**
+   * @description creates a new role
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } role
+   */
   create(req, res) {
     Role.findOne({
       where: {
@@ -24,6 +31,13 @@ export default {
           .then(newRole => res.status(201).send(roleCreator(newRole)));
       });
   },
+  /**
+   * @description retrieves all roles
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Array } roles
+   */
   getAll(req, res) {
     Role
       .all()
@@ -31,10 +45,24 @@ export default {
         roles
       }));
   },
+  /**
+   * @description retrieves a role
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } role
+   */
   getOne(req, res) {
     Role.findById(req.params.id)
       .then(role => res.status(200).send(roleCreator(role)));
   },
+  /**
+   * @description updates a role
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } role
+   */
   update(req, res) {
     return Role
       .findById(req.params.id)
@@ -59,6 +87,13 @@ export default {
           });
       });
   },
+  /**
+   * @description deletes a role
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } message
+   */
   delete(req, res) {
     Role.findById(req.params.id)
       .then((role) => {

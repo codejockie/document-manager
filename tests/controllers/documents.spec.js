@@ -107,7 +107,8 @@ describe('Documents endpoints', () => {
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.documents).to.be.an('array');
+          expect(res.body.documents[0].title).to.equal('Data 1');
+          expect(res.body.documents[1].title).to.equal('Data 2');
           expect(res.body.documents).to.have.lengthOf(3);
           done();
         });
@@ -164,7 +165,6 @@ describe('Documents endpoints', () => {
           expect(res.status).to.equal(200);
           expect(res.body.metaData.pageSize).to.equal(1);
           expect(res.body.metaData.totalCount).to.equal(4);
-          expect(res.body.documents).to.be.an('array');
           expect(res.body.documents[0].title).to.equal('Data 4');
           done();
         });
@@ -302,7 +302,7 @@ describe('Documents endpoints', () => {
             .set('X-Auth', authToken)
             .send(document)
             .end((err, res) => {
-              expect(res.status).to.equal(400);
+              expect(res.status).to.equal(500);
               expect(res.body.message).to.equal("Access field must be any of 'public' or 'private'");
               done();
             });
@@ -407,12 +407,12 @@ describe('Documents endpoints', () => {
         });
     });
 
-    it('given an invalid id, it returns a 400 status', (done) => {
+    it('given an invalid id, it returns a 500 status', (done) => {
       request
-        .get('/v1/documents/101243578787677678575645456674644646')
+        .get('/v1/documents/10124357878767767')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
           done();
         });
@@ -524,7 +524,7 @@ describe('Documents endpoints', () => {
         });
     });
 
-    it('returns a 400 status for duplicate title', (done) => {
+    it('returns a 422 status for duplicate title', (done) => {
       Document.bulkCreate([{
         title: 'PUTs',
         content: 'Running Tests',
@@ -573,14 +573,14 @@ describe('Documents endpoints', () => {
             access: 'invalid',
           })
           .end((err, res) => {
-            expect(res.status).to.equal(400);
+            expect(res.status).to.equal(500);
             expect(res.body.message).to.equal("Access field must be any of 'public' or 'private'");
             done();
           });
       });
     });
 
-    it('given an invalid id, it returns a 400 status', (done) => {
+    it('given an invalid id, it returns a 500 status', (done) => {
       const document = {
         title: 'Complete data',
         content: 'Running Tests',
@@ -592,13 +592,13 @@ describe('Documents endpoints', () => {
 
       Document.create(document).then(() => {
         request
-          .put('/v1/documents/101243578787677678575645456674644646')
+          .put('/v1/documents/10124357878767767857')
           .set('X-Auth', authToken)
           .send({
             access: 'public',
           })
           .end((err, res) => {
-            expect(res.status).to.equal(400);
+            expect(res.status).to.equal(500);
             expect(res.body.message).to.equal('Invalid ID');
             done();
           });
@@ -697,7 +697,7 @@ describe('Documents endpoints', () => {
         });
     });
 
-    it('given an invalid id, it returns a 400 status', (done) => {
+    it('given an invalid id, it returns a 500 status', (done) => {
       Document.create({
         title: 'Hey DELETE',
         content: 'Running Tests',
@@ -708,10 +708,10 @@ describe('Documents endpoints', () => {
       })
         .then(() => {
           request
-            .delete('/v1/documents/101243578787677678575645456674644646')
+            .delete('/v1/documents/1012435787876776785')
             .set('X-Auth', authToken)
             .end((err, res) => {
-              expect(res.status).to.equal(400);
+              expect(res.status).to.equal(500);
               expect(res.body.message).to.equal('Invalid ID');
               done();
             });

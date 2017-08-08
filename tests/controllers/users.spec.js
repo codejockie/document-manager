@@ -416,12 +416,12 @@ describe('Users endpoints', () => {
         });
     });
 
-    it('given an invalid id, it returns a 400 status', (done) => {
+    it('given an invalid id, it returns a 500 status', (done) => {
       request
-        .get('/v1/users/101243578787677678575645456674644646')
+        .get('/v1/users/101243578787677')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
           done();
         });
@@ -499,17 +499,17 @@ describe('Users endpoints', () => {
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body[0].title).to.equal('GET User Doc');
+          expect(res.body.documents[0].title).to.equal('GET User Doc');
           done();
         });
     });
 
-    it('given an invalid id, it returns a 400 status', (done) => {
+    it('given an invalid id, it returns a 500 status', (done) => {
       request
-        .get('/v1/users/101243578787677678575645456674644646/documents')
+        .get('/v1/users/101243578787677678/documents')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
           done();
         });
@@ -632,12 +632,12 @@ describe('Users endpoints', () => {
         });
     });
 
-    it('given an invalid id, it returns a 400 status', (done) => {
+    it('given an invalid id, it returns a 500 status', (done) => {
       request
-        .put('/v1/users/101243578787677678575645456674644646')
+        .put('/v1/users/101243578787677678575')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
           done();
         });
@@ -730,12 +730,12 @@ describe('Users endpoints', () => {
         });
     });
 
-    it('given an invalid id, it returns a 400 status', (done) => {
+    it('given an invalid id, it returns a 500 status', (done) => {
       request
-        .delete('/v1/users/101243578787677678575645456674644646')
+        .delete('/v1/users/101243578787677678575')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
           done();
         });

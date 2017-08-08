@@ -1,58 +1,68 @@
-import documentController from '../controllers/documents';
-import roleController from '../controllers/roles';
-import searchController from '../controllers/search';
-import userController from '../controllers/users';
-import m from '../middleware/middleware';
+import documentController from '../controllers/documentController';
+import roleController from '../controllers/roleController';
+import searchController from '../controllers/searchController';
+import userController from '../controllers/userController';
+import middleware from '../middleware/middleware';
 
 const routes = (router) => {
   // Document routes
   router.route('/documents')
-    .get(m.authenticate, m.validateLimitAndOffset, documentController.getAll)
-    .post(m.authenticate, m.validateDocument, documentController.create);
+    .get(middleware.authenticate, middleware.validateLimitAndOffset, documentController.getAll)
+    .post(middleware.authenticate, middleware.validateDocument, documentController.create);
 
   router.route('/documents/:id')
-    .get(m.authenticate, m.validateParam, m.findDocumentById, documentController.getOne)
-    .put(m.authenticate, m.validateParam, m.findDocumentById, documentController.update)
-    .delete(m.authenticate, m.validateParam, m.findDocumentById, documentController.delete);
+    .get(middleware.authenticate,
+      middleware.validateParam, middleware.findDocumentById, documentController.getOne)
+    .put(middleware.authenticate,
+      middleware.validateParam, middleware.findDocumentById, documentController.update)
+    .delete(middleware.authenticate,
+      middleware.validateParam, middleware.findDocumentById, documentController.delete);
 
   // Role routes
   router.route('/roles')
-    .get(m.authenticate, m.isAdministrator, roleController.getAll)
-    .post(m.authenticate, m.isAdministrator, m.validateRole, roleController.create);
+    .get(middleware.authenticate,
+      middleware.isAdministrator, roleController.getAll)
+    .post(middleware.authenticate,
+      middleware.isAdministrator, middleware.validateRole, roleController.create);
 
   router.route('/roles/:id')
-    .get(m.authenticate, m.isAdministrator,
-      m.validateParam, m.findRoleById, roleController.getOne)
-    .put(m.authenticate, m.isAdministrator,
-      m.validateParam, m.findRoleById, roleController.update)
-    .delete(m.authenticate, m.isAdministrator,
-      m.validateParam, m.findRoleById, roleController.delete);
+    .get(middleware.authenticate, middleware.isAdministrator,
+      middleware.validateParam, middleware.findRoleById, roleController.getOne)
+    .put(middleware.authenticate, middleware.isAdministrator,
+      middleware.validateParam, middleware.findRoleById, roleController.update)
+    .delete(middleware.authenticate, middleware.isAdministrator,
+      middleware.validateParam, middleware.findRoleById, roleController.delete);
 
   // Search route
   router.route('/search/users')
-    .get(m.validateQuery, searchController.searchUser);
+    .get(middleware.validateQuery, searchController.searchUser);
 
   router.route('/search/documents')
-    .get(m.validateQuery, searchController.searchDocument);
+    .get(middleware.validateQuery, searchController.searchDocument);
 
   // User routes
   router.route('/users/login')
-    .post(m.validateLogin, userController.login);
+    .post(middleware.validateLogin, userController.login);
 
   router.route('/users/logout')
     .post(userController.logout);
 
   router.route('/users')
-    .get(m.authenticate, m.isAdministrator, m.validateLimitAndOffset, userController.getAll)
-    .post(m.validateUser, userController.signup);
+    .get(middleware.authenticate,
+      middleware.isAdministrator, middleware.validateLimitAndOffset, userController.getAll)
+    .post(middleware.validateUser, userController.signup);
 
   router.route('/users/:id')
-    .get(m.authenticate, m.validateParam, m.findUserById, userController.getOne)
-    .put(m.authenticate, m.validateParam, m.findUserById, userController.update)
-    .delete(m.authenticate, m.validateParam, m.findUserById, userController.delete);
+    .get(middleware.authenticate,
+      middleware.validateParam, middleware.findUserById, userController.getOne)
+    .put(middleware.authenticate,
+      middleware.validateParam, middleware.findUserById, userController.update)
+    .delete(middleware.authenticate,
+      middleware.validateParam, middleware.findUserById, userController.delete);
 
   router.route('/users/:id/documents')
-    .get(m.authenticate, m.validateParam, m.findUserById, userController.getUserDocuments);
+    .get(middleware.authenticate,
+      middleware.validateParam, middleware.findUserById, userController.getUserDocuments);
 };
 
 export default routes;
