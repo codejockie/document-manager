@@ -53,7 +53,7 @@ export default {
 
         next();
       })
-      .catch(() => res.status(400).send({
+      .catch(() => res.status(500).send({
         message: 'Invalid ID'
       }));
   },
@@ -76,7 +76,7 @@ export default {
 
         next();
       })
-      .catch(() => res.status(400).send({
+      .catch(() => res.status(500).send({
         message: 'Invalid ID'
       }));
   },
@@ -99,7 +99,7 @@ export default {
 
         next();
       })
-      .catch(() => res.status(400).send({
+      .catch(() => res.status(500).send({
         message: 'Invalid ID'
       }));
   },

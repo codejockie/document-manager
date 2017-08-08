@@ -8,6 +8,13 @@ const User = models.User;
 const Document = models.Document;
 
 export default {
+  /**
+   * @description logs a user in
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } user
+   */
   login(req, res) {
     const body = _.pick(req.body, ['email', 'password']);
 
@@ -23,11 +30,25 @@ export default {
         message: 'Username or Password incorrect'
       }));
   },
+  /**
+   * @description logs out a user
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { void }
+   */
   logout(req, res) {
     req.user = null;
     req.token = null;
     res.header('X-Auth', '').status(200).send({ message: 'Logged out' });
   },
+  /**
+   * @description creates a new user
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } user
+   */
   signup(req, res) {
     User.findOne({
       where: {
@@ -60,6 +81,13 @@ export default {
         });
     });
   },
+  /**
+   * @description retrieves all users
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Array } users
+   */
   getAll(req, res) {
     User.findAll()
       .then((response) => {
@@ -76,6 +104,13 @@ export default {
           }));
       });
   },
+  /**
+   * @description retrieves a user
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } user
+   */
   getOne(req, res) {
     User.findById(req.params.id)
       .then((user) => {
@@ -89,21 +124,47 @@ export default {
         });
       });
   },
+  /**
+   * @description gets a user's documents
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Array } documents
+   */
   getUserDocuments(req, res) {
-    Document.findAll({
-      where: {
-        userId: req.params.id
-      }
-    })
-      .then((documents) => {
-        if (documents.length === 0) {
-          return res.status(404).send({
-            message: 'No document found for this user'
+    Document.findAll()
+      .then((response) => {
+        const totalCount = response.length;
+        const offset = req.query.offset || 0;
+        const limit = req.query.limit || 10;
+
+        return Document.findAll({
+          where: {
+            userId: req.params.id
+          },
+          offset,
+          limit,
+        })
+          .then((documents) => {
+            if (documents.length === 0) {
+              return res.status(404).send({
+                message: 'No document found for this user'
+              });
+            }
+            return res.status(200).send({
+              metaData: paginate(limit, offset, totalCount),
+              documents: documents.map(document => (documentCreator(document)))
+            });
           });
-        }
-        return res.status(200).json(documents.map(document => documentCreator(document)));
       });
   },
+  /**
+   * @description updates a user
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } user
+   */
   update(req, res) {
     User.findById(req.params.id)
       .then((user) => {
@@ -142,6 +203,13 @@ export default {
           });
       });
   },
+  /**
+   * @description deletes a user
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } message
+   */
   delete(req, res) {
     User.findById(req.params.id)
       .then((user) => {

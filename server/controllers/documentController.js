@@ -5,6 +5,13 @@ import paginate from '../helpers/paginate';
 const Document = models.Document;
 
 export default {
+  /**
+   * @description creates a new document
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } document
+   */
   create(req, res) {
     Document.findOne({
       where: {
@@ -27,9 +34,16 @@ export default {
           roleId: req.user.roleId
         })
           .then(newDoc => res.status(201).send(documentCreator(newDoc)))
-          .catch(() => res.status(400).send({ message: "Access field must be any of 'public' or 'private'" }));
+          .catch(() => res.status(500).send({ message: "Access field must be any of 'public' or 'private'" }));
       });
   },
+  /**
+   * @description retrieves all documents
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Array } documents
+   */
   getAll(req, res) {
     Document.findAll()
       .then((response) => {
@@ -64,6 +78,13 @@ export default {
           });
       });
   },
+  /**
+   * @description retrieves a document
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } document
+   */
   getOne(req, res) {
     Document.findById(req.params.id)
       .then((document) => {
@@ -78,6 +99,13 @@ export default {
         return res.status(200).send(documentCreator(document));
       });
   },
+  /**
+   * @description updates a document
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } document
+   */
   update(req, res) {
     Document.findById(req.params.id)
       .then((document) => {
@@ -108,16 +136,23 @@ export default {
               access: req.body.access || document.access,
               userId: document.userId,
               roleId: document.roleId,
-              createdAt: req.body.createdAt || document.createdAt,
-              updatedAt: req.body.updatedAt || document.updatedAt
+              createdAt: document.createdAt,
+              updatedAt: document.updatedAt
             })
               .then(() => res.status(201).send({
                 document: documentCreator(document)
               }))
-              .catch(() => res.status(400).send({ message: "Access field must be any of 'public' or 'private'" }));
+              .catch(() => res.status(500).send({ message: "Access field must be any of 'public' or 'private'" }));
           });
       });
   },
+  /**
+   * @description deletes a document
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Object } message
+   */
   delete(req, res) {
     Document.findById(req.params.id)
       .then((document) => {

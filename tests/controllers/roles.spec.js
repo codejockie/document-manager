@@ -210,12 +210,12 @@ describe('Roles endpoints', () => {
         });
     });
 
-    it('given an invalid id, it returns a 400 status', (done) => {
+    it('given an invalid id, it returns a 500 status', (done) => {
       request
         .get('/v1/roles/10124357878767767857')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
           done();
         });
@@ -278,12 +278,12 @@ describe('Roles endpoints', () => {
         });
     });
 
-    it('given an invalid id, it returns a 400 status', (done) => {
+    it('given an invalid id, it returns a 500 status', (done) => {
       request
         .put('/v1/roles/6900795794579575')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
           done();
         });
@@ -340,12 +340,12 @@ describe('Roles endpoints', () => {
         });
     });
 
-    it('given an invalid id, it returns a 400 status', (done) => {
+    it('given an invalid id, it returns a 500 status', (done) => {
       request
         .delete('/v1/roles/101243578787677678575')
         .set('X-Auth', authToken)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
           done();
         });

@@ -5,6 +5,13 @@ const Document = models.Document;
 const User = models.User;
 
 export default {
+  /**
+   * @description searches for occurrences of a user
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Array } users
+   */
   searchUser(req, res) {
     const query = req.query.q.trim();
 
@@ -37,6 +44,13 @@ export default {
         });
       });
   },
+  /**
+   * @description searches for occurrences of a document
+   * @method
+   * @param { Object } req
+   * @param { Object } res
+   * @returns { Array } documents
+   */
   searchDocument(req, res) {
     const query = req.query.q.trim();
 
@@ -52,8 +66,7 @@ export default {
             },
           ]
         }
-      },
-      order: [['createdAt', 'DESC']]
+      }
     })
       .then((documents) => {
         if (documents.length === 0) {
