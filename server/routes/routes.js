@@ -33,12 +33,12 @@ const routes = (router) => {
     .delete(middleware.authenticate, middleware.isAdministrator,
       middleware.validateParam, middleware.findRoleById, roleController.delete);
 
-  // Search route
+  // Search routes
   router.route('/search/users')
-    .get(middleware.validateQuery, searchController.searchUser);
+    .get(middleware.authenticate, middleware.validateQuery, searchController.searchUser);
 
   router.route('/search/documents')
-    .get(middleware.validateQuery, searchController.searchDocument);
+    .get(middleware.authenticate, middleware.validateQuery, searchController.searchDocument);
 
   // User routes
   router.route('/users/login')
@@ -50,7 +50,7 @@ const routes = (router) => {
   router.route('/users')
     .get(middleware.authenticate,
       middleware.isAdministrator, middleware.validateLimitAndOffset, userController.getAll)
-    .post(middleware.validateUser, userController.signup);
+    .post(middleware.validateUser, userController.create);
 
   router.route('/users/:id')
     .get(middleware.authenticate,
@@ -61,8 +61,8 @@ const routes = (router) => {
       middleware.validateParam, middleware.findUserById, userController.delete);
 
   router.route('/users/:id/documents')
-    .get(middleware.authenticate,
-      middleware.validateParam, middleware.findUserById, userController.getUserDocuments);
+    .get(middleware.authenticate, middleware.validateParam,
+      middleware.findUserById, middleware.validateLimitAndOffset, userController.getUserDocuments);
 };
 
 export default routes;

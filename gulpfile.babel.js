@@ -24,7 +24,7 @@ gulp.task('test', ['compile'], (done) => {
           verbose: true
         }))
         .pipe(istanbul.writeReports())
-        .pipe(istanbul.enforceThresholds({ thresholds: { global: 90 } }))
+        .pipe(istanbul.enforceThresholds({ thresholds: { global: 85 } }))
         .on('end', done)
         .pipe(exit());
     });

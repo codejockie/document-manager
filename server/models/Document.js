@@ -18,7 +18,7 @@ export default (sequelize, DataTypes) => {
     access: {
       allowNull: false,
       type: DataTypes.ENUM,
-      values: ['private', 'public']
+      values: ['private', 'public', 'role']
     },
     userId: {
       type: DataTypes.INTEGER,

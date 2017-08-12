@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import lodash from 'lodash';
 import models from '../models';
 import { documentCreator, hashPassword, isAdmin, isUser, userCreator } from '../helpers/helper';
 import { findByEmailAndPassword, generateAuthToken } from '../helpers/jwt';
@@ -6,6 +6,7 @@ import paginate from '../helpers/paginate';
 
 const User = models.User;
 const Document = models.Document;
+const serverErrorMessage = 'An error occurred while processing the request';
 
 export default {
   /**
@@ -16,7 +17,7 @@ export default {
    * @returns { Object } user
    */
   login(req, res) {
-    const body = _.pick(req.body, ['email', 'password']);
+    const body = lodash.pick(req.body, ['email', 'password']);
 
     findByEmailAndPassword(body.email, body.password)
       .then((user) => {
@@ -49,7 +50,7 @@ export default {
    * @param { Object } res
    * @returns { Object } user
    */
-  signup(req, res) {
+  create(req, res) {
     User.findOne({
       where: {
         $or: [
@@ -78,7 +79,10 @@ export default {
             user: userCreator(newUser),
             token
           });
-        });
+        })
+        .catch(() => res.status(500).send({
+          message: serverErrorMessage
+        }));
     });
   },
   /**
@@ -89,20 +93,21 @@ export default {
    * @returns { Array } users
    */
   getAll(req, res) {
-    User.findAll()
-      .then((response) => {
-        const totalCount = response.length;
-        const offset = req.query.offset || 0;
-        const limit = req.query.limit || 10;
-        return User.findAll({
-          offset,
-          limit,
-        })
-          .then(users => res.status(200).send({
-            metaData: paginate(limit, offset, totalCount),
-            users: users.map(user => userCreator(user)),
-          }));
-      });
+    const offset = req.query.offset || 0;
+    const limit = req.query.limit || 10;
+    User.findAll({
+      offset,
+      limit,
+    })
+      .then((users) => {
+        res.status(200).send({
+          metaData: paginate(limit, offset, users.length),
+          users: users.map(user => userCreator(user)),
+        });
+      })
+      .catch(() => res.status(500).send({
+        message: serverErrorMessage
+      }));
   },
   /**
    * @description retrieves a user
@@ -114,14 +119,14 @@ export default {
   getOne(req, res) {
     User.findById(req.params.id)
       .then((user) => {
-        res.status(200).json({
-          id: user.id,
-          firstname: user.firstname,
-          lastname: user.lastname,
-          email: user.email,
-          username: user.username,
-          createdAt: user.createdAt
-        });
+        // ensures a user only has access to his own account
+        if (!isUser(user.id, req.user.id) && !isAdmin(req.user.roleId)) {
+          return res.status(401).send({
+            message: "Unauthorised user. You don't have permission to access this user"
+          });
+        }
+
+        res.status(200).send(userCreator(user));
       });
   },
   /**
@@ -132,31 +137,42 @@ export default {
    * @returns { Array } documents
    */
   getUserDocuments(req, res) {
-    Document.findAll()
-      .then((response) => {
-        const totalCount = response.length;
-        const offset = req.query.offset || 0;
-        const limit = req.query.limit || 10;
+    const options = {
+      attributes: {
+        exclude: ['roleId']
+      }
+    };
 
-        return Document.findAll({
-          where: {
-            userId: req.params.id
-          },
-          offset,
-          limit,
-        })
-          .then((documents) => {
-            if (documents.length === 0) {
-              return res.status(404).send({
-                message: 'No document found for this user'
-              });
-            }
-            return res.status(200).send({
-              metaData: paginate(limit, offset, totalCount),
-              documents: documents.map(document => (documentCreator(document)))
-            });
+    const role = req.user.roleId;
+
+    if (role === 1) {
+      options.where = { userId: req.params.id };
+    } else {
+      options.where = {
+        userId: req.params.id,
+        access: 'public'
+      };
+    }
+
+    options.offset = req.query.offset || 0;
+    options.limit = req.query.limit || 10;
+
+    Document.findAll(options)
+      .then((documents) => {
+        if (documents.length === 0) {
+          return res.status(404).send({
+            message: 'No document found for this user'
           });
-      });
+        }
+
+        return res.status(200).send({
+          metaData: paginate(options.limit, options.offset, documents.length),
+          documents: documents.map(document => (documentCreator(document)))
+        });
+      })
+      .catch(() => res.status(500).send({
+        message: serverErrorMessage
+      }));
   },
   /**
    * @description updates a user
@@ -199,8 +215,12 @@ export default {
               password: req.body.password ? hashPassword(req.body.password) : user.password,
               roleId: isAdmin(req.user.roleId) ? req.body.roleId : user.roleId
             })
-              .then(() => res.status(200).send(userCreator(user)));
-          });
+              .then(() => res.status(200).send(userCreator(user)))
+              .catch(() => res.status(500).send({ message: 'No role with that ID' }));
+          })
+          .catch(() => res.status(500).send({
+            message: serverErrorMessage
+          }));
       });
   },
   /**
@@ -223,6 +243,9 @@ export default {
           .then(() => res.status(200).json({
             message: 'User deleted successfully'
           }));
-      });
+      })
+      .catch(() => res.status(500).send({
+        message: serverErrorMessage
+      }));
   }
 };

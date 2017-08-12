@@ -150,11 +150,18 @@ export default {
    * @returns {json} json error response
    */
   validateLimitAndOffset(req, res, next) {
-    if (req.query.limit || req.query.offset) {
-      if (!Number.isInteger(Number(req.query.limit))
-        || !Number.isInteger(Number(req.query.offset))) {
+    if (req.query.limit) {
+      if (!Number.isInteger(Number(req.query.limit))) {
         return res.status(400).send({
-          message: 'Limit and Offset params must be numbers'
+          message: 'Limit must be an integer'
+        });
+      }
+    }
+
+    if (req.query.offset) {
+      if (!Number.isInteger(Number(req.query.offset))) {
+        return res.status(400).send({
+          message: 'Offset must be an integer'
         });
       }
     }

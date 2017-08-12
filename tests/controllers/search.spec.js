@@ -170,7 +170,7 @@ describe('Search endpoints', () => {
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.documents).to.have.lengthOf(2);
+          expect(res.body.documents).to.have.lengthOf(3);
           expect(res.body.documents[0].title).to.equal('Data 1');
           expect(res.body.documents[1].content).to.equal('Tests Running');
           done();
