@@ -13,6 +13,7 @@ const authToken = process.env.AUTH_TOKEN;
 const token = process.env.TOKEN;
 const invalidToken = process.env.INVALID_TOKEN;
 const nonUserToken = process.env.NON_USER_TOKEN;
+const accessError = "Access field must be any of 'public' or 'private' or 'role'";
 
 describe('Documents endpoints', () => {
   beforeEach((done) => {
@@ -60,14 +61,21 @@ describe('Documents endpoints', () => {
   // GET /v1/documents route
   describe('GET /v1/documents', () => {
     beforeEach((done) => {
-      User.create({
+      User.bulkCreate([{
         username: process.env.USERNAME,
         firstname: process.env.FIRSTNAME,
         lastname: process.env.LASTNAME,
         password: process.env.PASSWORD,
         email: process.env.EMAIL,
         roleId: 1
-      }).then((err) => {
+      }, {
+        username: 'acedcoder',
+        firstname: process.env.FIRSTNAME,
+        lastname: process.env.LASTNAME,
+        password: 'test',
+        email: 'devjckennedy@gmail.com',
+        roleId: 2
+      }]).then((err) => {
         if (!err) {
           //
         }
@@ -75,7 +83,7 @@ describe('Documents endpoints', () => {
       });
     });
 
-    it('retrieves all documents', (done) => {
+    it('given an admin, it retrieves all documents', (done) => {
       Document.bulkCreate([{
         title: 'Data 1',
         content: 'Running Tests',
@@ -114,13 +122,52 @@ describe('Documents endpoints', () => {
         });
     });
 
+    it('given a non admin, it retrieves based on access type', (done) => {
+      Document.bulkCreate([{
+        title: 'Data 1',
+        content: 'Running Tests',
+        author: 'John Kennedy',
+        access: 'role',
+        userId: 1,
+        roleId: 2
+      }, {
+        title: 'Data 2',
+        content: 'Tests Running',
+        author: 'John Kennedy',
+        access: 'private',
+        userId: 1,
+        roleId: 1,
+      }, {
+        title: 'Data 3',
+        content: 'Tests Running!!!',
+        author: 'John Kennedy',
+        access: 'public',
+        userId: 1,
+        roleId: 1,
+      }]).then(() => {
+        //
+      });
+
+      request
+        .get('/v1/documents')
+        .set('Accept', 'application/json')
+        .set('X-Auth', token)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body.documents[0].title).to.equal('Data 1');
+          expect(res.body.documents[1].title).to.equal('Data 3');
+          expect(res.body.documents).to.have.lengthOf(2);
+          done();
+        });
+    });
+
     it('validates offset and limit query params', (done) => {
       request
-        .get('/v1/documents/?limit=cj&offset=0')
+        .get('/v1/documents/?limit=10&offset=cj')
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body.message).to.equal('Limit and Offset params must be numbers');
+          expect(res.body.message).to.equal('Offset must be an integer');
           done();
         });
     });
@@ -164,7 +211,7 @@ describe('Documents endpoints', () => {
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.metaData.pageSize).to.equal(1);
-          expect(res.body.metaData.totalCount).to.equal(4);
+          expect(res.body.metaData.totalCount).to.equal(1);
           expect(res.body.documents[0].title).to.equal('Data 4');
           done();
         });
@@ -283,7 +330,7 @@ describe('Documents endpoints', () => {
         });
     });
 
-    it('given an invalid access type, it should return a 400 status', (done) => {
+    it('given an invalid access type, it should return a 500 status', (done) => {
       const document = {
         title: 'Complete data',
         content: 'Running Tests',
@@ -303,7 +350,7 @@ describe('Documents endpoints', () => {
             .send(document)
             .end((err, res) => {
               expect(res.status).to.equal(500);
-              expect(res.body.message).to.equal("Access field must be any of 'public' or 'private'");
+              expect(res.body.message).to.equal(accessError);
               done();
             });
         });
@@ -574,7 +621,7 @@ describe('Documents endpoints', () => {
           })
           .end((err, res) => {
             expect(res.status).to.equal(500);
-            expect(res.body.message).to.equal("Access field must be any of 'public' or 'private'");
+            expect(res.body.message).to.equal(accessError);
             done();
           });
       });

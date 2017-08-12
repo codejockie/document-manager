@@ -197,7 +197,7 @@ describe('Users endpoints', () => {
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body.message).to.equal('Limit and Offset params must be numbers');
+          expect(res.body.message).to.equal('Limit must be an integer');
           done();
         });
     });
@@ -209,7 +209,7 @@ describe('Users endpoints', () => {
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.metaData.pageSize).to.equal(1);
-          expect(res.body.metaData.totalCount).to.equal(2);
+          expect(res.body.metaData.totalCount).to.equal(1);
           expect(res.body.users).to.be.an('array');
           expect(res.body.users[0].firstname).to.equal('Kennedy');
           expect(res.body.users[0].email).to.equal(process.env.EMAIL);

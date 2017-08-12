@@ -67,7 +67,7 @@ export function isUser(id, userId) {
  * @returns {Object} response
  */
 export function documentCreator(document) {
-  const documentData = {
+  return {
     id: document.id,
     title: document.title,
     content: document.content,
@@ -77,12 +77,6 @@ export function documentCreator(document) {
     roleId: document.roleId,
     createdAt: document.createdAt,
   };
-
-  if (document.updatedAt) {
-    documentData.updatedAt = document.updatedAt;
-  }
-
-  return documentData;
 }
 
 /**
@@ -106,7 +100,7 @@ export function roleCreator(role) {
  * @returns {Object} response
  */
 export function userCreator(user) {
-  const userData = {
+  return {
     id: user.id,
     firstname: user.firstname,
     lastname: user.lastname,
@@ -115,10 +109,4 @@ export function userCreator(user) {
     roleId: user.roleId,
     createdAt: user.createdAt,
   };
-
-  if (user.updatedAt) {
-    userData.updatedAt = user.updatedAt;
-  }
-
-  return userData;
 }

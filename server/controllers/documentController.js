@@ -3,6 +3,8 @@ import { documentCreator, isUser } from '../helpers/helper';
 import paginate from '../helpers/paginate';
 
 const Document = models.Document;
+const accessErrorMessage = "Access field must be any of 'public' or 'private' or 'role'";
+const serverErrorMessage = 'An error occurred while processing the request';
 
 export default {
   /**
@@ -34,7 +36,9 @@ export default {
           roleId: req.user.roleId
         })
           .then(newDoc => res.status(201).send(documentCreator(newDoc)))
-          .catch(() => res.status(500).send({ message: "Access field must be any of 'public' or 'private'" }));
+          .catch(() => res.status(500).send({
+            message: accessErrorMessage
+          }));
       });
   },
   /**
@@ -45,38 +49,54 @@ export default {
    * @returns { Array } documents
    */
   getAll(req, res) {
-    Document.findAll()
-      .then((response) => {
-        const totalCount = response.length;
-        const offset = req.query.offset || 0;
-        const limit = req.query.limit || 10;
+    const options = {
+      attributes: {
+        exclude: ['roleId']
+      }
+    };
 
-        return Document.findAll({
-          where: {
-            $or: [{
-              userId: req.user.id
-            }, {
-              roleId: req.user.roleId
-            }, {
-              access: 'public'
-            }]
-          },
-          offset,
-          limit,
-        })
-          .then((documents) => {
-            if (documents.length === 0) {
-              return res.status(404).send({
-                message: 'No document found'
-              });
+    const currentUser = req.user.id;
+    const role = req.user.roleId;
+
+    if (role === 1) {
+      options.where = {};
+    } else {
+      options.where = {
+        $or: [
+          { access: 'public' },
+          { access: 'role',
+            $and: {
+              roleId: role
             }
+          },
+          { access: 'private',
+            $and: {
+              userId: currentUser
+            }
+          }
+        ]
+      };
+    }
 
-            return res.status(200).send({
-              metaData: paginate(limit, offset, totalCount),
-              documents: documents.map(document => (documentCreator(document)))
-            });
+    options.offset = req.query.offset || 0;
+    options.limit = req.query.limit || 10;
+
+    Document.findAll(options)
+      .then((documents) => {
+        if (documents.length === 0) {
+          return res.status(404).send({
+            message: 'No document found'
           });
-      });
+        }
+
+        return res.status(200).send({
+          metaData: paginate(options.limit, options.offset, documents.length),
+          documents: documents.map(document => (documentCreator(document)))
+        });
+      })
+      .catch(() => res.status(500).send({
+        message: serverErrorMessage
+      }));
   },
   /**
    * @description retrieves a document
@@ -142,7 +162,9 @@ export default {
               .then(() => res.status(201).send({
                 document: documentCreator(document)
               }))
-              .catch(() => res.status(500).send({ message: "Access field must be any of 'public' or 'private'" }));
+              .catch(() => res.status(500).send({
+                message: accessErrorMessage
+              }));
           });
       });
   },
@@ -166,6 +188,7 @@ export default {
           .then(() => res.status(200).send({
             message: 'Document deleted successfully'
           }));
-      });
+      })
+      .catch(() => res.status(500).send({ message: serverErrorMessage }));
   }
 };

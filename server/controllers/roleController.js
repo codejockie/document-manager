@@ -2,6 +2,7 @@ import models from '../models';
 import { roleCreator } from '../helpers/helper';
 
 const Role = models.Role;
+const serverErrorMessage = 'An error occurred while processing the request';
 
 export default {
   /**
@@ -29,7 +30,10 @@ export default {
             name: req.body.name
           })
           .then(newRole => res.status(201).send(roleCreator(newRole)));
-      });
+      })
+      .catch(() => res.status(500).send({
+        message: serverErrorMessage
+      }));
   },
   /**
    * @description retrieves all roles
@@ -43,6 +47,9 @@ export default {
       .all()
       .then(roles => res.status(200).send({
         roles
+      }))
+      .catch(() => res.status(500).send({
+        message: serverErrorMessage
       }));
   },
   /**
@@ -54,7 +61,10 @@ export default {
    */
   getOne(req, res) {
     Role.findById(req.params.id)
-      .then(role => res.status(200).send(roleCreator(role)));
+      .then(role => res.status(200).send(roleCreator(role)))
+      .catch(() => res.status(500).send({
+        message: serverErrorMessage
+      }));
   },
   /**
    * @description updates a role
@@ -85,7 +95,10 @@ export default {
             })
               .then(() => res.status(200).send(roleCreator(role)));
           });
-      });
+      })
+      .catch(() => res.status(500).send({
+        message: serverErrorMessage
+      }));
   },
   /**
    * @description deletes a role
@@ -102,6 +115,9 @@ export default {
           .then(() => res.status(200).send({
             message: 'Role deleted successfully'
           }));
-      });
+      })
+      .catch(() => res.status(500).send({
+        message: serverErrorMessage
+      }));
   }
 };

@@ -16,11 +16,5 @@ export default (limit, offset, count) => {
   metaData.pageSize = Number(limit);
   metaData.totalCount = count;
 
-  if (metaData.page === metaData.pageCount && offset !== 0) {
-    metaData.pageSize = metaData.totalCount % offset === 0 ?
-      metaData.totalCount - offset : metaData.totalCount % offset;
-    metaData.pageSize = Number(metaData.pageSize);
-  }
-
   return metaData;
 };

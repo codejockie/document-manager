@@ -3,6 +3,7 @@ import { documentCreator } from '../helpers/helper';
 
 const Document = models.Document;
 const User = models.User;
+const serverErrorMessage = 'An error occurred while processing the request';
 
 export default {
   /**
@@ -26,6 +27,9 @@ export default {
             $iLike: `%${query}%`
           }
         }]
+      },
+      attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt']
       }
     })
       .then((users) => {
@@ -42,7 +46,8 @@ export default {
               username: user.username
             }))
         });
-      });
+      })
+      .catch(() => res.status(500).send({ message: serverErrorMessage }));
   },
   /**
    * @description searches for occurrences of a document
@@ -56,16 +61,11 @@ export default {
 
     Document.findAll({
       where: {
-        $and: {
-          title: {
-            $iLike: `%${query}%`
-          },
-          $or: [
-            {
-              access: 'public',
-            },
-          ]
-        }
+        title: { $iLike: `%${query}%` },
+        $or: [{ access: 'public' }, { userId: req.user.id }]
+      },
+      attributes: {
+        exclude: ['roleId']
       }
     })
       .then((documents) => {
@@ -77,6 +77,7 @@ export default {
         return res.status(200).send({
           documents: documents.map(document => documentCreator(document))
         });
-      });
+      })
+      .catch(() => res.status(500).send({ message: serverErrorMessage }));
   }
 };

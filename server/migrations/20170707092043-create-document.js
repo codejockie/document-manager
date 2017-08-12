@@ -22,7 +22,7 @@ module.exports = {
     access: {
       allowNull: false,
       type: Sequelize.ENUM,
-      values: ['private', 'public']
+      values: ['private', 'public', 'role']
     },
     userId: {
       type: Sequelize.INTEGER,
