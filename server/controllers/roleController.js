@@ -1,5 +1,5 @@
 import models from '../models';
-import { roleCreator } from '../helpers/helper';
+import { generateRoleObject } from '../helpers/helper';
 
 const Role = models.Role;
 const serverErrorMessage = 'An error occurred while processing the request';
@@ -29,7 +29,7 @@ export default {
           .create({
             name: req.body.name
           })
-          .then(newRole => res.status(201).send(roleCreator(newRole)));
+          .then(newRole => res.status(201).send(generateRoleObject(newRole)));
       })
       .catch(() => res.status(500).send({
         message: serverErrorMessage
@@ -61,7 +61,7 @@ export default {
    */
   getOne(req, res) {
     Role.findById(req.params.id)
-      .then(role => res.status(200).send(roleCreator(role)))
+      .then(role => res.status(200).send(generateRoleObject(role)))
       .catch(() => res.status(500).send({
         message: serverErrorMessage
       }));
@@ -93,7 +93,7 @@ export default {
             return role.update({
               name: req.body.name
             })
-              .then(() => res.status(200).send(roleCreator(role)));
+              .then(() => res.status(200).send(generateRoleObject(role)));
           });
       })
       .catch(() => res.status(500).send({

@@ -1,5 +1,5 @@
 import models from '../models';
-import { documentCreator, isUser } from '../helpers/helper';
+import { generateDocumentObject, isUser } from '../helpers/helper';
 import paginate from '../helpers/paginate';
 
 const Document = models.Document;
@@ -35,7 +35,7 @@ export default {
           userId: req.user.id,
           roleId: req.user.roleId
         })
-          .then(newDoc => res.status(201).send(documentCreator(newDoc)))
+          .then(newDoc => res.status(201).send(generateDocumentObject(newDoc)))
           .catch(() => res.status(500).send({
             message: accessErrorMessage
           }));
@@ -91,7 +91,7 @@ export default {
 
         return res.status(200).send({
           metaData: paginate(options.limit, options.offset, documents.length),
-          documents: documents.map(document => (documentCreator(document)))
+          documents: documents.map(document => (generateDocumentObject(document)))
         });
       })
       .catch(() => res.status(500).send({
@@ -116,8 +116,11 @@ export default {
           });
         }
 
-        return res.status(200).send(documentCreator(document));
-      });
+        return res.status(200).send(generateDocumentObject(document));
+      })
+      .catch(() => res.status(500).send({
+        message: serverErrorMessage
+      }));
   },
   /**
    * @description updates a document
@@ -160,7 +163,7 @@ export default {
               updatedAt: document.updatedAt
             })
               .then(() => res.status(201).send({
-                document: documentCreator(document)
+                document: generateDocumentObject(document)
               }))
               .catch(() => res.status(500).send({
                 message: accessErrorMessage

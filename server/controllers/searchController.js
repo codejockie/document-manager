@@ -1,5 +1,5 @@
 import models from '../models';
-import { documentCreator } from '../helpers/helper';
+import { generateDocumentObject } from '../helpers/helper';
 
 const Document = models.Document;
 const User = models.User;
@@ -75,7 +75,7 @@ export default {
           });
         }
         return res.status(200).send({
-          documents: documents.map(document => documentCreator(document))
+          documents: documents.map(document => generateDocumentObject(document))
         });
       })
       .catch(() => res.status(500).send({ message: serverErrorMessage }));

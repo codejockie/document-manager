@@ -14,6 +14,25 @@ export function formatDate(date) {
 }
 
 /**
+ * @description generates document object response
+ * @function
+ * @param {Object} document The document sent from the controller
+ * @returns {Object} response
+ */
+export function generateDocumentObject(document) {
+  return {
+    id: document.id,
+    title: document.title,
+    content: document.content,
+    author: document.author,
+    access: document.access,
+    userId: document.userId,
+    roleId: document.roleId,
+    createdAt: document.createdAt,
+  };
+}
+
+/**
  * @description creates errors in Object format
  * @function
  * @param {Array} errors The caught errors during validation
@@ -26,6 +45,38 @@ export function generateErrors(errors) {
   });
 
   return response;
+}
+
+/**
+ * @description generates role object response
+ * @function
+ * @param {Object} role The role sent from the controller
+ * @returns {Object} response
+ */
+export function generateRoleObject(role) {
+  return {
+    id: role.id,
+    name: role.name,
+    createdAt: role.createdAt
+  };
+}
+
+/**
+ * @description generates user object response
+ * @function
+ * @param {Object} user The user sent from the controller
+ * @returns {Object} response
+ */
+export function generateUserObject(user) {
+  return {
+    id: user.id,
+    firstname: user.firstname,
+    lastname: user.lastname,
+    email: user.email,
+    username: user.username,
+    roleId: user.roleId,
+    createdAt: user.createdAt,
+  };
 }
 
 /**
@@ -42,7 +93,7 @@ export function hashPassword(password) {
 /**
  * @description checks if a user has admin privileges
  * @function
- * @param {Object} userRoleId The user's id
+ * @param {Object} userRoleId The user's role id
  * @returns {boolean} true/false
  */
 export function isAdmin(userRoleId) {
@@ -58,55 +109,4 @@ export function isAdmin(userRoleId) {
  */
 export function isUser(id, userId) {
   return id === userId;
-}
-
-/**
- * @description generates document object response
- * @function
- * @param {Object} document The document sent from the controller
- * @returns {Object} response
- */
-export function documentCreator(document) {
-  return {
-    id: document.id,
-    title: document.title,
-    content: document.content,
-    author: document.author,
-    access: document.access,
-    userId: document.userId,
-    roleId: document.roleId,
-    createdAt: document.createdAt,
-  };
-}
-
-/**
- * @description generates role object response
- * @function
- * @param {Object} role The role sent from the controller
- * @returns {Object} response
- */
-export function roleCreator(role) {
-  return {
-    id: role.id,
-    name: role.name,
-    createdAt: role.createdAt
-  };
-}
-
-/**
- * @description generates user object response
- * @function
- * @param {Object} user The user sent from the controller
- * @returns {Object} response
- */
-export function userCreator(user) {
-  return {
-    id: user.id,
-    firstname: user.firstname,
-    lastname: user.lastname,
-    email: user.email,
-    username: user.username,
-    roleId: user.roleId,
-    createdAt: user.createdAt,
-  };
 }

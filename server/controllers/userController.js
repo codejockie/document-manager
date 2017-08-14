@@ -1,6 +1,6 @@
 import lodash from 'lodash';
 import models from '../models';
-import { documentCreator, hashPassword, isAdmin, isUser, userCreator } from '../helpers/helper';
+import { generateDocumentObject, hashPassword, isAdmin, isUser, generateUserObject } from '../helpers/helper';
 import { findByEmailAndPassword, generateAuthToken } from '../helpers/jwt';
 import paginate from '../helpers/paginate';
 
@@ -23,11 +23,11 @@ export default {
       .then((user) => {
         const token = generateAuthToken(user.id, user.email, user.username);
         res.header('X-Auth', token).send({
-          user: userCreator(user),
+          user: generateUserObject(user),
           token
         });
       })
-      .catch(() => res.status(404).send({
+      .catch(() => res.status(401).send({
         message: 'Username or Password incorrect'
       }));
   },
@@ -76,7 +76,7 @@ export default {
         .then((newUser) => {
           const token = generateAuthToken(newUser.id, newUser.email, newUser.username);
           res.header('X-Auth', token).status(201).send({
-            user: userCreator(newUser),
+            user: generateUserObject(newUser),
             token
           });
         })
@@ -102,7 +102,7 @@ export default {
       .then((users) => {
         res.status(200).send({
           metaData: paginate(limit, offset, users.length),
-          users: users.map(user => userCreator(user)),
+          users: users.map(user => generateUserObject(user)),
         });
       })
       .catch(() => res.status(500).send({
@@ -126,8 +126,11 @@ export default {
           });
         }
 
-        res.status(200).send(userCreator(user));
-      });
+        res.status(200).send(generateUserObject(user));
+      })
+      .catch(() => res.status(500).send({
+        message: serverErrorMessage
+      }));
   },
   /**
    * @description gets a user's documents
@@ -167,7 +170,7 @@ export default {
 
         return res.status(200).send({
           metaData: paginate(options.limit, options.offset, documents.length),
-          documents: documents.map(document => (documentCreator(document)))
+          documents: documents.map(document => (generateDocumentObject(document)))
         });
       })
       .catch(() => res.status(500).send({
@@ -215,7 +218,7 @@ export default {
               password: req.body.password ? hashPassword(req.body.password) : user.password,
               roleId: isAdmin(req.user.roleId) ? req.body.roleId : user.roleId
             })
-              .then(() => res.status(200).send(userCreator(user)))
+              .then(() => res.status(200).send(generateUserObject(user)))
               .catch(() => res.status(500).send({ message: 'No role with that ID' }));
           })
           .catch(() => res.status(500).send({

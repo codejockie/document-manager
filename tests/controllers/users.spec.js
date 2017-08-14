@@ -87,7 +87,7 @@ describe('Users endpoints', () => {
         });
     });
 
-    it('given non-existing account details, it returns a 404 status', (done) => {
+    it('given non-existing account details, it returns a 401 status', (done) => {
       request
         .post('/v1/users/login')
         .send({
@@ -95,7 +95,7 @@ describe('Users endpoints', () => {
           password: process.env.PASSWORD
         })
         .end((err, res) => {
-          expect(res.status).to.equal(404);
+          expect(res.status).to.equal(401);
           expect(res.body.message).to.equal('Username or Password incorrect');
           done();
         });
@@ -149,7 +149,7 @@ describe('Users endpoints', () => {
           password: 'test'
         })
         .end((err, res) => {
-          expect(res.status).to.equal(404);
+          expect(res.status).to.equal(401);
           expect(res.body.message).to.equal('Username or Password incorrect');
           done();
         });
