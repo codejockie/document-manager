@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import validator from 'express-validator';
 
 import routes from './routes';
+import { authenticate } from './middleware/middleware';
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ app.use(validator());
 app.use(express.static(path.resolve(`${__dirname}./../public`)));
 
 routes(router);
-app.use('/v1', router);
+app.use('/v1', authenticate, router);
 
 app.get('/', (req, res) => {
   res.status(200).render('index.html');
