@@ -20,6 +20,7 @@ app.use(validator());
 app.use(express.static(path.resolve(`${__dirname}./../public`)));
 
 routes(router);
+app.use('/v1/auth', router);
 app.use('/v1', authenticate, router);
 
 app.get('/', (req, res) => {

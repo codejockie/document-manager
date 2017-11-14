@@ -49,8 +49,8 @@ describe('Users endpoints', () => {
       });
   });
 
-  // POST /v1/users/login
-  describe('POST /v1/users/login', () => {
+  // POST /v1/auth/login
+  describe('POST /v1/auth/login', () => {
     beforeEach((done) => {
       User.bulkCreate([{
         username: process.env.USERNAME,
@@ -73,7 +73,7 @@ describe('Users endpoints', () => {
 
     it('should validate login details', (done) => {
       request
-        .post('/v1/users/login')
+        .post('/v1/auth/login')
         .send({
           email: 'codejockie@',
           password: ''
@@ -89,7 +89,7 @@ describe('Users endpoints', () => {
 
     it('given non-existing account details, it returns a 401 status', (done) => {
       request
-        .post('/v1/users/login')
+        .post('/v1/auth/login')
         .send({
           email: 'codejockie@codes.com',
           password: process.env.PASSWORD
@@ -103,7 +103,7 @@ describe('Users endpoints', () => {
 
     it('successfully authenticates a user', (done) => {
       request
-        .post('/v1/users/login')
+        .post('/v1/auth/login')
         .send({
           email: process.env.EMAIL,
           password: process.env.PASSWORD
@@ -116,7 +116,7 @@ describe('Users endpoints', () => {
 
     it('generates a token on successful authentication', (done) => {
       request
-        .post('/v1/users/login')
+        .post('/v1/auth/login')
         .send({
           email: process.env.EMAIL,
           password: process.env.PASSWORD
@@ -130,7 +130,7 @@ describe('Users endpoints', () => {
 
     it('sets the token on the header with a key of  X-Auth', (done) => {
       request
-        .post('/v1/users/login')
+        .post('/v1/auth/login')
         .send({
           email: process.env.EMAIL,
           password: process.env.PASSWORD
@@ -143,7 +143,7 @@ describe('Users endpoints', () => {
 
     it('given a wrong password, it throws an error', (done) => {
       request
-        .post('/v1/users/login')
+        .post('/v1/auth/login')
         .send({
           email: process.env.EMAIL,
           password: 'test'
@@ -156,11 +156,11 @@ describe('Users endpoints', () => {
     });
   });
 
-  // POST /v1/users/logout
-  describe('POST /v1/users/logout', () => {
+  // POST /v1/auth/logout
+  describe('POST /v1/auth/logout', () => {
     it('clears the X-Auth header on logout', (done) => {
       request
-        .post('/v1/users/logout')
+        .post('/v1/auth/logout')
         .expect(200)
         .end((err, res) => {
           expect(res.header['x-auth']).to.equal('');
@@ -272,8 +272,8 @@ describe('Users endpoints', () => {
     });
   });
 
-  // POST /v1/users route
-  describe('POST /v1/users', () => {
+  // POST /v1/auth/register route
+  describe('POST /v1/auth/register', () => {
     beforeEach((done) => {
       User.create({
         username: process.env.USERNAME,
@@ -300,7 +300,7 @@ describe('Users endpoints', () => {
       };
 
       request
-        .post('/v1/users')
+        .post('/v1/auth/register')
         .set('X-Auth', authToken)
         .send(user)
         .end((err, res) => {
@@ -326,7 +326,7 @@ describe('Users endpoints', () => {
       };
 
       request
-        .post('/v1/users/')
+        .post('/v1/auth/register')
         .set('X-Auth', authToken)
         .send(user)
         .end((err, res) => {
@@ -348,7 +348,7 @@ describe('Users endpoints', () => {
       };
 
       request
-        .post('/v1/users')
+        .post('/v1/auth/register')
         .send(user)
         .end((err, res) => {
           expect(res.status).to.equal(201);

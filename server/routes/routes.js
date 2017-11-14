@@ -9,11 +9,9 @@ import {
   findUserById,
   validateDocument,
   validateLimitAndOffset,
-  validateLogin,
   validateParam,
   validateQuery,
   validateRole,
-  validateUser
 } from '../middleware/middleware';
 
 const routes = (router) => {
@@ -48,15 +46,8 @@ const routes = (router) => {
     .get(validateQuery, searchController.searchDocument);
 
   // User routes
-  router.route('/users/login')
-    .post(validateLogin, userController.login);
-
-  router.route('/users/logout')
-    .post(userController.logout);
-
   router.route('/users')
-    .get(isAdministrator, validateLimitAndOffset, userController.getAll)
-    .post(validateUser, userController.create);
+    .get(isAdministrator, validateLimitAndOffset, userController.getAll);
 
   router.route('/users/:id')
     .get(validateParam, findUserById, userController.getOne)
