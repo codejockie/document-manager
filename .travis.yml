@@ -4,11 +4,11 @@ node_js:
 services:
   - postgresql
 before_script:
-- npm install -g gulp-cli
+- yarn global add gulp-cli
 - psql -c 'create database doc_man_test;' -U postgres
 - NODE_ENV=test sequelize db:migrate
 after_success:
-- npm install -g codeclimate-test-reporter
+- yarn global add codeclimate-test-reporter
 - codeclimate-test-reporter < ./coverage/lcov.info
 - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
 env:

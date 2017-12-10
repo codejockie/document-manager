@@ -19,8 +19,8 @@
 ## Project Dependencies
 ### Dependencies
 +  **[babel-cli](https://www.npmjs.com/package/babel-cli)** - Allows running the app in ES6 mode on the fly without having to transpile down to ES5
-+ **[babel-preset-es2015](https://www.npmjs.com/package/babel-preset-es2015)**, **[babel-preset-stage-0](https://www.npmjs.com/package/babel-preset-stage-0)** - These packages provide Babel presets for es2015 plugins, stage 0 plugins
-+  **[bcryptjs](https://www.npmjs.com/package/bcryptjs)** - Used to hash passwords
++ **[babel-preset-env](https://www.npmjs.com/package/babel-preset-env)**, **[babel-preset-stage-0](https://www.npmjs.com/package/babel-preset-stage-0)** - These packages provide Babel presets for es2015 plugins, stage 0 plugins
++  **[bcrypt](https://www.npmjs.com/package/bcrypt)** - Used to hash passwords
 +  **[body-parser](https://www.npmjs.com/package/body-parser)** - Node.js body parsing middleware. Parse incoming request bodies in a middleware before your handlers, available under the `req.body` property.
 +  **[dotenv](https://www.npmjs.com/package/dotenv)** - Loads environment variables
 +  **[express](https://www.npmjs.com/package/express)** - Used as the web server for this application
