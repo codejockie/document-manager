@@ -1,13 +1,12 @@
 import models from '../models';
 import { generateRoleObject } from '../helpers/helper';
+import { serverErrorMessage } from '../helpers/messages';
 
-const Role = models.Role;
-const serverErrorMessage = 'An error occurred while processing the request';
+const { Role } = models;
 
 export default {
   /**
-   * @description creates a new role
-   * @method
+   * Creates a new role
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } role
@@ -36,8 +35,7 @@ export default {
       }));
   },
   /**
-   * @description retrieves all roles
-   * @method
+   * Retrieves all roles
    * @param { Object } req
    * @param { Object } res
    * @returns { Array } roles
@@ -53,8 +51,7 @@ export default {
       }));
   },
   /**
-   * @description retrieves a role
-   * @method
+   * Retrieves a role
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } role
@@ -67,8 +64,7 @@ export default {
       }));
   },
   /**
-   * @description updates a role
-   * @method
+   * Updates a role
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } role
@@ -101,8 +97,7 @@ export default {
       }));
   },
   /**
-   * @description deletes a role
-   * @method
+   * Deletes a role
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } message

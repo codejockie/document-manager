@@ -1,15 +1,13 @@
 import models from '../models';
 import { generateDocumentObject, isUser } from '../helpers/helper';
 import paginate from '../helpers/paginate';
+import { accessErrorMessage, serverErrorMessage } from '../helpers/messages';
 
-const Document = models.Document;
-const accessErrorMessage = "Access field must be any of 'public' or 'private' or 'role'";
-const serverErrorMessage = 'An error occurred while processing the request';
+const { Document } = models;
 
 export default {
   /**
-   * @description creates a new document
-   * @method
+   * Creates a new document
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } document
@@ -42,8 +40,7 @@ export default {
       });
   },
   /**
-   * @description retrieves all documents
-   * @method
+   * Retrieves all documents
    * @param { Object } req
    * @param { Object } res
    * @returns { Array } documents
@@ -99,8 +96,7 @@ export default {
       }));
   },
   /**
-   * @description retrieves a document
-   * @method
+   * Retrieves a document
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } document
@@ -123,8 +119,7 @@ export default {
       }));
   },
   /**
-   * @description updates a document
-   * @method
+   * Updates a document
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } document
@@ -172,8 +167,7 @@ export default {
       });
   },
   /**
-   * @description deletes a document
-   * @method
+   * Deletes a document
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } message

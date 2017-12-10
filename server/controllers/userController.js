@@ -3,15 +3,13 @@ import models from '../models';
 import { generateDocumentObject, hashPassword, isAdmin, isUser, generateUserObject } from '../helpers/helper';
 import { findByEmailAndPassword, generateAuthToken } from '../helpers/jwt';
 import paginate from '../helpers/paginate';
+import { serverErrorMessage } from '../helpers/messages';
 
-const User = models.User;
-const Document = models.Document;
-const serverErrorMessage = 'An error occurred while processing the request';
+const { User, Document } = models;
 
 export default {
   /**
-   * @description logs a user in
-   * @method
+   * Logs a user in
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } user
@@ -32,8 +30,7 @@ export default {
       }));
   },
   /**
-   * @description logs out a user
-   * @method
+   * Logs out a user
    * @param { Object } req
    * @param { Object } res
    * @returns { void }
@@ -44,8 +41,7 @@ export default {
     res.header('X-Auth', '').status(200).send({ message: 'Logged out' });
   },
   /**
-   * @description creates a new user
-   * @method
+   * Creates a new user
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } user
@@ -70,7 +66,7 @@ export default {
         username: req.body.username,
         firstname: req.body.firstname,
         lastname: req.body.lastname,
-        password: hashPassword(req.body.password),
+        password: req.body.password,
         roleId: 2
       })
         .then((newUser) => {
@@ -86,8 +82,7 @@ export default {
     });
   },
   /**
-   * @description retrieves all users
-   * @method
+   * Retrieves all users
    * @param { Object } req
    * @param { Object } res
    * @returns { Array } users
@@ -110,8 +105,7 @@ export default {
       }));
   },
   /**
-   * @description retrieves a user
-   * @method
+   * Rretrieves a user
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } user
@@ -133,8 +127,7 @@ export default {
       }));
   },
   /**
-   * @description gets a user's documents
-   * @method
+   * Gets a user's documents
    * @param { Object } req
    * @param { Object } res
    * @returns { Array } documents
@@ -178,8 +171,7 @@ export default {
       }));
   },
   /**
-   * @description updates a user
-   * @method
+   * Updates a user
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } user
@@ -210,16 +202,17 @@ export default {
               });
             }
 
+            const password = req.body.password;
             return user.update({
               email: req.body.email || user.email,
               username: req.body.username || user.username,
               firstname: req.body.firstname || user.firstname,
               lastname: req.body.lastname || user.lastname,
-              password: req.body.password ? hashPassword(req.body.password) : user.password,
+              password: password ? hashPassword(password, true) : user.password,
               roleId: isAdmin(req.user.roleId) ? req.body.roleId : user.roleId
             })
               .then(() => res.status(200).send(generateUserObject(user)))
-              .catch(() => res.status(500).send({ message: 'No role with that ID' }));
+              .catch(error => res.status(500).send({ message: error.message }));
           })
           .catch(() => res.status(500).send({
             message: serverErrorMessage
@@ -227,8 +220,7 @@ export default {
       });
   },
   /**
-   * @description deletes a user
-   * @method
+   * Deletes a user
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } message
