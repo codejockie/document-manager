@@ -4,14 +4,14 @@
   "description": "A RESTful API based document management system",
   "main": "server/server.js",
   "scripts": {
-    "heroku-postbuild": "gulp compile",
-    "start": "node src/server.js",
-    "test": "NODE_ENV=test gulp test",
     "dev": "nodemon -w server --exec babel-node -- server/server.js",
+    "heroku-postbuild": "gulp compile",
     "migrate": "sequelize db:migrate && npm run seed",
-    "mocha": "NODE_ENV=test nyc --reporter=lcov --reporter=text --reporter=html mocha --timeout 90000 --compilers js:babel-register -- ./tests/**/*.spec.js",
     "seed": "sequelize db:seed:all",
-    "testmigrate": "NODE_ENV=test sequelize db:migrate",
+    "start": "node src/server.js",
+    "test": "gulp compile && npm run test:mocha",
+    "test:migrate": "NODE_ENV=test sequelize db:migrate",
+    "test:mocha": "NODE_ENV=test nyc --reporter=lcov --reporter=text --reporter=html mocha --timeout 90000 --compilers js:babel-register -- ./tests/**/*.spec.js",
     "undo": "sequelize db:migrate:undo:all"
   },
   "repository": {
