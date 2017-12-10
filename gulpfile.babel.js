@@ -7,9 +7,7 @@ import jasmine from 'gulp-jasmine';
 import nodemon from 'gulp-nodemon';
 
 gulp.task('compile', () => gulp.src('server/**/*.js')
-  .pipe(babel({
-    presets: ['es2015', 'stage-0']
-  }))
+  .pipe(babel())
   .pipe(gulp.dest('src')));
 
 gulp.task('test', ['compile'], (done) => {
