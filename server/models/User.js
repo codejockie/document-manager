@@ -1,4 +1,4 @@
-import { formatDate } from '../helpers/helper';
+import { formatDate, hashPassword } from '../helpers/helper';
 
 export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
@@ -57,5 +57,11 @@ export default (sequelize, DataTypes) => {
       onDelete: 'CASCADE'
     });
   };
+
+  User.beforeCreate(user => hashPassword(user.password)
+    .then((hash) => {
+      user.password = hash;
+    }));
+
   return User;
 };

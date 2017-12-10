@@ -3,67 +3,33 @@ import supertest from 'supertest';
 import app from '../../src/server';
 import models from '../../server/models';
 
-const Document = models.Document;
-const User = models.User;
-const Role = models.Role;
-
+const { Document, Role, User } = models;
 const request = supertest.agent(app);
-
 const authToken = process.env.AUTH_TOKEN;
 
 describe('Search endpoints', () => {
-  beforeEach((done) => {
-    User.destroy({
-      where: {},
-      truncate: true,
-      cascade: true,
-      restartIdentity: true
-    })
-      .then((err) => {
-        if (!err) {
-          Role.destroy({
-            where: {},
-            truncate: true,
-            cascade: true,
-            restartIdentity: true
-          })
-            .then((err) => {
-              if (!err) {
-                Role.bulkCreate([{
-                  name: 'admin'
-                },
-                {
-                  name: 'user'
-                }]).then((err) => {
-                  if (!err) {
-                    //
-                  }
-                  done();
-                });
-              }
-            });
-        }
+  before((done) => {
+    models.sequelize.sync({ force: true })
+      .then(() => {
+        Role.bulkCreate([
+          { name: 'admin' },
+          { name: 'user' }
+        ]);
+
+        User.create({
+          username: process.env.USERNAME,
+          firstname: process.env.FIRSTNAME,
+          lastname: process.env.LASTNAME,
+          password: process.env.PASSWORD,
+          email: process.env.EMAIL,
+          roleId: 1
+        })
+          .then(() => done());
       });
   });
 
   // GET /v1/search/users
   describe('GET /v1/search/users', () => {
-    beforeEach((done) => {
-      User.create({
-        username: process.env.USERNAME,
-        firstname: process.env.FIRSTNAME,
-        lastname: process.env.LASTNAME,
-        password: process.env.PASSWORD,
-        email: process.env.EMAIL,
-        roleId: 1
-      }).then((err) => {
-        if (!err) {
-          //
-        }
-        done();
-      });
-    });
-
     it('returns a 400 status if query param is not supplied', (done) => {
       request
         .get('/v1/search/users?q=')
@@ -101,22 +67,6 @@ describe('Search endpoints', () => {
 
   // GET /v1/search/documents
   describe('GET /v1/search/documents', () => {
-    beforeEach((done) => {
-      User.create({
-        username: process.env.USERNAME,
-        firstname: process.env.FIRSTNAME,
-        lastname: process.env.LASTNAME,
-        password: process.env.PASSWORD,
-        email: process.env.EMAIL,
-        roleId: 1
-      }).then((err) => {
-        if (!err) {
-          //
-        }
-        done();
-      });
-    });
-
     it('returns a 400 status if query param is not supplied', (done) => {
       request
         .get('/v1/search/documents?q=')

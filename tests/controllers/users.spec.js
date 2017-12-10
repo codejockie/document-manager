@@ -3,74 +3,108 @@ import supertest from 'supertest';
 import isEmpty from 'lodash/isEmpty';
 import app from '../../src/server';
 import models from '../../server/models';
-import { hashPassword } from '../../server/helpers/helper';
 
-const Document = models.Document;
-const User = models.User;
-const Role = models.Role;
-
+const { Document, Role, User } = models;
 const request = supertest.agent(app);
 
 const authToken = process.env.AUTH_TOKEN;
 const token = process.env.TOKEN;
 
 describe('Users endpoints', () => {
-  beforeEach((done) => {
-    User.destroy({
-      where: {},
-      truncate: true,
-      cascade: true,
-      restartIdentity: true
-    })
-      .then((err) => {
-        if (!err) {
-          Role.destroy({
-            where: {},
-            truncate: true,
-            cascade: true,
-            restartIdentity: true
-          })
-            .then((err) => {
-              if (!err) {
-                Role.bulkCreate([{
-                  name: 'admin'
-                },
-                {
-                  name: 'user'
-                }]).then((err) => {
-                  if (!err) {
-                    //
-                  }
-                  done();
-                });
-              }
-            });
-        }
+  before((done) => {
+    models.sequelize.sync({ force: true })
+      .then(() => {
+        Role.bulkCreate([
+          { name: 'admin' },
+          { name: 'user' }
+        ]);
+
+        User.create({
+          username: process.env.USERNAME,
+          firstname: process.env.FIRSTNAME,
+          lastname: process.env.LASTNAME,
+          password: process.env.PASSWORD,
+          email: process.env.EMAIL,
+          roleId: 1
+        }).then(() => {
+          done();
+        });
       });
+  });
+
+  // POST /v1/auth/register route
+  describe('POST /v1/auth/register', () => {
+    it('should not POST incomplete user data', (done) => {
+      const user = {
+        username: '',
+        firstname: '',
+        lastname: '',
+        password: '',
+        email: process.env.EMAIL,
+      };
+
+      request
+        .post('/v1/auth/register')
+        .send(user)
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(isEmpty(res.body.errors)).to.equal(false);
+          expect(res.body.errors.username).to.equal('Username is required');
+          expect(res.body.errors.firstname).to.equal('Firstname is required');
+          expect(res.body.errors.lastname).to.equal('Lastname is required');
+          expect(res.body.errors.password).to.equal('Password is required');
+          expect(res.body.errors).to.not.have.property('email');
+          done();
+        });
+    });
+
+    it('should return 422 status message for duplicate user', (done) => {
+      const user = {
+        username: process.env.USERNAME,
+        firstname: process.env.FIRSTNAME,
+        lastname: process.env.LASTNAME,
+        password: process.env.PASSWORD,
+        email: process.env.EMAIL,
+        roleId: 1
+      };
+
+      request
+        .post('/v1/auth/register')
+        .send(user)
+        .end((err, res) => {
+          expect(res.status).to.equal(422);
+          expect(res.body.message).to
+            .equal('username and email must be unique');
+          done();
+        });
+    });
+
+    it('should post a valid user data', (done) => {
+      const user = {
+        username: 'acedcoder',
+        firstname: 'Kennedy',
+        lastname: 'John',
+        password: 'test',
+        email: 'devjckennedy@gmail.com',
+        roleId: 1
+      };
+
+      request
+        .post('/v1/auth/register')
+        .send(user)
+        .end((err, res) => {
+          expect(res.status).to.equal(201);
+          expect(res.body).to.have.property('user');
+          expect(res.body).to.have.property('token');
+          expect(res.body.user.email).to.equal('devjckennedy@gmail.com');
+          expect(res.body.user.username).to.equal('acedcoder');
+          done();
+        });
+    });
   });
 
   // POST /v1/auth/login
   describe('POST /v1/auth/login', () => {
-    beforeEach((done) => {
-      User.bulkCreate([{
-        username: process.env.USERNAME,
-        firstname: process.env.FIRSTNAME,
-        lastname: process.env.LASTNAME,
-        password: hashPassword(process.env.PASSWORD),
-        email: process.env.EMAIL,
-        roleId: 1
-      }, {
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword('test'),
-        email: 'devjckennedy@gmail.com',
-        roleId: 2
-      }]).then(() => {
-        done();
-      });
-    });
-
     it('should validate login details', (done) => {
       request
         .post('/v1/auth/login')
@@ -171,26 +205,6 @@ describe('Users endpoints', () => {
 
   // GET /v1/users route
   describe('GET /v1/users', () => {
-    beforeEach((done) => {
-      User.bulkCreate([{
-        username: process.env.USERNAME,
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword(process.env.PASSWORD),
-        email: process.env.EMAIL,
-        roleId: 1
-      }, {
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword('test'),
-        email: 'devjckennedy@gmail.com',
-        roleId: 2
-      }]).then(() => {
-        done();
-      });
-    });
-
     it('validates offset and limit query params', (done) => {
       request
         .get('/v1/users/?limit=cj&offset=0')
@@ -218,24 +232,6 @@ describe('Users endpoints', () => {
     });
 
     it('should return a 401 status on header with no token set', (done) => {
-      User.destroy({
-        where: {},
-        truncate: true,
-        cascade: true,
-        restartIdentity: true
-      }).then((err) => {
-        if (!err) {
-          Role.destroy({
-            where: {},
-            truncate: true,
-            cascade: true,
-            restartIdentity: true
-          }).then(() => {
-            //
-          });
-        }
-      });
-
       request
         .get('/v1/users')
         .set('Accept', 'application/json')
@@ -272,113 +268,8 @@ describe('Users endpoints', () => {
     });
   });
 
-  // POST /v1/auth/register route
-  describe('POST /v1/auth/register', () => {
-    beforeEach((done) => {
-      User.create({
-        username: process.env.USERNAME,
-        firstname: process.env.FIRSTNAME,
-        lastname: process.env.LASTNAME,
-        password: hashPassword(process.env.PASSWORD),
-        email: process.env.EMAIL,
-        roleId: 1
-      }).then((err) => {
-        if (!err) {
-          //
-        }
-        done();
-      });
-    });
-
-    it('should not POST incomplete user data', (done) => {
-      const user = {
-        username: '',
-        firstname: '',
-        lastname: '',
-        password: '',
-        email: process.env.EMAIL,
-      };
-
-      request
-        .post('/v1/auth/register')
-        .set('X-Auth', authToken)
-        .send(user)
-        .end((err, res) => {
-          expect(res.status).to.equal(400);
-          expect(isEmpty(res.body.errors)).to.equal(false);
-          expect(res.body.errors.username).to.equal('Username is required');
-          expect(res.body.errors.firstname).to.equal('Firstname is required');
-          expect(res.body.errors.lastname).to.equal('Lastname is required');
-          expect(res.body.errors.password).to.equal('Password is required');
-          expect(res.body.errors).to.not.have.property('email');
-          done();
-        });
-    });
-
-    it('should return 422 status message for duplicate user', (done) => {
-      const user = {
-        username: process.env.USERNAME,
-        firstname: process.env.FIRSTNAME,
-        lastname: process.env.LASTNAME,
-        password: hashPassword(process.env.PASSWORD),
-        email: process.env.EMAIL,
-        roleId: 1
-      };
-
-      request
-        .post('/v1/auth/register')
-        .set('X-Auth', authToken)
-        .send(user)
-        .end((err, res) => {
-          expect(res.status).to.equal(422);
-          expect(res.body.message).to
-            .equal('username and email must be unique');
-          done();
-        });
-    });
-
-    it('should post a valid user data', (done) => {
-      const user = {
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword('test'),
-        email: 'devjckennedy@gmail.com',
-        roleId: 1
-      };
-
-      request
-        .post('/v1/auth/register')
-        .send(user)
-        .end((err, res) => {
-          expect(res.status).to.equal(201);
-          expect(res.body).to.have.property('user');
-          expect(res.body).to.have.property('token');
-          expect(res.body.user.email).to.equal('devjckennedy@gmail.com');
-          expect(res.body.user.username).to.equal('acedcoder');
-          done();
-        });
-    });
-  });
-
   // GET /v1/users/:id route
   describe('GET /v1/users/:id', () => {
-    beforeEach((done) => {
-      User.create({
-        username: process.env.USERNAME,
-        firstname: process.env.FIRSTNAME,
-        lastname: process.env.LASTNAME,
-        password: hashPassword(process.env.PASSWORD),
-        email: process.env.EMAIL,
-        roleId: 1
-      }).then((err) => {
-        if (!err) {
-          //
-        }
-        done();
-      });
-    });
-
     it('gets a user by id', (done) => {
       request
         .get('/v1/users/1')
@@ -430,34 +321,18 @@ describe('Users endpoints', () => {
 
   // GET /v1/users/:id/documents
   describe('GET /v1/users/:id/documents', () => {
-    beforeEach((done) => {
-      User.bulkCreate([{
-        username: process.env.USERNAME,
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword(process.env.PASSWORD),
-        email: process.env.EMAIL,
-        roleId: 1
-      }, {
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword('test'),
-        email: 'devjckennedy@gmail.com',
-        roleId: 2
-      }]).then(() => {
-        Document.create({
-          title: 'GET User Doc',
-          content: 'Running Tests',
-          author: 'John Kennedy',
-          userId: 1,
-          roleId: 1,
-          access: 'public'
-        })
-          .then(() => {
-            done();
-          });
-      });
+    before((done) => {
+      Document.create({
+        title: 'GET User Doc',
+        content: 'Running Tests',
+        author: 'John Kennedy',
+        userId: 1,
+        roleId: 1,
+        access: 'public'
+      })
+        .then(() => {
+          done();
+        });
     });
 
     it('returns error on invalid document id', (done) => {
@@ -518,22 +393,6 @@ describe('Users endpoints', () => {
 
   // PUT /v1/users/:id route
   describe('PUT /v1/users/:id', () => {
-    beforeEach((done) => {
-      User.create({
-        username: process.env.USERNAME,
-        firstname: process.env.FIRSTNAME,
-        lastname: process.env.LASTNAME,
-        password: hashPassword(process.env.PASSWORD),
-        email: process.env.EMAIL,
-        roleId: 1
-      }).then((err) => {
-        if (!err) {
-          //
-        }
-        done();
-      });
-    });
-
     it('returns a 400 status for invalid input param', (done) => {
       request
         .put('/v1/users/cj')
@@ -557,18 +416,6 @@ describe('Users endpoints', () => {
     });
 
     it('returns a 401 status for unauthorised user', (done) => {
-      User.create({
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword('test'),
-        email: 'devjckennedy@gmail.com',
-        roleId: 2
-      })
-        .then(() => {
-          //
-        });
-
       request
         .put('/v1/users/1')
         .set('X-Auth', token)
@@ -585,33 +432,16 @@ describe('Users endpoints', () => {
     });
 
     it('returns a 422 status for duplicate email or username', (done) => {
-      User.bulkCreate([{
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword('test'),
-        email: 'devjckennedy@gmail.com',
-        roleId: 1,
-      }, {
-        username: 'intelbrainee',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword('test'),
-        email: 'kennedy20000@yahoo.com',
-        roleId: 2,
-      }])
-        .then(() => {
-          request
-            .put('/v1/users/1')
-            .set('X-Auth', authToken)
-            .send({
-              email: 'kennedy20000@yahoo.com',
-            })
-            .end((err, res) => {
-              expect(res.status).to.equal(422);
-              expect(res.body.message).to.equal('A user exist with same email or username');
-              done();
-            });
+      request
+        .put('/v1/users/1')
+        .set('X-Auth', authToken)
+        .send({
+          email: 'devjckennedy@gmail.com',
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(422);
+          expect(res.body.message).to.equal('A user exist with same email or username');
+          done();
         });
     });
 
@@ -646,22 +476,6 @@ describe('Users endpoints', () => {
 
   // DELETE /v1/users/:id route
   describe('DELETE /v1/users/:id', () => {
-    beforeEach((done) => {
-      User.create({
-        username: process.env.USERNAME,
-        firstname: process.env.FIRSTNAME,
-        lastname: process.env.LASTNAME,
-        password: hashPassword(process.env.PASSWORD),
-        email: process.env.EMAIL,
-        roleId: 1
-      }).then((err) => {
-        if (!err) {
-          //
-        }
-        done();
-      });
-    });
-
     it('returns a 400 status for invalid input param', (done) => {
       request
         .delete('/v1/users/cj')
@@ -685,18 +499,6 @@ describe('Users endpoints', () => {
     });
 
     it('returns a 401 status for unauthorised user', (done) => {
-      User.create({
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: hashPassword('test'),
-        email: 'devjckennedy@gmail.com',
-        roleId: 2
-      })
-        .then(() => {
-          //
-        });
-
       request
         .delete('/v1/users/1')
         .set('X-Auth', token)
@@ -722,7 +524,7 @@ describe('Users endpoints', () => {
     it('given a non-existing user id, it returns a 404 status', (done) => {
       request
         .delete('/v1/users/10')
-        .set('X-Auth', authToken)
+        .set('X-Auth', token)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('User not found');
@@ -733,7 +535,7 @@ describe('Users endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .delete('/v1/users/101243578787677678575')
-        .set('X-Auth', authToken)
+        .set('X-Auth', token)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');

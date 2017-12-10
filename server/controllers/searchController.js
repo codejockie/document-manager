@@ -1,14 +1,12 @@
 import models from '../models';
 import { generateDocumentObject } from '../helpers/helper';
+import { serverErrorMessage } from '../helpers/messages';
 
-const Document = models.Document;
-const User = models.User;
-const serverErrorMessage = 'An error occurred while processing the request';
+const { User, Document } = models;
 
 export default {
   /**
-   * @description searches for occurrences of a user
-   * @method
+   * Searches for occurrences of a user
    * @param { Object } req
    * @param { Object } res
    * @returns { Array } users
@@ -50,8 +48,7 @@ export default {
       .catch(() => res.status(500).send({ message: serverErrorMessage }));
   },
   /**
-   * @description searches for occurrences of a document
-   * @method
+   * Searches for occurrences of a document
    * @param { Object } req
    * @param { Object } res
    * @returns { Array } documents

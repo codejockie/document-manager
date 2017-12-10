@@ -2,12 +2,10 @@ import models from '../models';
 import { generateErrors } from '../helpers/helper';
 import { findByToken } from '../helpers/jwt';
 
-const Document = models.Document;
-const Role = models.Role;
-const User = models.User;
+const { Document, Role, User } = models;
 
 /**
- *  checks if a user is authenticated
+ * Checks if a user is authenticated
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next
@@ -34,7 +32,7 @@ const authenticate = (req, res, next) => {
 };
 
 /**
- *  checks if a document can be found by its id
+ * Checks if a document can be found by its id
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next
@@ -57,7 +55,7 @@ const findDocumentById = (req, res, next) => {
 };
 
 /**
- *  checks if a role can be found by its id
+ * Checks if a role can be found by its id
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next
@@ -80,7 +78,7 @@ const findRoleById = (req, res, next) => {
 };
 
 /**
- *  checks if a user can be found by its id
+ * Checks if a user can be found by its id
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next
@@ -103,7 +101,7 @@ const findUserById = (req, res, next) => {
 };
 
 /**
- *  checks if an authenticated user is an admin
+ * Checks if an authenticated user is an admin
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next
@@ -120,7 +118,7 @@ const isAdministrator = (req, res, next) => {
 };
 
 /**
- *  validates inputs for document creation
+ * Validates inputs for document creation
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next
@@ -141,7 +139,7 @@ const validateDocument = (req, res, next) => {
 };
 
 /**
- *  validates limit and offset if they are provided
+ * Validates limit and offset if they are provided
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next
@@ -168,7 +166,7 @@ const validateLimitAndOffset = (req, res, next) => {
 };
 
 /**
- *  validates login fields
+ * Validates login fields
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next
@@ -187,7 +185,7 @@ const validateLogin = (req, res, next) => {
 };
 
 /**
- *  validates input param in the url
+ * Validates input param in the url
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next
@@ -203,7 +201,7 @@ const validateParam = (req, res, next) => {
 };
 
 /**
- *  validates search query param in the url
+ * Validates search query param in the url
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next
@@ -219,7 +217,7 @@ const validateQuery = (req, res, next) => {
 };
 
 /**
- *  validates input for role creation
+ * Validates input for role creation
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next
@@ -237,7 +235,7 @@ const validateRole = (req, res, next) => {
 };
 
 /**
- *  validates inputs for user creation
+ * Validates inputs for user creation
  * @param {Object} req
  * @param {Object} res
  * @param {callback} next

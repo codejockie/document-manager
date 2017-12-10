@@ -1,12 +1,11 @@
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import models from '../models';
 
 const User = models.User;
 
 /**
- * @description finds a user by supplied credentials
- * @function
+ * Finds a user by supplied credentials
  * @param {string} email The user's email
  * @param {string} password The user's password
  * @returns {Object} user
@@ -35,8 +34,7 @@ export function findByEmailAndPassword(email, password) {
 }
 
 /**
- * @description finds a user by token
- * @function
+ * Finds a user by token
  * @param {string} token The user's token stored in the database
  * @returns {Object} user
  */
@@ -61,8 +59,7 @@ export function findByToken(token) {
 }
 
 /**
- * @description generates a jwt token for authentication
- * @function
+ * Generates jwt token for authentication
  * @param {string} id User's id stored in the database
  * @param {string} email User's email stored in the database
  * @param {string} username User's username stored in the database

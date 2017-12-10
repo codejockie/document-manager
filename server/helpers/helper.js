@@ -1,9 +1,8 @@
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import moment from 'moment';
 
 /**
- * @description formats a date using moment.js
- * @function
+ * Formats a date using moment.js
  * @param {string} date The date to format
  * @returns {Date} Date
  */
@@ -14,8 +13,7 @@ export function formatDate(date) {
 }
 
 /**
- * @description generates document object response
- * @function
+ * Generates document object response
  * @param {Object} document The document sent from the controller
  * @returns {Object} response
  */
@@ -33,8 +31,7 @@ export function generateDocumentObject(document) {
 }
 
 /**
- * @description creates errors in Object format
- * @function
+ * Creates errors in Object format
  * @param {Array} errors The caught errors during validation
  * @returns {Object} errors
  */
@@ -48,8 +45,7 @@ export function generateErrors(errors) {
 }
 
 /**
- * @description generates role object response
- * @function
+ * Generates role object response
  * @param {Object} role The role sent from the controller
  * @returns {Object} response
  */
@@ -62,8 +58,7 @@ export function generateRoleObject(role) {
 }
 
 /**
- * @description generates user object response
- * @function
+ * Generates user object response
  * @param {Object} user The user sent from the controller
  * @returns {Object} response
  */
@@ -80,19 +75,19 @@ export function generateUserObject(user) {
 }
 
 /**
- * @description hashes supplied password
- * @function
+ * Hashes supplied password
  * @param {string} password The user's password to be hashed
- * @returns {string} hashed password
+ * @param {boolean} isUpdate Set to true when updating a user
+ * @returns {String | Promise} hashed password
  */
-export function hashPassword(password) {
-  const salt = bcrypt.genSaltSync(13);
-  return bcrypt.hashSync(password, salt);
+export function hashPassword(password, isUpdate = false) {
+  const saltRounds = 13;
+  if (isUpdate) return bcrypt.hashSync(password, saltRounds);
+  return bcrypt.hash(password, saltRounds);
 }
 
 /**
- * @description checks if a user has admin privileges
- * @function
+ * Checks if a user has admin privileges
  * @param {Object} userRoleId The user's role id
  * @returns {boolean} true/false
  */
@@ -101,8 +96,7 @@ export function isAdmin(userRoleId) {
 }
 
 /**
- * @description checks for equality of two IDs
- * @function
+ * Checks for equality of two IDs
  * @param {Object} id The document/user stored in the database id
  * @param {Object} userId The user's id
  * @returns {boolean} true/false
