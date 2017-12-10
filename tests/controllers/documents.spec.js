@@ -3,9 +3,7 @@ import supertest from 'supertest';
 import app from '../../src/server';
 import models from '../../server/models';
 
-const Document = models.Document;
-const User = models.User;
-const Role = models.Role;
+const { Document, Role, User } = models;
 
 const request = supertest.agent(app);
 
@@ -15,100 +13,82 @@ const invalidToken = process.env.INVALID_TOKEN;
 const nonUserToken = process.env.NON_USER_TOKEN;
 const accessError = "Access field must be any of 'public' or 'private' or 'role'";
 
+const createDocuments = (done) => {
+  Document.bulkCreate([{
+    title: 'Data 1',
+    content: 'Running Tests',
+    author: 'John Kennedy',
+    access: 'private',
+    userId: 1,
+    roleId: 1
+  }, {
+    title: 'Data 2',
+    content: 'Tests Running',
+    author: 'John Kennedy',
+    access: 'private',
+    userId: 1,
+    roleId: 1,
+  }, {
+    title: 'Data 3',
+    content: 'Tests Running!!!',
+    author: 'John Kennedy',
+    access: 'private',
+    userId: 1,
+    roleId: 1,
+  }, {
+    title: 'Data 4',
+    content: 'Running Tests',
+    author: 'John Kennedy',
+    access: 'role',
+    userId: 1,
+    roleId: 2
+  }, {
+    title: 'Data 5',
+    content: 'Tests Running',
+    author: 'John Kennedy',
+    access: 'public',
+    userId: 1,
+    roleId: 1,
+  }]).then(() => done());
+};
+
 describe('Documents endpoints', () => {
-  beforeEach((done) => {
-    Document.destroy({
-      where: {},
-      truncate: true,
-      cascade: true,
-      restartIdentity: true
-    })
+  before((done) => {
+    models.sequelize.sync({ force: true })
       .then(() => {
-        User.destroy({
-          where: {},
-          truncate: true,
-          cascade: true,
-          restartIdentity: true
+        Role.bulkCreate([
+          { name: 'admin' },
+          { name: 'user' }
+        ]);
+
+        User.create({
+          username: process.env.USERNAME,
+          firstname: process.env.FIRSTNAME,
+          lastname: process.env.LASTNAME,
+          password: process.env.PASSWORD,
+          email: process.env.EMAIL,
+          roleId: 1
         })
-          .then((err) => {
-            if (!err) {
-              Role.destroy({
-                where: {},
-                truncate: true,
-                cascade: true,
-                restartIdentity: true
+          .then(() => {
+            User
+              .create({
+                username: 'acedcoder',
+                firstname: process.env.FIRSTNAME,
+                lastname: process.env.LASTNAME,
+                password: 'test',
+                email: 'devjckennedy@gmail.com',
+                roleId: 2
               })
-                .then((err) => {
-                  if (!err) {
-                    Role.bulkCreate([{
-                      name: 'admin'
-                    },
-                    {
-                      name: 'user'
-                    }]).then((err) => {
-                      if (!err) {
-                        //
-                      }
-                      done();
-                    });
-                  }
-                });
-            }
+              .then(() => {
+                createDocuments(done);
+              });
           });
       });
   });
 
   // GET /v1/documents route
   describe('GET /v1/documents', () => {
-    beforeEach((done) => {
-      User.bulkCreate([{
-        username: process.env.USERNAME,
-        firstname: process.env.FIRSTNAME,
-        lastname: process.env.LASTNAME,
-        password: process.env.PASSWORD,
-        email: process.env.EMAIL,
-        roleId: 1
-      }, {
-        username: 'acedcoder',
-        firstname: process.env.FIRSTNAME,
-        lastname: process.env.LASTNAME,
-        password: 'test',
-        email: 'devjckennedy@gmail.com',
-        roleId: 2
-      }]).then((err) => {
-        if (!err) {
-          //
-        }
-        done();
-      });
-    });
-
     it('given an admin, it retrieves all documents', (done) => {
-      Document.bulkCreate([{
-        title: 'Data 1',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1
-      }, {
-        title: 'Data 2',
-        content: 'Tests Running',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1,
-      }, {
-        title: 'Data 3',
-        content: 'Tests Running!!!',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1,
-      }]).then(() => {
-        //
-      });
-
       request
         .get('/v1/documents')
         .set('Accept', 'application/json')
@@ -117,45 +97,20 @@ describe('Documents endpoints', () => {
           expect(res.status).to.equal(200);
           expect(res.body.documents[0].title).to.equal('Data 1');
           expect(res.body.documents[1].title).to.equal('Data 2');
-          expect(res.body.documents).to.have.lengthOf(3);
+          expect(res.body.documents).to.have.lengthOf(5);
           done();
         });
     });
 
     it('given a non admin, it retrieves based on access type', (done) => {
-      Document.bulkCreate([{
-        title: 'Data 1',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        access: 'role',
-        userId: 1,
-        roleId: 2
-      }, {
-        title: 'Data 2',
-        content: 'Tests Running',
-        author: 'John Kennedy',
-        access: 'private',
-        userId: 1,
-        roleId: 1,
-      }, {
-        title: 'Data 3',
-        content: 'Tests Running!!!',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1,
-      }]).then(() => {
-        //
-      });
-
       request
         .get('/v1/documents')
         .set('Accept', 'application/json')
         .set('X-Auth', token)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.documents[0].title).to.equal('Data 1');
-          expect(res.body.documents[1].title).to.equal('Data 3');
+          expect(res.body.documents[0].title).to.equal('Data 4');
+          expect(res.body.documents[1].title).to.equal('Data 5');
           expect(res.body.documents).to.have.lengthOf(2);
           done();
         });
@@ -173,60 +128,36 @@ describe('Documents endpoints', () => {
     });
 
     it('given valid offset and limit, it returns correct data', (done) => {
-      Document.bulkCreate([{
-        title: 'Data 1',
-        content: 'Tests Running',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1,
-      }, {
-        title: 'Data 2',
-        content: 'Tests Running',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1,
-      }, {
-        title: 'Data 3',
-        content: 'Tests Running',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1,
-      }, {
-        title: 'Data 4',
-        content: 'Tests Running',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1,
-      }]).then(() => {
-        //
-      });
-
       request
-        .get('/v1/documents/?limit=3&offset=3')
+        .get('/v1/documents/?limit=2&offset=0')
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.metaData.pageSize).to.equal(1);
-          expect(res.body.metaData.totalCount).to.equal(1);
-          expect(res.body.documents[0].title).to.equal('Data 4');
+          expect(res.body.metaData.pageSize).to.equal(2);
+          expect(res.body.metaData.totalCount).to.equal(2);
+          expect(res.body.documents[0].title).to.equal('Data 1');
           done();
         });
     });
 
     it('returns 404 status message if no document is found', (done) => {
-      request
-        .get('/v1/documents')
-        .set('Accept', 'application/json')
-        .set('X-Auth', authToken)
-        .end((err, res) => {
-          expect(res.status).to.equal(404);
-          expect(res.body.message).to.equal('No document found');
-          done();
-        });
+      Document.destroy({
+        where: {},
+        truncate: true,
+        cascade: false,
+        restartIdentity: true
+      }).then(() => {
+        request
+          .get('/v1/documents')
+          .set('Accept', 'application/json')
+          .set('X-Auth', authToken)
+          .end((err, res) => {
+            expect(res.status).to.equal(404);
+            expect(res.body.message).to.equal('No document found');
+          });
+
+        createDocuments(done);
+      });
     });
 
     it('throws an error with an invalid token', (done) => {
@@ -254,21 +185,6 @@ describe('Documents endpoints', () => {
 
   // POST /v1/documents route
   describe('POST /v1/documents', () => {
-    beforeEach((done) => {
-      const user = {
-        username: process.env.USERNAME,
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: process.env.PASSWORD,
-        email: process.env.EMAIL,
-        roleId: 1
-      };
-
-      User.create(user).then(() => {
-        done();
-      });
-    });
-
     it('should return a 400 status message on incomplete data', (done) => {
       const document = {
         title: 'Incomplete data',
@@ -315,10 +231,6 @@ describe('Documents endpoints', () => {
         roleId: 1
       };
 
-      Document.create(document).then(() => {
-        //
-      });
-
       request
         .post('/v1/documents')
         .set('X-Auth', authToken)
@@ -332,7 +244,7 @@ describe('Documents endpoints', () => {
 
     it('given an invalid access type, it should return a 500 status', (done) => {
       const document = {
-        title: 'Complete data',
+        title: 'New data',
         content: 'Running Tests',
         author: 'John Kennedy',
         access: 'invalid',
@@ -340,48 +252,20 @@ describe('Documents endpoints', () => {
         roleId: 1
       };
 
-      Document.create(document).then(() => {
-        //
-      })
-        .catch(() => {
-          request
-            .post('/v1/documents')
-            .set('X-Auth', authToken)
-            .send(document)
-            .end((err, res) => {
-              expect(res.status).to.equal(500);
-              expect(res.body.message).to.equal(accessError);
-              done();
-            });
+      request
+        .post('/v1/documents')
+        .set('X-Auth', authToken)
+        .send(document)
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          expect(res.body.message).to.equal(accessError);
+          done();
         });
     });
   });
 
   // GET /v1/documents/:id route
   describe('GET /v1/documents/:id', () => {
-    beforeEach((done) => {
-      const user = {
-        username: process.env.USERNAME,
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: process.env.PASSWORD,
-        email: process.env.EMAIL,
-        roleId: 1
-      };
-      const user2 = {
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: 'test',
-        email: 'devjckennedy@gmail.com',
-        roleId: 2
-      };
-
-      User.bulkCreate([user, user2]).then(() => {
-        done();
-      });
-    });
-
     it('should throw error for invalid id', (done) => {
       request
         .get('/v1/documents/sdfsfd')
@@ -396,7 +280,7 @@ describe('Documents endpoints', () => {
 
     it('should return 404 status if document is not found', (done) => {
       request
-        .get('/v1/documents/1/')
+        .get('/v1/documents/10/')
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -407,18 +291,6 @@ describe('Documents endpoints', () => {
     });
 
     it('should throw error for unauthorised user', (done) => {
-      Document.create({
-        title: 'Testing',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1,
-      })
-        .then(() => {
-          //
-        });
-
       request
         .get('/v1/documents/1/')
         .set('X-Auth', token)
@@ -431,24 +303,12 @@ describe('Documents endpoints', () => {
     });
 
     it('should get a document a user has access to', (done) => {
-      Document.create({
-        title: 'Test GET document',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        userId: 1,
-        roleId: 1,
-        access: 'public'
-      })
-        .then(() => {
-          //
-        });
-
       request
         .get('/v1/documents/1')
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.title).to.equal('Test GET document');
+          expect(res.body.title).to.equal('Data 1');
           expect(res.body.content).to.equal('Running Tests');
           done();
         });
@@ -468,26 +328,6 @@ describe('Documents endpoints', () => {
 
   // PUT /v1/documents/:id route
   describe('PUT /v1/documents/:id', () => {
-    beforeEach((done) => {
-      User.bulkCreate([{
-        username: process.env.USERNAME,
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: process.env.PASSWORD,
-        email: process.env.EMAIL,
-        roleId: 1
-      }, {
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: 'test',
-        email: 'devjckennedy@gmail.com',
-        roleId: 2
-      }]).then(() => {
-        done();
-      });
-    });
-
     it('return error on invalid document id', (done) => {
       const document = {
         title: 'Test PUT',
@@ -510,7 +350,7 @@ describe('Documents endpoints', () => {
 
     it('returns a 404 status if document is not found', (done) => {
       request
-        .put('/v1/documents/1')
+        .put('/v1/documents/20')
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -520,18 +360,6 @@ describe('Documents endpoints', () => {
     });
 
     it('returns a 401 status for unauthorised user', (done) => {
-      Document.create({
-        title: 'PUT test',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        userId: 1,
-        roleId: 1,
-        access: 'public'
-      })
-        .then(() => {
-          //
-        });
-
       request
         .put('/v1/documents/1')
         .set('X-Auth', token)
@@ -547,135 +375,65 @@ describe('Documents endpoints', () => {
     });
 
     it('should update a document by id', (done) => {
-      Document.create({
-        title: 'PUT at work',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1,
-      })
-        .then(() => {
-          request
-            .put('/v1/documents/1')
-            .set('X-Auth', authToken)
-            .send({
-              title: 'Hello PUT',
-              content: 'Tests Running',
-            })
-            .end((err, res) => {
-              expect(res.status).to.equal(201);
-              expect(res.body.document.content).to.equal('Tests Running');
-              done();
-            });
+      request
+        .put('/v1/documents/1')
+        .set('X-Auth', authToken)
+        .send({
+          title: 'Hello PUT',
+          content: 'Tests Running',
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(201);
+          expect(res.body.document.content).to.equal('Tests Running');
+          done();
         });
     });
 
     it('returns a 422 status for duplicate title', (done) => {
-      Document.bulkCreate([{
-        title: 'PUTs',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1,
-      }, {
-        title: 'PUTs at work',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1,
-      }])
-        .then(() => {
-          request
-            .put('/v1/documents/1')
-            .set('X-Auth', authToken)
-            .send({
-              title: 'PUTs at work',
-            })
-            .end((err, res) => {
-              expect(res.status).to.equal(422);
-              expect(res.body.message).to.equal('A document exist with the same title');
-              done();
-            });
+      request
+        .put('/v1/documents/1')
+        .set('X-Auth', authToken)
+        .send({
+          title: 'Data 2',
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(422);
+          expect(res.body.message).to.equal('A document exist with the same title');
+          done();
         });
     });
 
     it('should throw an error with an invalid access type', (done) => {
-      const document = {
-        title: 'Complete data',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        access: 'private',
-        userId: 1,
-        roleId: 1
-      };
-
-      Document.create(document).then(() => {
-        request
-          .put('/v1/documents/1')
-          .set('X-Auth', authToken)
-          .send({
-            access: 'invalid',
-          })
-          .end((err, res) => {
-            expect(res.status).to.equal(500);
-            expect(res.body.message).to.equal(accessError);
-            done();
-          });
-      });
+      request
+        .put('/v1/documents/1')
+        .set('X-Auth', authToken)
+        .send({
+          access: 'invalid',
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          expect(res.body.message).to.equal(accessError);
+          done();
+        });
     });
 
     it('given an invalid id, it returns a 500 status', (done) => {
-      const document = {
-        title: 'Complete data',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        access: 'private',
-        userId: 1,
-        roleId: 1
-      };
-
-      Document.create(document).then(() => {
-        request
-          .put('/v1/documents/10124357878767767857')
-          .set('X-Auth', authToken)
-          .send({
-            access: 'public',
-          })
-          .end((err, res) => {
-            expect(res.status).to.equal(500);
-            expect(res.body.message).to.equal('Invalid ID');
-            done();
-          });
-      });
+      request
+        .put('/v1/documents/10124357878767767857')
+        .set('X-Auth', authToken)
+        .send({
+          access: 'public',
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          expect(res.body.message).to.equal('Invalid ID');
+          done();
+        });
     });
   });
 
   // DELETE /v1/documents/:id route
   describe('DELETE /v1/documents/:id', () => {
-    beforeEach((done) => {
-      User.bulkCreate([{
-        username: process.env.USERNAME,
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: process.env.PASSWORD,
-        email: process.env.EMAIL,
-        roleId: 1
-      }, {
-        username: 'acedcoder',
-        firstname: 'Kennedy',
-        lastname: 'John',
-        password: 'test',
-        email: 'devjckennedy@gmail.com',
-        roleId: 2
-      }]
-      ).then(() => {
-        done();
-      });
-    });
-
     it('returns error for invalid parameter', (done) => {
       request
         .delete('/v1/documents/cj/')
@@ -689,7 +447,7 @@ describe('Documents endpoints', () => {
 
     it('returns 404 status for non existing document', (done) => {
       request
-        .delete('/v1/documents/1')
+        .delete('/v1/documents/10')
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -699,18 +457,6 @@ describe('Documents endpoints', () => {
     });
 
     it('returns a 401 status for unauthorised user', (done) => {
-      Document.create({
-        title: 'Hey DELETE',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        userId: 1,
-        roleId: 1,
-        access: 'public',
-      })
-        .then(() => {
-          //
-        });
-
       request
         .delete('/v1/documents/1')
         .set('X-Auth', token)
@@ -723,45 +469,25 @@ describe('Documents endpoints', () => {
     });
 
     it('delete a single document', (done) => {
-      Document.create({
-        title: 'Hey DELETE',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        access: 'public',
-        userId: 1,
-        roleId: 1
-      })
-        .then(() => {
-          request
-            .delete('/v1/documents/1/')
-            .set('X-Auth', authToken)
-            .end((err, res) => {
-              expect(res.status).to.equal(200);
-              expect(res.body.message).to
-                .equal('Document deleted successfully');
-              done();
-            });
+      request
+        .delete('/v1/documents/3/')
+        .set('X-Auth', authToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body.message).to
+            .equal('Document deleted successfully');
+          done();
         });
     });
 
     it('given an invalid id, it returns a 500 status', (done) => {
-      Document.create({
-        title: 'Hey DELETE',
-        content: 'Running Tests',
-        author: 'John Kennedy',
-        userId: 1,
-        roleId: 1,
-        access: 'public',
-      })
-        .then(() => {
-          request
-            .delete('/v1/documents/1012435787876776785')
-            .set('X-Auth', authToken)
-            .end((err, res) => {
-              expect(res.status).to.equal(500);
-              expect(res.body.message).to.equal('Invalid ID');
-              done();
-            });
+      request
+        .delete('/v1/documents/1012435787876776785')
+        .set('X-Auth', authToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          expect(res.body.message).to.equal('Invalid ID');
+          done();
         });
     });
   });
