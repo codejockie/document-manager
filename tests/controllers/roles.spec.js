@@ -1,31 +1,31 @@
 import { expect } from 'chai';
 import supertest from 'supertest';
 import app from '../../src/server';
-import models from '../../server/models';
 import { hashPassword } from '../../server/helpers/helper';
+import models from '../../server/models';
 
-const Role = models.Role;
-const User = models.User;
+const { Role, User } = models;
 const request = supertest.agent(app);
 const authToken = process.env.AUTH_TOKEN;
 const token = process.env.TOKEN;
 const adminRole = 'admin';
 const userRole = 'user';
 const editorRole = 'editor';
+const publisherRole = 'publisher';
 
 const createUsers = (done) => {
   User.bulkCreate([{
     username: process.env.USERNAME,
-    firstname: 'Kennedy',
-    lastname: 'John',
-    password: hashPassword(process.env.PASSWORD),
+    firstname: process.env.FIRSTNAME,
+    lastname: process.env.LASTNAME,
+    password: hashPassword(process.env.PASSWORD, true),
     email: process.env.EMAIL,
     roleId: 1
   }, {
     username: 'acedcoder',
     firstname: 'Kennedy',
     lastname: 'John',
-    password: hashPassword('test'),
+    password: hashPassword('test', true),
     email: 'devjckennedy@gmail.com',
     roleId: 2
   }]).then(() => {
@@ -34,45 +34,20 @@ const createUsers = (done) => {
 };
 
 describe('Roles endpoints', () => {
-  beforeEach((done) => {
-    User.destroy({
-      where: {},
-      truncate: true,
-      cascade: true,
-      restartIdentity: true
-    })
-      .then((err) => {
-        if (!err) {
-          Role.destroy({
-            where: {},
-            truncate: true,
-            cascade: true,
-            restartIdentity: true
-          })
-            .then((err) => {
-              if (!err) {
-                Role.bulkCreate([{
-                  name: adminRole
-                }, {
-                  name: userRole
-                }]).then((err) => {
-                  if (!err) {
-                    //
-                  }
-                  done();
-                });
-              }
-            });
-        }
+  before((done) => {
+    models.sequelize.sync({ force: true })
+      .then(() => {
+        Role.bulkCreate([
+          { name: adminRole },
+          { name: userRole }
+        ]);
+
+        createUsers(done);
       });
   });
 
   // POST /v1/roles route
   describe('POST /v1/roles', () => {
-    beforeEach((done) => {
-      createUsers(done);
-    });
-
     it('should validate request', (done) => {
       const role = {
         name: '',
@@ -140,10 +115,6 @@ describe('Roles endpoints', () => {
 
   // GET /v1/roles route
   describe('GET /v1/roles', () => {
-    beforeEach((done) => {
-      createUsers(done);
-    });
-
     it('successfully retrieves roles', (done) => {
       request
         .get('/v1/roles')
@@ -172,10 +143,6 @@ describe('Roles endpoints', () => {
 
   // GET /v1/roles/:id route
   describe('GET /v1/roles/:id', () => {
-    beforeEach((done) => {
-      createUsers(done);
-    });
-
     it('retrieves a role by id', (done) => {
       request
         .get('/v1/roles/1')
@@ -190,7 +157,7 @@ describe('Roles endpoints', () => {
 
     it('returns a 404 status message for non-existing role', (done) => {
       request
-        .get('/v1/roles/3')
+        .get('/v1/roles/20')
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -224,10 +191,6 @@ describe('Roles endpoints', () => {
 
   // PUT /v1/roles/:id route
   describe('PUT /v1/roles/:id', () => {
-    beforeEach((done) => {
-      createUsers(done);
-    });
-
     it('returns a 400 status for invalid input param', (done) => {
       request
         .put('/v1/roles/cj')
@@ -266,14 +229,14 @@ describe('Roles endpoints', () => {
 
     it('updates a role by id', (done) => {
       request
-        .put('/v1/roles/1')
+        .put('/v1/roles/3')
         .set('X-Auth', authToken)
         .send({
-          name: editorRole,
+          name: publisherRole,
         })
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.name).to.equal(editorRole);
+          expect(res.body.name).to.equal(publisherRole);
           done();
         });
     });
@@ -292,10 +255,6 @@ describe('Roles endpoints', () => {
 
   // DELETE /v1/roles/:id route
   describe('DELETE /v1/roles/:id', () => {
-    beforeEach((done) => {
-      createUsers(done);
-    });
-
     it('returns a 400 status for invalid input param', (done) => {
       request
         .delete('/v1/roles/cj')
@@ -320,7 +279,7 @@ describe('Roles endpoints', () => {
 
     it('deletes a role by id', (done) => {
       request
-        .delete('/v1/roles/1')
+        .delete('/v1/roles/3')
         .set('X-Auth', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
