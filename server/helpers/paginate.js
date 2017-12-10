@@ -1,6 +1,5 @@
 /**
- * @description paginates list of data
- * @function
+ * Paginates list of data
  * @param { Number } limit
  * @param { Number } offset
  * @param { Number } count
