@@ -3,10 +3,10 @@ import roleController from '../controllers/roleController';
 import searchController from '../controllers/searchController';
 import userController from '../controllers/userController';
 import {
-  isAdministrator,
   findDocumentById,
   findRoleById,
   findUserById,
+  isAdministrator,
   validateDocument,
   validateLimitAndOffset,
   validateParam,
