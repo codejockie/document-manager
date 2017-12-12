@@ -81,8 +81,7 @@ const routes = (router) => {
     .put(validateParam, findUserById, updateUser);
 
   router.route('/users/:id/documents')
-    .get(validateParam,
-      findUserById, validateLimitAndOffset, getUserDocuments);
+    .get(validateParam, findUserById, validateLimitAndOffset, getUserDocuments);
 };
 
 export default routes;
