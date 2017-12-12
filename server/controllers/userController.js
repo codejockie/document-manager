@@ -1,9 +1,18 @@
 import lodash from 'lodash';
 import models from '../models';
-import { generateDocumentObject, hashPassword, isAdmin, isUser, generateUserObject } from '../helpers/helper';
-import { findByEmailAndPassword, generateAuthToken } from '../helpers/jwt';
 import paginate from '../helpers/paginate';
 import { serverErrorMessage } from '../helpers/messages';
+import {
+  generateDocumentObject,
+  generateUserObject,
+  hashPassword,
+  isAdmin,
+  isUser
+} from '../helpers/helper';
+import {
+  findByEmailAndPassword,
+  generateAuthToken
+} from '../helpers/jwt';
 
 const { User, Document } = models;
 
@@ -105,7 +114,7 @@ export default {
       }));
   },
   /**
-   * Rretrieves a user
+   * Retrieves a user
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } user

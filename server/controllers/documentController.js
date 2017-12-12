@@ -1,7 +1,13 @@
 import models from '../models';
-import { generateDocumentObject, isUser } from '../helpers/helper';
 import paginate from '../helpers/paginate';
-import { accessErrorMessage, serverErrorMessage } from '../helpers/messages';
+import {
+  generateDocumentObject,
+  isUser
+} from '../helpers/helper';
+import {
+  accessErrorMessage,
+  serverErrorMessage
+} from '../helpers/messages';
 
 const { Document } = models;
 
