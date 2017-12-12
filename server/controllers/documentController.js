@@ -18,7 +18,7 @@ export default {
    * @param { Object } res
    * @returns { Object } document
    */
-  create(req, res) {
+  createDocument(req, res) {
     Document.findOne({
       where: {
         title: req.body.title
@@ -51,7 +51,7 @@ export default {
    * @param { Object } res
    * @returns { Array } documents
    */
-  getAll(req, res) {
+  getDocuments(req, res) {
     const options = {
       attributes: {
         exclude: ['roleId']
@@ -67,12 +67,14 @@ export default {
       options.where = {
         $or: [
           { access: 'public' },
-          { access: 'role',
+          {
+            access: 'role',
             $and: {
               roleId: role
             }
           },
-          { access: 'private',
+          {
+            access: 'private',
             $and: {
               userId: currentUser
             }
@@ -107,7 +109,7 @@ export default {
    * @param { Object } res
    * @returns { Object } document
    */
-  getOne(req, res) {
+  getDocument(req, res) {
     Document.findById(req.params.id)
       .then((document) => {
         // Checks if the document owner's ID is
@@ -130,7 +132,7 @@ export default {
    * @param { Object } res
    * @returns { Object } document
    */
-  update(req, res) {
+  updateDocument(req, res) {
     Document.findById(req.params.id)
       .then((document) => {
         if (!isUser(document.userId, req.user.id)) {
@@ -178,7 +180,7 @@ export default {
    * @param { Object } res
    * @returns { Object } message
    */
-  delete(req, res) {
+  deleteDocument(req, res) {
     Document.findById(req.params.id)
       .then((document) => {
         if (!isUser(document.userId, req.user.id)) {

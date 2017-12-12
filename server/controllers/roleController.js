@@ -11,7 +11,7 @@ export default {
    * @param { Object } res
    * @returns { Object } role
    */
-  create(req, res) {
+  createRole(req, res) {
     Role.findOne({
       where: {
         name: req.body.name
@@ -40,7 +40,7 @@ export default {
    * @param { Object } res
    * @returns { Array } roles
    */
-  getAll(req, res) {
+  getRoles(req, res) {
     Role
       .all()
       .then(roles => res.status(200).send({
@@ -56,7 +56,7 @@ export default {
    * @param { Object } res
    * @returns { Object } role
    */
-  getOne(req, res) {
+  getRole(req, res) {
     Role.findById(req.params.id)
       .then(role => res.status(200).send(generateRoleObject(role)))
       .catch(() => res.status(500).send({
@@ -69,7 +69,7 @@ export default {
    * @param { Object } res
    * @returns { Object } role
    */
-  update(req, res) {
+  updateRole(req, res) {
     return Role
       .findById(req.params.id)
       .then((role) => {
@@ -102,7 +102,7 @@ export default {
    * @param { Object } res
    * @returns { Object } message
    */
-  delete(req, res) {
+  deleteRole(req, res) {
     Role.findById(req.params.id)
       .then((role) => {
         role

@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import models from '../models';
 
-const User = models.User;
+const { User } = models;
 
 /**
  * Finds a user by supplied credentials

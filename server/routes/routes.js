@@ -14,49 +14,74 @@ import {
   validateRole,
 } from '../middleware/middleware';
 
+const {
+  createDocument,
+  deleteDocument,
+  getDocument,
+  getDocuments,
+  updateDocument
+} = documentController;
+
+const {
+  createRole,
+  deleteRole,
+  getRole,
+  getRoles,
+  updateRole
+} = roleController;
+
+const {
+  searchDocument,
+  searchUser
+} = searchController;
+
+const {
+  deleteUser,
+  getUser,
+  getUserDocuments,
+  getUsers,
+  updateUser
+} = userController;
+
 const routes = (router) => {
   // Document routes
   router.route('/documents')
-    .get(validateLimitAndOffset, documentController.getAll)
-    .post(validateDocument, documentController.create);
+    .get(validateLimitAndOffset, getDocuments)
+    .post(validateDocument, createDocument);
 
   router.route('/documents/:id')
-    .get(validateParam, findDocumentById, documentController.getOne)
-    .put(validateParam, findDocumentById, documentController.update)
-    .delete(validateParam, findDocumentById, documentController.delete);
+    .delete(validateParam, findDocumentById, deleteDocument)
+    .get(validateParam, findDocumentById, getDocument)
+    .put(validateParam, findDocumentById, updateDocument);
 
   // Role routes
   router.route('/roles')
-    .get(isAdministrator, roleController.getAll)
-    .post(isAdministrator, validateRole, roleController.create);
+    .get(isAdministrator, getRoles)
+    .post(isAdministrator, validateRole, createRole);
 
   router.route('/roles/:id')
-    .get(isAdministrator,
-      validateParam, findRoleById, roleController.getOne)
-    .put(isAdministrator,
-      validateParam, findRoleById, roleController.update)
-    .delete(isAdministrator,
-      validateParam, findRoleById, roleController.delete);
+    .delete(isAdministrator, validateParam, findRoleById, deleteRole)
+    .get(isAdministrator, validateParam, findRoleById, getRole)
+    .put(isAdministrator, validateParam, findRoleById, updateRole);
 
   // Search routes
-  router.route('/search/users')
-    .get(validateQuery, searchController.searchUser);
-
   router.route('/search/documents')
-    .get(validateQuery, searchController.searchDocument);
+    .get(validateQuery, searchDocument);
+
+  router.route('/search/users')
+    .get(validateQuery, searchUser);
 
   // User routes
   router.route('/users')
-    .get(isAdministrator, validateLimitAndOffset, userController.getAll);
+    .get(isAdministrator, validateLimitAndOffset, getUsers);
 
   router.route('/users/:id')
-    .get(validateParam, findUserById, userController.getOne)
-    .put(validateParam, findUserById, userController.update)
-    .delete(validateParam, findUserById, userController.delete);
+    .delete(validateParam, findUserById, deleteUser)
+    .get(validateParam, findUserById, getUser)
+    .put(validateParam, findUserById, updateUser);
 
   router.route('/users/:id/documents')
-    .get(validateParam,
-      findUserById, validateLimitAndOffset, userController.getUserDocuments);
+    .get(validateParam, findUserById, validateLimitAndOffset, getUserDocuments);
 };
 
 export default routes;
