@@ -6,12 +6,12 @@
   "scripts": {
     "dev": "nodemon -w server --exec babel-node -- server/server.js",
     "heroku-postbuild": "gulp compile",
-    "migrate": "sequelize db:migrate && npm run seed",
+    "migrate": "sequelize db:migrate && yarn run seed",
     "seed": "sequelize db:seed:all",
     "start": "node src/server.js",
-    "test": "gulp compile && npm run test:mocha",
+    "test": "gulp compile && yarn run test:mocha",
     "test:migrate": "NODE_ENV=test sequelize db:migrate",
-    "test:mocha": "NODE_ENV=test nyc --reporter=lcov --reporter=text --reporter=html mocha --timeout 90000 --compilers js:babel-register -- ./tests/**/*.spec.js",
+    "test:mocha": "NODE_ENV=test nyc --reporter=lcov --reporter=text --reporter=html mocha --timeout 90000 --compilers js:babel-register -- ./__tests__/**/*.spec.js",
     "undo": "sequelize db:migrate:undo:all"
   },
   "repository": {
@@ -65,7 +65,7 @@
   "nyc": {
     "exclude": [
       "server",
-      "tests",
+      "__tests__",
       "src/models/index.js",
       "src/routes",
       "src/server.js"

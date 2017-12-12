@@ -55,7 +55,7 @@ export default {
    * @param { Object } res
    * @returns { Object } user
    */
-  create(req, res) {
+  createUser(req, res) {
     User.findOne({
       where: {
         $or: [
@@ -96,7 +96,7 @@ export default {
    * @param { Object } res
    * @returns { Array } users
    */
-  getAll(req, res) {
+  getUsers(req, res) {
     const offset = req.query.offset || 0;
     const limit = req.query.limit || 10;
     User.findAll({
@@ -119,7 +119,7 @@ export default {
    * @param { Object } res
    * @returns { Object } user
    */
-  getOne(req, res) {
+  getUser(req, res) {
     User.findById(req.params.id)
       .then((user) => {
         // ensures a user only has access to his own account
@@ -185,7 +185,7 @@ export default {
    * @param { Object } res
    * @returns { Object } user
    */
-  update(req, res) {
+  updateUser(req, res) {
     User.findById(req.params.id)
       .then((user) => {
         if (!isUser(user.id, req.user.id) && !isAdmin(req.user.roleId)) {
@@ -211,7 +211,7 @@ export default {
               });
             }
 
-            const password = req.body.password;
+            const { password } = req.body;
             return user.update({
               email: req.body.email || user.email,
               username: req.body.username || user.username,
@@ -234,7 +234,7 @@ export default {
    * @param { Object } res
    * @returns { Object } message
    */
-  delete(req, res) {
+  deleteUser(req, res) {
     User.findById(req.params.id)
       .then((user) => {
         if (!isAdmin(req.user.roleId) && !isUser(user.id, req.user.id)) {
