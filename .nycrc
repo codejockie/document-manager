@@ -1,0 +1,14 @@
+{
+  "exclude": [
+      "server",
+      "__tests__",
+      "src/models/index.js",
+      "src/routes",
+      "src/server.js"
+    ],
+    "reporter": [
+      "lcov",
+      "html",
+      "text-summary"
+    ]
+}
