@@ -2,8 +2,8 @@ import path from 'path';
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
-let appName = 'bundle';
-const entry =  [
+const appName = 'bundle';
+const entry = [
   'webpack-hot-middleware/client',
   './client/index.js'
 ];
@@ -63,7 +63,7 @@ const config = {
 };
 
 if (webpackEnv === 'production' || nodeEnv === 'production') {
-  const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
+  const { UglifyJsPlugin } = webpack.optimize;
 
   config.plugins.push(new UglifyJsPlugin({ minimize: true }));
   config.plugins.push(new webpack.DefinePlugin({
@@ -72,7 +72,7 @@ if (webpackEnv === 'production' || nodeEnv === 'production') {
     }
   }));
 
-  config.devtool = 'source-map'
+  config.devtool = 'source-map';
   config.output.filename += '.min.js';
 } else {
   config.devtool = 'cheap-module-eval-sourcemap';
