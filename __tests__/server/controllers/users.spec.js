@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import supertest from 'supertest';
 import isEmpty from 'lodash/isEmpty';
-import app from '../../src/server';
-import models from '../../server/models';
+import app from '../../../src/server';
+import models from '../../../server/models';
 
 const { Document, Role, User } = models;
 const request = supertest.agent(app);

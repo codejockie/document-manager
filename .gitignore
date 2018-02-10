@@ -7,3 +7,7 @@ package-lock.json
 src/
 .nyc_output/
 coverage/
+
+# Project generated files
+index.html
+bundle.js
