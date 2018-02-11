@@ -32,8 +32,8 @@ describe('Users endpoints', () => {
       });
   });
 
-  // POST /v1/auth/register route
-  describe('POST /v1/auth/register', () => {
+  // POST /v1/auth/signup route
+  describe('POST /v1/auth/signup', () => {
     it('should not POST incomplete user data', (done) => {
       const user = {
         username: '',
@@ -44,7 +44,7 @@ describe('Users endpoints', () => {
       };
 
       request
-        .post('/v1/auth/register')
+        .post('/v1/auth/signup')
         .send(user)
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -69,7 +69,7 @@ describe('Users endpoints', () => {
       };
 
       request
-        .post('/v1/auth/register')
+        .post('/v1/auth/signup')
         .send(user)
         .end((err, res) => {
           expect(res.status).to.equal(422);
@@ -90,7 +90,7 @@ describe('Users endpoints', () => {
       };
 
       request
-        .post('/v1/auth/register')
+        .post('/v1/auth/signup')
         .send(user)
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -103,11 +103,11 @@ describe('Users endpoints', () => {
     });
   });
 
-  // POST /v1/auth/login
-  describe('POST /v1/auth/login', () => {
-    it('should validate login details', (done) => {
+  // POST /v1/auth/signin
+  describe('POST /v1/auth/signin', () => {
+    it('should validate signin details', (done) => {
       request
-        .post('/v1/auth/login')
+        .post('/v1/auth/signin')
         .send({
           email: 'codejockie@',
           password: ''
@@ -123,7 +123,7 @@ describe('Users endpoints', () => {
 
     it('given non-existing account details, it returns a 401 status', (done) => {
       request
-        .post('/v1/auth/login')
+        .post('/v1/auth/signin')
         .send({
           email: 'codejockie@codes.com',
           password: process.env.PASSWORD
@@ -137,7 +137,7 @@ describe('Users endpoints', () => {
 
     it('successfully authenticates a user', (done) => {
       request
-        .post('/v1/auth/login')
+        .post('/v1/auth/signin')
         .send({
           email: process.env.EMAIL,
           password: process.env.PASSWORD
@@ -150,7 +150,7 @@ describe('Users endpoints', () => {
 
     it('generates a token on successful authentication', (done) => {
       request
-        .post('/v1/auth/login')
+        .post('/v1/auth/signin')
         .send({
           email: process.env.EMAIL,
           password: process.env.PASSWORD
@@ -164,7 +164,7 @@ describe('Users endpoints', () => {
 
     it('sets the token on the header with a key of  X-Auth', (done) => {
       request
-        .post('/v1/auth/login')
+        .post('/v1/auth/signin')
         .send({
           email: process.env.EMAIL,
           password: process.env.PASSWORD
@@ -177,7 +177,7 @@ describe('Users endpoints', () => {
 
     it('given a wrong password, it throws an error', (done) => {
       request
-        .post('/v1/auth/login')
+        .post('/v1/auth/signin')
         .send({
           email: process.env.EMAIL,
           password: 'test'

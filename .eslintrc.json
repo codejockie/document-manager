@@ -27,6 +27,8 @@
         "MethodDefinition": true,
         "ClassDeclaration": true
       }
-    }]
+    }],
+    "import/extensions": "off",
+    "import/no-unresolved": "off"
   }
 }

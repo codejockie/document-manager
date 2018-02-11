@@ -1,4 +1,3 @@
-import lodash from 'lodash';
 import models from '../models';
 import paginate from '../helpers/paginate';
 import { serverErrorMessage } from '../helpers/messages';
@@ -23,10 +22,10 @@ export default {
    * @param { Object } res
    * @returns { Object } user
    */
-  login(req, res) {
-    const body = lodash.pick(req.body, ['email', 'password']);
+  signin(req, res) {
+    const { email, password } = req.body;
 
-    findByEmailAndPassword(body.email, body.password)
+    findByEmailAndPassword(email, password)
       .then((user) => {
         const token = generateAuthToken(user.id, user.email, user.username);
         res.header('X-Auth', token).send({
@@ -55,12 +54,20 @@ export default {
    * @param { Object } res
    * @returns { Object } user
    */
-  createUser(req, res) {
+  signup(req, res) {
+    const {
+      email,
+      firstname,
+      lastname,
+      password,
+      username
+    } = req.body;
+
     User.findOne({
       where: {
         $or: [
-          { username: req.body.username },
-          { email: req.body.email }
+          { username },
+          { email }
         ]
       }
     }).then((user) => {
@@ -71,11 +78,11 @@ export default {
       }
 
       User.create({
-        email: req.body.email,
-        username: req.body.username,
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        password: req.body.password,
+        email,
+        username,
+        firstname,
+        lastname,
+        password,
         roleId: 2
       })
         .then((newUser) => {
@@ -148,9 +155,7 @@ export default {
       }
     };
 
-    const role = req.user.roleId;
-
-    if (role === 1) {
+    if (req.user.roleId === 1) {
       options.where = { userId: req.params.id };
     } else {
       options.where = {

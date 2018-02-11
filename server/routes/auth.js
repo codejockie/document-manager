@@ -5,20 +5,20 @@ import {
 } from '../middleware/middleware';
 
 const {
-  createUser,
-  login,
+  signup,
+  signin,
   logout
 } = userController;
 
-const authRoutes = (router) => {
-  router.route('/login')
-    .post(validateLogin, login);
+const auth = (router) => {
+  router.route('/signin')
+    .post(validateLogin, signin);
 
   router.route('/logout')
     .post(logout);
 
-  router.route('/register')
-    .post(validateUser, createUser);
+  router.route('/signup')
+    .post(validateUser, signup);
 };
 
-export default authRoutes;
+export default auth;
