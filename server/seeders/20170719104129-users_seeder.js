@@ -1,5 +1,5 @@
 const dotenv = require('dotenv'),
-  bcrypt = require('bcryptjs');
+  bcrypt = require('bcrypt');
 
 dotenv.config();
 const salt = bcrypt.genSaltSync(13);
