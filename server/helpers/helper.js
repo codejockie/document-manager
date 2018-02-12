@@ -1,3 +1,4 @@
+import os from 'os';
 import bcrypt from 'bcrypt';
 import moment from 'moment';
 
@@ -75,14 +76,29 @@ export function generateUserObject(user) {
 }
 
 /**
+ * Retrives operating system info
+ * @returns {string} OS type
+ */
+export function getOperatingSystemType() {
+  switch (os.type()) {
+    case 'Darwin':
+      return 'macOS';
+    case 'Windows_NT':
+      return 'Windows';
+    default:
+      return 'Linux';
+  }
+}
+
+/**
  * Hashes supplied password
  * @param {string} password The user's password to be hashed
  * @param {boolean} isUpdate Set to true when updating a user
  * @returns {String | Promise} hashed password
  */
 export function hashPassword(password, isUpdate = false) {
-  const saltRounds = 13;
-  if (isUpdate) return bcrypt.hashSync(password, saltRounds);
+  const saltRounds = bcrypt.genSaltSync(13);
+  if (isUpdate) { return bcrypt.hashSync(password, saltRounds); }
   return bcrypt.hash(password, saltRounds);
 }
 
