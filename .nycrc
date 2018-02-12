@@ -4,11 +4,12 @@
       "__tests__",
       "src/models/index.js",
       "src/routes",
-      "src/server.js"
+      "src/server.js",
+      "webpack.config.babel.js"
     ],
     "reporter": [
       "lcov",
       "html",
-      "text-summary"
+      "text"
     ]
 }
