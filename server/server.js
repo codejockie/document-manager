@@ -1,7 +1,7 @@
 import path from 'path';
+import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import express from 'express';
-import bodyParser from 'body-parser';
 import validator from 'express-validator';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
@@ -12,11 +12,14 @@ import routes from './routes';
 import { authenticate } from './middleware/middleware';
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+process.env.PORT = process.env.PORT || '4200';
 
 dotenv.config();
 
 const app = express();
 const router = express.Router();
+
+// Set static directory and webpack config
 const distDir = path.join(__dirname, 'client/assets'),
   htmlFile = path.join(distDir, 'index.html'),
   compiler = webpack(config),
@@ -51,6 +54,6 @@ app.get('*', (req, res) => {
   res.redirect(302, '/');
 });
 
-app.listen(process.env.PORT || '4200');
+app.listen(process.env.PORT);
 
 export default app;
