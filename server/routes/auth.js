@@ -1,14 +1,16 @@
-import userController from '../controllers/userController';
+import AuthController from '../controllers/AuthController';
 import {
   validateLogin,
   validateUser
 } from '../middleware/middleware';
 
 const {
+  forgotPassword,
+  logout,
+  resetPassword,
   signup,
   signin,
-  logout
-} = userController;
+} = AuthController;
 
 const auth = (router) => {
   router.route('/signin')
@@ -19,6 +21,12 @@ const auth = (router) => {
 
   router.route('/signup')
     .post(validateUser, signup);
+
+  router.route('/forgot-password')
+    .post(forgotPassword);
+
+  router.route('/reset-password')
+    .post(resetPassword);
 };
 
 export default auth;
