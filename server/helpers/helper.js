@@ -120,3 +120,21 @@ export function isAdmin(userRoleId) {
 export function isUser(id, userId) {
   return id === userId;
 }
+
+/**
+ * Send email using SMTP transport
+ * @param {Object} smtpTransport The mail transport
+ * @param {Object} mailOptions The mail options
+ * @param {Object} res The response object
+ * @returns {Object} Message status
+ */
+export function sendMail(smtpTransport, mailOptions, res) {
+  smtpTransport.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return res.send({ message: 'Email not sent' });
+    }
+    return res.send({
+      message: `Message sent. ${info.messageId}`
+    });
+  });
+}

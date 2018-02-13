@@ -9,6 +9,7 @@ import {
   generateUserObject,
   getOperatingSystemType,
   hashPassword,
+  sendMail
 } from '../helpers/helper';
 import {
   findByEmailAndPassword,
@@ -89,11 +90,7 @@ export default class AuthController {
    */
   static signup(req, res) {
     const {
-      email,
-      firstname,
-      lastname,
-      password,
-      username
+      email, firstname, lastname, password, username
     } = req.body;
 
     User.findOne({
@@ -177,14 +174,7 @@ export default class AuthController {
               }
             };
 
-            smtpTransport.sendMail(mailOptions, (error, info) => {
-              if (error) {
-                return res.send({ message: 'Email not sent' });
-              }
-              return res.send({
-                message: `Message sent. ${info.messageId}`
-              });
-            });
+            sendMail(smtpTransport, mailOptions, res);
           })
           .catch(error => res.status(500).send({ error }));
       })
@@ -236,14 +226,7 @@ export default class AuthController {
             }
           };
 
-          smtpTransport.sendMail(mailOptions, (error, info) => {
-            if (error) {
-              return res.send({ message: 'Email not sent' });
-            }
-            return res.send({
-              message: `Message sent. ${info.messageId}`
-            });
-          });
+          sendMail(smtpTransport, mailOptions, res);
         })
         .catch(error => res.status(500).send({ error }));
     })
