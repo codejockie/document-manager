@@ -1,7 +1,7 @@
 import routes from './routes';
-import authRoutes from './authRoutes';
+import auth from './auth';
 
 export default (router) => {
-  authRoutes(router);
+  auth(router);
   routes(router);
 };

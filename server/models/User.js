@@ -24,6 +24,12 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.STRING,
     },
+    resetPasswordToken: {
+      type: DataTypes.STRING
+    },
+    resetPasswordExpires: {
+      type: DataTypes.DATE
+    },
     roleId: {
       type: DataTypes.INTEGER
     },

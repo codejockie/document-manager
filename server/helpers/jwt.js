@@ -21,15 +21,14 @@ export function findByEmailAndPassword(email, password) {
         return Promise.reject();
       }
 
-      return new Promise((resolve, reject) => {
-        bcrypt.compare(password, user.password, (err, isMatch) => {
-          if (isMatch) {
-            resolve(user);
-          } else {
-            reject();
+      return bcrypt.compare(password, user.password)
+        .then((isMatch) => {
+          if (!isMatch) {
+            return Promise.reject();
           }
-        });
-      });
+          return Promise.resolve(user);
+        })
+        .catch(() => Promise.reject());
     });
 }
 
@@ -39,9 +38,8 @@ export function findByEmailAndPassword(email, password) {
  * @returns {Object} user
  */
 export function findByToken(token) {
-  let decoded;
   try {
-    decoded = jwt.verify(token, process.env.SECRET);
+    const decoded = jwt.verify(token, process.env.SECRET);
     return User.findOne({
       where: {
         $or: [{
@@ -54,7 +52,7 @@ export function findByToken(token) {
       }
     });
   } catch (error) {
-    return Promise.reject();
+    return Promise.reject(error);
   }
 }
 

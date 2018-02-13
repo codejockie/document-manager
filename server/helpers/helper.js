@@ -1,3 +1,4 @@
+import os from 'os';
 import bcrypt from 'bcrypt';
 import moment from 'moment';
 
@@ -75,14 +76,29 @@ export function generateUserObject(user) {
 }
 
 /**
+ * Retrives operating system info
+ * @returns {string} OS type
+ */
+export function getOperatingSystemType() {
+  switch (os.type()) {
+    case 'Darwin':
+      return 'macOS';
+    case 'Windows_NT':
+      return 'Windows';
+    default:
+      return 'Linux';
+  }
+}
+
+/**
  * Hashes supplied password
  * @param {string} password The user's password to be hashed
  * @param {boolean} isUpdate Set to true when updating a user
  * @returns {String | Promise} hashed password
  */
 export function hashPassword(password, isUpdate = false) {
-  const saltRounds = 13;
-  if (isUpdate) return bcrypt.hashSync(password, saltRounds);
+  const saltRounds = bcrypt.genSaltSync(13);
+  if (isUpdate) { return bcrypt.hashSync(password, saltRounds); }
   return bcrypt.hash(password, saltRounds);
 }
 
@@ -103,4 +119,22 @@ export function isAdmin(userRoleId) {
  */
 export function isUser(id, userId) {
   return id === userId;
+}
+
+/**
+ * Send email using SMTP transport
+ * @param {Object} smtpTransport The mail transport
+ * @param {Object} mailOptions The mail options
+ * @param {Object} res The response object
+ * @returns {Object} Message status
+ */
+export function sendMail(smtpTransport, mailOptions, res) {
+  smtpTransport.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return res.send({ message: 'Email not sent' });
+    }
+    return res.send({
+      message: `Message sent. ${info.messageId}`
+    });
+  });
 }
