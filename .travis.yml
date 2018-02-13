@@ -11,6 +11,8 @@ after_success:
 - yarn global add codeclimate-test-reporter
 - codeclimate-test-reporter < ./coverage/lcov.info
 - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+- cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage
+- rm -rf ./coverage
 env:
   global:
   - secure: XyRi4wHLXcjZdJ2vA+NKTAyZLvWxIu1OyjxDzhAM/fx2vQLVcFwV9s1d6H+J8JBokL/0//5UsCjzyjbeoZbxn/rLlCdAG4EeS7o4Ua4WFlssFUTaLvsuJQ0nF/RlOM7ztEkSroM5521jdnxqmli6GPBZexcqJCAIK+3GT0CxcP2w03ziQYsMa0F6qoEidzEVNYduK7a43yrlV2Ik56OEOPEYq/PBFl7pfwUR0w7iykn1Diy66HxYRqYGXko/ePE4p0J4bLzkE/wKqN6FtXcsRoGEG3x7S+uBvmPHBBd/WpMDTr9czMUL4a5CDReev+oJLzJyOvnl1qVU0XOOnkLB8GCYG4nPYxv7zvOs/Zktu4Hdh971oWvxxXozzjNz5dmQOSyM/Fp8Knjhzk80dbd/ytTnGThQuzmXVtO+VJm+snFw8HVIf2ZG0cQoUa6bh6PuBf9Njnzit410k0sdkwsXsdiO7DbACiF4deQ89kAGaYR6X6xpCuSciEbK4f0GrTAYIqatsNFcWTgA9eL5vYEPIcoHtILsZcaNfEeeKnk0qmDk6nO1BHZDAw2xlrKWzionNNJ2Skgi+1cGHE12CnX+ovJ8+P8Mr9ipxch355rWaSKh7uZBMFFJ4sn8reZVrpnMtzw4QVthZKkIJ6IoZ4wTWMi334wsNTgE2+hr2RsUq84=
