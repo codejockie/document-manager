@@ -20,7 +20,7 @@ const app = express();
 const router = express.Router();
 
 // Set static directory and webpack config
-const distDir = path.join(__dirname, 'client/assets'),
+const distDir = path.join(__dirname, '../client/assets'),
   htmlFile = path.join(distDir, 'index.html'),
   compiler = webpack(config),
   isDevelopment = process.env.NODE_ENV === 'development';
@@ -46,12 +46,8 @@ routes(router);
 app.use('/v1/auth', router);
 app.use('/v1', authenticate, router);
 
-app.get('/', (req, res) => {
-  res.status(200).render(htmlFile);
-});
-
 app.get('*', (req, res) => {
-  res.redirect(302, '/');
+  res.status(200).sendFile(htmlFile);
 });
 
 app.listen(process.env.PORT);
