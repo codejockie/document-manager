@@ -10,7 +10,7 @@
     "heroku-postbuild": "gulp compile && yarn run build",
     "migrate": "sequelize db:migrate && yarn run seed",
     "seed": "sequelize db:seed:all",
-    "start": "node src/server.js",
+    "start": "babel-node server/server.js",
     "server:test": "NODE_ENV=test nyc mocha -- ./__tests__/server/**/*.spec.js",
     "test": "gulp compile && yarn run server:test",
     "test:migrate": "NODE_ENV=test sequelize db:migrate",
