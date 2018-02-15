@@ -5,7 +5,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 const appName = 'bundle';
 const entry = [
   'webpack-hot-middleware/client',
-  './client/index.js'
+  './client/src/index.js'
 ];
 const nodeEnv = process.env.NODE_ENV;
 const webpackEnv = process.env.WEBPACK_ENV;
@@ -33,7 +33,7 @@ const config = {
           {
             loader: 'babel-loader',
             options: {
-              presets: ['react', 'env']
+              presets: ['@babel/preset-react', '@babel/preset-env']
             }
           }
         ]

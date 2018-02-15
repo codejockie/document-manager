@@ -1,0 +1,4 @@
+--exit
+--require @babel/register
+--ui bdd
+--timeout 90000

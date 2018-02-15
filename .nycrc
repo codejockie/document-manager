@@ -1,4 +1,7 @@
 {
+  "require": [
+      "@babel/register"
+    ],
   "exclude": [
       "server",
       "__tests__",
