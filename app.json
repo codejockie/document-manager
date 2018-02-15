@@ -9,6 +9,18 @@
     },
     "SECRET": {
       "required": true
+    },
+    "MAILER_CLIENT_ID": {
+      "required": true
+    },
+    "MAILER_CLIENT_SECRET": {
+      "required": true
+    },
+    "MAILER_ACCESS_TOKEN": {
+      "required": true
+    },
+    "MAILER_REFRESH_TOKEN": {
+      "required": true
     }
   },
   "formation": {
