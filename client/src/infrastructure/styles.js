@@ -1,4 +1,7 @@
 const styles = theme => ({
+  appBar: {
+    width: '100%',
+  },
   button: {
     margin: theme.spacing.unit,
   },
@@ -9,6 +12,9 @@ const styles = theme => ({
     width: theme.spacing.unit * 4,
     height: theme.spacing.unit * 4,
   },
+  flex: {
+    flex: 1,
+  },
   formControl: {
     margin: theme.spacing.unit,
   },
@@ -17,6 +23,10 @@ const styles = theme => ({
   },
   input: {
     display: 'none',
+  },
+  menuButton: {
+    marginLeft: -12,
+    marginRight: 20,
   },
   root: {
     display: 'flex',

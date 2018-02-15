@@ -1,11 +1,15 @@
 import axios from 'axios';
 
-import { AUTH_USER, AUTH_ERROR } from '../actions/actionTypes';
+import {
+  AUTH_ERROR,
+  AUTH_USER,
+  UNAUTH_USER
+} from './actionTypes';
 
 /**
  *
  * @param {object} error Error object
- * @returns {object} Payload
+ * @returns {object} action
  */
 export function authError(error) {
   return {
@@ -38,4 +42,15 @@ export function signInUser(userData, history) {
         dispatch(authError('Bad Login Info'));
       });
   };
+}
+
+/**
+ *
+ * @param {object} userData User's email and password
+ * @returns {object} action
+ */
+export function signOutUser() {
+  localStorage.removeItem('cUser');
+
+  return { type: UNAUTH_USER };
 }
