@@ -68,7 +68,7 @@ if (webpackEnv === 'production' || nodeEnv === 'production') {
   config.plugins.push(new UglifyJsPlugin({ minimize: true }));
   config.plugins.push(new webpack.DefinePlugin({
     'process.env': {
-      NODE_ENV: 'production'
+      NODE_ENV: JSON.stringify(process.env.NODE_ENV)
     }
   }));
 
