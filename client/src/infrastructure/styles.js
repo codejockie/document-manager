@@ -14,6 +14,7 @@ const styles = theme => ({
   },
   flex: {
     flex: 1,
+    textDecoration: 'none',
   },
   formControl: {
     margin: theme.spacing.unit,
@@ -31,7 +32,10 @@ const styles = theme => ({
   root: {
     display: 'flex',
     flexWrap: 'wrap',
-  }
+  },
+  signUpGrid: {
+    margin: '10rem -12px'
+  },
 });
 
 export default styles;
