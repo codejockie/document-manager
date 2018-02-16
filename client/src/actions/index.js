@@ -21,10 +21,10 @@ export function authError(error) {
 /**
  *
  * @param {object} userData User's email and password
- * @param {object} history Browser history
+ * @param {object} browserHistory Browser history
  * @returns {func} Function
  */
-export function signInUser(userData, history) {
+export function signInUser(userData, browserHistory) {
   const url = '/v1/auth/signin';
 
   return (dispatch) => {
@@ -36,10 +36,44 @@ export function signInUser(userData, history) {
           accessToken: response.data.token
         };
         localStorage.setItem('cUser', JSON.stringify(user));
-        history.push('/');
+        browserHistory.push('/');
       })
-      .catch(() => {
-        dispatch(authError('Bad Login Info'));
+      .catch((error) => {
+        if (error.response) {
+          dispatch(authError(error.response.data.message));
+        } else {
+          dispatch(authError('Bad Login Info'));
+        }
+      });
+  };
+}
+
+/**
+ *
+ * @param {object} userData User's email, password,
+ * username, firstname, and lastname
+ * @param {object} browserHistory Browser history
+ * @returns {func} Function
+ */
+export function signUpUser(userData, browserHistory) {
+  const url = '/v1/auth/signup';
+
+  return (dispatch) => {
+    axios.post(url, userData)
+      .then((response) => {
+        const user = {
+          ...response.data.user,
+          accessToken: response.data.token
+        };
+        localStorage.setItem('cUser', JSON.stringify(user));
+        browserHistory.push('/');
+      })
+      .catch((error) => {
+        if (error.response) {
+          dispatch(authError(error.response.data.message));
+        } else {
+          dispatch(authError('Sign up failed'));
+        }
       });
   };
 }
