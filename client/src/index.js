@@ -6,13 +6,20 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 
 import Root from './components/Root';
 import reducers from './reducers';
+import { AUTH_USER } from './actions/actionTypes';
 
-const storeWithMiddleware = createStore(
+const store = createStore(
   reducers,
   composeWithDevTools(applyMiddleware(reduxThunk))
 );
 
+const user = JSON.parse(localStorage.getItem('cUser'));
+
+if (user && user.accessToken) {
+  store.dispatch({ type: AUTH_USER });
+}
+
 render(
-  <Root store={storeWithMiddleware} />,
+  <Root store={store} />,
   document.querySelector('#content')
 );

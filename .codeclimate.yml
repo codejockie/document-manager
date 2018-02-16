@@ -1,25 +1,41 @@
-engines:
+version: "2"
+checks:
+  argument-count:
+    config:
+      threshold: 4
+  complex-logic:
+    config:
+      threshold: 4
+  file-lines:
+    config:
+      threshold: 350
+  method-complexity:
+    config:
+      threshold: 5
+  method-count:
+    config:
+      threshold: 20
+  method-lines:
+    config:
+      threshold: 50
+  nested-control-flow:
+    config:
+      threshold: 4
+  return-statements:
+    config:
+      threshold: 4
+  similar-code:
+    enabled: false
+  identical-code:
+    enabled: false
+plugins:
   eslint:
     enabled: true
     config:
-      config: .eslintrc
-  duplication:
-    enabled: true
-    checks:
-      Similar code:
-        enabled: false
-    config:
-      languages:
-      - javascript
-  fixme:
-    enabled: true
-ratings:
-  paths:
-  - "**.es6"
-  - "**.js"
-  - "**.jsx"
-exclude_paths:
-- node_modules/**/*
-- __tests__/*
-- server/models
-- server/migrations
+      file: ".eslintrc.json"
+exclude_patterns:
+- "node_modules/**/*"
+- "__tests__/*"
+- "server/models"
+- "server/migrations"
+- "server/seeders"
