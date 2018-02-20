@@ -11,3 +11,4 @@ coverage/
 # Project generated files
 index.html
 bundle.js
+bundle.min.js

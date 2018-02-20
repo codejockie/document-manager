@@ -4,7 +4,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 const appName = 'bundle';
 const entry = [
-  'webpack-hot-middleware/client',
+  'webpack-hot-middleware/client?reload=truepath=//localhost:4200/__webpack_hmr',
   './client/src/index.js'
 ];
 const nodeEnv = process.env.NODE_ENV;
@@ -65,6 +65,10 @@ const config = {
 if (webpackEnv === 'production' || nodeEnv === 'production') {
   const { UglifyJsPlugin } = webpack.optimize;
 
+  // Removing hot module from from the entry array in production fixes
+  // EventSource's response has a MIME type ("text/html")
+  // that is not "text/event-stream". Aborting the connection. error
+  config.entry = entry.slice(1);
   config.plugins.push(new UglifyJsPlugin({ minimize: true }));
   config.plugins.push(new webpack.DefinePlugin({
     'process.env': {
