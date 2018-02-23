@@ -8,10 +8,10 @@ import nodemon from 'gulp-nodemon';
 
 gulp.task('compile', () => gulp.src('server/**/*.js')
   .pipe(babel())
-  .pipe(gulp.dest('src')));
+  .pipe(gulp.dest('dist')));
 
 gulp.task('test', ['compile'], (done) => {
-  gulp.src(['src/controllers/*.js', 'src/helpers/*.js', 'src/middleware/*.js'])
+  gulp.src(['dist/controllers/*.js', 'dist/helpers/*.js', 'dist/middleware/*.js'])
     .pipe(istanbul())
     .pipe(istanbul.hookRequire())
     .on('finish', () => {
@@ -30,7 +30,7 @@ gulp.task('test', ['compile'], (done) => {
 
 gulp.task('watch', ['compile'], () => {
   nodemon({
-    script: 'src/server.js',
+    script: 'dist/server.js',
     ext: 'js',
     env: { NODE_ENV: 'development' },
     ignore: ['README.md', 'node_modules/**', '.DS_Store', 'LICENSE', '.*.yml'],

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import supertest from 'supertest';
-import app from '../../../src/server';
+import app from '../../../dist/server';
 import { hashPassword } from '../../../server/helpers/helper';
 import models from '../../../server/models';
 

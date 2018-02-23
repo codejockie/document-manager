@@ -1,6 +1,8 @@
 import path from 'path';
+import autoprefixer from 'autoprefixer';
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
 
 const appName = 'bundle';
 const entry = [
@@ -38,14 +40,31 @@ const config = {
           }
         ]
       }, {
-        test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader']
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+          use: [
+            {
+              loader: 'css-loader',
+              options: { importLoaders: 1 }
+            },
+            {
+              loader: 'postcss-loader',
+              options: { plugins: [autoprefixer()] }
+            }
+          ]
+        })
       }, {
-        test: /\.(eot|svg|ttf|woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.scss$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'sass-loader']
+        })
+      }, {
+        test: /\.(eot|gif|jpe?g|png|svg|ttf|woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
         use: {
           loader: 'file-loader',
           options: {
-            name: '[name].[ext]'
+            name: 'client/assets/[name].[ext]'
           }
         }
       }
@@ -58,6 +77,9 @@ const config = {
     new HtmlWebpackPlugin({
       title: 'Document Manager',
       template: 'client/assets/template.html'
+    }),
+    new ExtractTextPlugin({
+      filename: 'client/assets/style.css',
     })
   ]
 };
@@ -65,9 +87,9 @@ const config = {
 if (webpackEnv === 'production' || nodeEnv === 'production') {
   const { UglifyJsPlugin } = webpack.optimize;
 
-  // Removing hot module from from the entry array in production fixes
-  // EventSource's response has a MIME type ("text/html")
-  // that is not "text/event-stream". Aborting the connection. error
+  // Removing hot module from the entry array in production fixes
+  // EventSource's response has a MIME type ('text/html')
+  // that is not 'text/event-stream'. Aborting the connection. error
   config.entry = entry.slice(1);
   config.plugins.push(new UglifyJsPlugin({ minimize: true }));
   config.plugins.push(new webpack.DefinePlugin({

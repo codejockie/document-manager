@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import supertest from 'supertest';
 import isEmpty from 'lodash/isEmpty';
-import app from '../../../src/server';
+import app from '../../../dist/server';
 import models from '../../../server/models';
 
 const { Document, Role, User } = models;
