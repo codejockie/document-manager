@@ -4,7 +4,7 @@ node_modules/
 .vscode/
 .env
 package-lock.json
-/src/
+/dist/
 .nyc_output/
 coverage/
 
