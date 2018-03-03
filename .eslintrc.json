@@ -2,10 +2,11 @@
   "root": true,
   "extends": "airbnb-base",
   "env": {
-    "node": true,
+    "browser": true,
     "es6": true,
+    "jest": true,
     "mocha": true,
-    "browser": true
+    "node": true
   },
   "parser": "babel-eslint",
   "parserOptions": {

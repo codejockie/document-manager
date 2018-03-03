@@ -27,25 +27,23 @@ export function authError(error) {
 export function signInUser(userData, browserHistory) {
   const url = '/v1/auth/signin';
 
-  return (dispatch) => {
-    axios.post(url, userData)
-      .then((response) => {
-        dispatch({ type: AUTH_USER });
-        const user = {
-          ...response.data.user,
-          accessToken: response.data.token
-        };
-        localStorage.setItem('cUser', JSON.stringify(user));
-        browserHistory.push('/');
-      })
-      .catch((error) => {
-        if (error.response) {
-          dispatch(authError(error.response.data.message));
-        } else {
-          dispatch(authError('Bad Login Info'));
-        }
-      });
-  };
+  return dispatch => axios.post(url, userData)
+    .then((response) => {
+      dispatch({ type: AUTH_USER });
+      const user = {
+        ...response.data.user,
+        accessToken: response.data.token
+      };
+      localStorage.setItem('cUser', JSON.stringify(user));
+      browserHistory.push('/');
+    })
+    .catch((error) => {
+      if (error.response) {
+        dispatch(authError(error.response.data.message));
+      } else {
+        dispatch(authError('Bad Login Info'));
+      }
+    });
 }
 
 /**
@@ -58,24 +56,22 @@ export function signInUser(userData, browserHistory) {
 export function signUpUser(userData, browserHistory) {
   const url = '/v1/auth/signup';
 
-  return (dispatch) => {
-    axios.post(url, userData)
-      .then((response) => {
-        const user = {
-          ...response.data.user,
-          accessToken: response.data.token
-        };
-        localStorage.setItem('cUser', JSON.stringify(user));
-        browserHistory.push('/');
-      })
-      .catch((error) => {
-        if (error.response) {
-          dispatch(authError(error.response.data.message));
-        } else {
-          dispatch(authError('Sign up failed'));
-        }
-      });
-  };
+  return dispatch => axios.post(url, userData)
+    .then((response) => {
+      const user = {
+        ...response.data.user,
+        accessToken: response.data.token
+      };
+      localStorage.setItem('cUser', JSON.stringify(user));
+      browserHistory.push('/');
+    })
+    .catch((error) => {
+      if (error.response) {
+        dispatch(authError(error.response.data.message));
+      } else {
+        dispatch(authError('Sign up failed'));
+      }
+    });
 }
 
 /**
