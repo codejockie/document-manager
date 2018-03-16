@@ -60,11 +60,27 @@ const config = {
           use: ['css-loader', 'sass-loader']
         })
       }, {
-        test: /\.(eot|gif|jpe?g|png|svg|ttf|woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.(gif|jpe?g|png|svg)(\?v=\d+\.\d+\.\d+)?$/,
         use: {
           loader: 'file-loader',
           options: {
-            name: 'client/assets/[name].[ext]'
+            name: 'client/assets/images/[name].[ext]'
+          }
+        }
+      }, {
+        test: /\.(eot|ttf|woff2?)(\?v=\d+\.\d+\.\d+)?$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: 'client/assets/fonts/[name].[ext]'
+          }
+        }
+      }, {
+        test: /\.(aac|flac|mkv|mp3|mp4|ogg|wma|wmv)(\?v=\d+\.\d+\.\d+)?$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: 'client/assets/media/[name].[ext]'
           }
         }
       }
@@ -101,6 +117,11 @@ if (webpackEnv === 'production' || nodeEnv === 'production') {
   config.devtool = 'source-map';
   config.output.filename += '.min.js';
 } else {
+  config.plugins.push(new webpack.DefinePlugin({
+    'process.env': {
+      NODE_ENV: JSON.stringify('development')
+    }
+  }));
   config.devtool = 'cheap-module-eval-sourcemap';
   config.output.filename += '.js';
 }
