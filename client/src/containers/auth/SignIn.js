@@ -37,7 +37,8 @@ class SignIn extends React.Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     errorMessage: PropTypes.string,
-    signInUser: PropTypes.func.isRequired
+    signInUser: PropTypes.func.isRequired,
+    history: PropTypes.object
   }
 
   /**

@@ -1,36 +1,36 @@
 import path from 'path';
-import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import express from 'express';
+import { json, urlencoded } from 'body-parser';
 import validator from 'express-validator';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
+import { authenticate } from './middleware/middleware';
 import config from '../webpack.config.babel';
 import routes from './routes';
-import { authenticate } from './middleware/middleware';
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-process.env.PORT = process.env.PORT || '4200';
-
+// Configure dotenv to load environment variables
 dotenv.config();
 
 const app = express();
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const PORT = process.env.PORT || 4200;
 const router = express.Router();
 
 // Set static directory and webpack config
 const distDir = path.join(__dirname, '../client/assets'),
   htmlFile = path.join(distDir, 'index.html'),
-  compiler = webpack(config),
-  isDevelopment = process.env.NODE_ENV === 'development';
+  compiler = webpack(config);
 
 // Configure middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(urlencoded({ extended: true }));
+app.use(json());
 app.use(validator());
 
-if (isDevelopment) {
+if (NODE_ENV === 'development') {
+  // Configure webpack middleware for bundling
   app.use(webpackDevMiddleware(compiler, {
     publicPath: config.output.publicPath
   }));
@@ -41,15 +41,22 @@ if (isDevelopment) {
   app.use(express.static(distDir));
 }
 
+// Enable CORS
+app.use((request, response, next) => {
+  response.header('Access-Control-Allow-Origin', '*');
+  response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
 // Configure routes
 routes(router);
 app.use('/v1/auth', router);
 app.use('/v1', authenticate, router);
 
-app.get('*', (req, res) => {
-  res.status(200).sendFile(htmlFile);
+app.get('*', (request, response) => {
+  response.status(200).sendFile(htmlFile);
 });
 
-app.listen(process.env.PORT);
+app.listen(PORT);
 
 export default app;

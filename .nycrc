@@ -5,9 +5,9 @@
   "exclude": [
       "server",
       "__tests__",
-      "src/models/index.js",
-      "src/routes",
-      "src/server.js",
+      "dist/models/index.js",
+      "dist/routes",
+      "dist/server.js",
       "webpack.config.babel.js"
     ],
     "reporter": [

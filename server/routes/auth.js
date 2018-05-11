@@ -6,7 +6,7 @@ import {
 
 const {
   forgotPassword,
-  logout,
+  verify,
   resetPassword,
   signup,
   signin,
@@ -16,9 +16,6 @@ const auth = (router) => {
   router.route('/signin')
     .post(validateLogin, signin);
 
-  router.route('/logout')
-    .post(logout);
-
   router.route('/signup')
     .post(validateUser, signup);
 
@@ -27,6 +24,9 @@ const auth = (router) => {
 
   router.route('/reset-password')
     .post(resetPassword);
+
+  router.route('/verify')
+    .post(verify);
 };
 
 export default auth;
