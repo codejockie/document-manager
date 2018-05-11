@@ -52,7 +52,8 @@ class SignUp extends React.Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     errorMessage: PropTypes.string,
-    signUpUser: PropTypes.func.isRequired
+    signUpUser: PropTypes.func.isRequired,
+    history: PropTypes.object
   }
 
   /**

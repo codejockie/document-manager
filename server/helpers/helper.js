@@ -37,7 +37,9 @@ export function generateDocumentObject(document) {
  * @returns {Object} errors
  */
 export function generateErrors(errors) {
-  const response = { errors: {} };
+  const response = {
+    errors: {}
+  };
   errors.forEach((error) => {
     response.errors[error.param] = error.msg;
   });
@@ -98,7 +100,9 @@ export function getOperatingSystemType() {
  */
 export function hashPassword(password, isUpdate = false) {
   const saltRounds = bcrypt.genSaltSync(13);
-  if (isUpdate) { return bcrypt.hashSync(password, saltRounds); }
+  if (isUpdate) {
+    return bcrypt.hashSync(password, saltRounds);
+  }
   return bcrypt.hash(password, saltRounds);
 }
 
@@ -122,18 +126,44 @@ export function isUser(id, userId) {
 }
 
 /**
+ * Email options
+ * @param {Object} context Properties for handlebars data binding
+ * @param {string} subject Email subject
+ * @param {string} template Email template to use
+ * @param {string} to Recipient's email
+ * @returns {object} Mail options
+ */
+export function emailOptions(context, subject, template, to) {
+  const options = {
+    context,
+    from: 'CJDocs <no-reply@cjdocs.com>',
+    to,
+    subject,
+    template,
+  };
+
+  if (template === 'forgot-password') {
+    options.context.operatingSystem = getOperatingSystemType();
+  }
+
+  return options;
+}
+
+/**
  * Send email using SMTP transport
  * @param {Object} smtpTransport The mail transport
  * @param {Object} mailOptions The mail options
- * @param {Object} res The response object
+ * @param {Object} response Express response object
  * @returns {Object} Message status
  */
-export function sendMail(smtpTransport, mailOptions, res) {
+export function sendMail(smtpTransport, mailOptions, response) {
   smtpTransport.sendMail(mailOptions, (error, info) => {
     if (error) {
-      return res.send({ message: 'Email not sent' });
+      return response.send({
+        message: 'Oops! An error occurred while sending the mail.'
+      });
     }
-    return res.send({
+    return response.send({
       message: `Message sent. ${info.messageId}`
     });
   });

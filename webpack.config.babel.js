@@ -14,6 +14,7 @@ const DEVELOPMENT_ENV = 'development';
 const PRODUCTION_ENV = 'production';
 const resolve = dir => path.resolve(__dirname, dir);
 const outputPath = resolve('client/assets');
+const extractTextPlugin = new ExtractTextPlugin('style.css');
 
 const config = {
   entry,
@@ -42,7 +43,7 @@ const config = {
         ]
       }, {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
+        use: extractTextPlugin.extract({
           use: [
             {
               loader: 'css-loader',
@@ -56,7 +57,7 @@ const config = {
         })
       }, {
         test: /\.scss$/,
-        use: ExtractTextPlugin.extract({
+        use: extractTextPlugin.extract({
           fallback: 'style-loader',
           use: ['css-loader', 'sass-loader']
         })
@@ -95,9 +96,7 @@ const config = {
       title: 'Document Manager',
       template: 'client/assets/template.html'
     }),
-    new ExtractTextPlugin({
-      filename: 'client/assets/style.css',
-    })
+    extractTextPlugin,
   ]
 };
 

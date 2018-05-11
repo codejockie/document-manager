@@ -1,13 +1,13 @@
-import path from 'path';
 import crypto from 'crypto';
+import path from 'path';
 import hbs from 'nodemailer-express-handlebars';
 import nodemailer from 'nodemailer';
 
 import models from '../models';
 import { serverErrorMessage } from '../helpers/messages';
 import {
+  emailOptions,
   generateUserObject,
-  getOperatingSystemType,
   hashPassword,
   sendMail
 } from '../helpers/helper';
@@ -50,48 +50,36 @@ smtpTransport.use('compile', hbs(handlebarsOptions));
 export default class AuthController {
   /**
    * Logs a user in
-   * @param { Object } req
-   * @param { Object } res
+   * @param { Object } request
+   * @param { Object } response
    * @returns { Object } user
    */
-  static signin(req, res) {
-    const { email, password } = req.body;
+  static signin(request, response) {
+    const { email, password } = request.body;
 
     findByEmailAndPassword(email, password)
       .then((user) => {
         const token = generateAuthToken(user.id, user.email, user.username);
-        res.header('X-Auth', token).send({
+        response.header('X-Auth', token).send({
           user: generateUserObject(user),
           token
         });
       })
-      .catch(() => res.status(401).send({
+      .catch(() => response.status(401).send({
         message: 'Username or Password incorrect'
       }));
   }
 
   /**
-   * Logs out a user
-   * @param { Object } req
-   * @param { Object } res
-   * @returns { void }
-   */
-  static logout(req, res) {
-    req.user = null;
-    req.token = null;
-    res.header('X-Auth', '').status(200).send({ message: 'Logged out' });
-  }
-
-  /**
    * Creates a new user
-   * @param { Object } req
-   * @param { Object } res
+   * @param { Object } request
+   * @param { Object } response
    * @returns { Object } user
    */
-  static signup(req, res) {
+  static signup(request, response) {
     const {
       email, firstname, lastname, password, username
-    } = req.body;
+    } = request.body;
 
     User.findOne({
       where: {
@@ -102,7 +90,7 @@ export default class AuthController {
       }
     }).then((user) => {
       if (user) {
-        return res.status(422).send({
+        return response.status(422).send({
           message: 'username and email must be unique'
         });
       }
@@ -117,12 +105,12 @@ export default class AuthController {
       })
         .then((newUser) => {
           const token = generateAuthToken(newUser.id, newUser.email, newUser.username);
-          res.header('X-Auth', token).status(201).send({
+          response.header('X-Auth', token).status(201).send({
             user: generateUserObject(newUser),
             token
           });
         })
-        .catch(() => res.status(500).send({
+        .catch(() => response.status(500).send({
           message: serverErrorMessage
         }));
     });
@@ -130,82 +118,78 @@ export default class AuthController {
 
   /**
    * Handle forgot password
-   * @param { Object } req
-   * @param { Object } res
+   * @param { Object } request
+   * @param { Object } response
    * @returns { string } email status
    */
-  static forgotPassword(req, res) {
-    User.findOne({ where: { email: req.body.email } })
+  static forgotPassword(request, response) {
+    const { body: { email }, headers, hostname } = request;
+
+    User.findOne({ where: { email } })
       .then((user) => {
         if (!user) {
-          return res.status(401).send({
+          return response.status(401).send({
             message: 'User not found'
           });
         }
 
         // Generates reset password token using crypto buffer to hex
-        const token = crypto.randomBytes(25).toString('hex');
-        const date = new Date();
-        date.setHours(date.getHours() + 24);
+        const resetPasswordToken = crypto.randomBytes(10).toString('hex');
+        const resetPasswordExpires = new Date();
+        resetPasswordExpires.setHours(resetPasswordExpires.getHours() + 24);
 
         // Set password reset url
-        let url;
+        let url = 'http';
         if (process.env.NODE_ENV === 'development') {
-          url = `https://${req.hostname}:${process.env.PORT}/auth/reset-password?token=${token}`;
+          url += `://${hostname}:${process.env.PORT}/auth/reset-password?password-reset-token=${resetPasswordToken}`;
         } else {
-          url = `https://${req.hostname}/auth/reset-password?token=${token}`;
+          url += `s://${hostname}/auth/reset-password?password-reset-token=${resetPasswordToken}`;
         }
 
         user.update({
-          resetPasswordToken: token,
-          resetPasswordExpires: date
+          resetPasswordToken,
+          resetPasswordExpires
         })
           .then(() => {
-            const mailOptions = {
-              from: 'CJDocs <no-reply@cjdocs.com>',
-              to: user.email,
-              template: 'forgot-password',
-              subject: 'Password Reset',
-              context: {
-                browserName: req.headers['user-agent'],
-                name: user.firstname,
-                operatingSystem: getOperatingSystemType(),
-                url,
-              }
+            const context = {
+              browserName: headers['user-agent'],
+              name: user.firstname,
+              url,
             };
+            const mailOptions = emailOptions(context, 'Password Reset', 'forgot-password', user.email);
 
-            sendMail(smtpTransport, mailOptions, res);
+            sendMail(smtpTransport, mailOptions, response);
           })
-          .catch(error => res.status(500).send({ error }));
+          .catch(error => response.status(500).send({ error }));
       })
-      .catch(error => res.status(500).send({ error }));
+      .catch(error => response.status(500).send({ error }));
   }
 
   /**
    * Handle password reset
-   * @param { Object } req
-   * @param { Object } res
+   * @param { Object } request
+   * @param { Object } response
    * @returns { string } reset status
    */
-  static resetPassword(req, res) {
+  static resetPassword(request, response) {
     User.findOne({
       where: {
-        resetPasswordToken: req.body.token,
+        resetPasswordToken: request.body.token,
         resetPasswordExpires: {
           $gt: Date.now()
         }
       }
     }).then((user) => {
       if (!user) {
-        return res.status(400).send({
+        return response.status(400).send({
           message: 'Password reset token is invalid or has expired.'
         });
       }
 
-      const { password, verifyPassword } = req.body;
+      const { body: { password, verifyPassword } } = request;
 
       if (password !== verifyPassword) {
-        return res.status(422).send({
+        return response.status(422).send({
           message: 'Passwords do not match'
         });
       }
@@ -216,20 +200,33 @@ export default class AuthController {
         resetPasswordExpires: null
       })
         .then(() => {
-          const mailOptions = {
-            from: 'CJDocs <no-reply@cjdocs.com>',
-            to: user.email,
-            template: 'reset-password',
-            subject: 'Password Reset Confirmation',
-            context: {
-              name: user.firstname
-            }
+          const context = {
+            name: user.firstname
           };
+          const mailOptions = emailOptions(context, 'Password Reset Confirmation', 'reset-password', user.email);
 
-          sendMail(smtpTransport, mailOptions, res);
+          sendMail(smtpTransport, mailOptions, response);
         })
-        .catch(error => res.status(500).send({ error }));
+        .catch(error => response.status(500).send({ error }));
     })
-      .catch(error => res.status(500).send({ error }));
+      .catch(error => response.status(500).send({ error }));
+  }
+
+  /**
+   * Verify Auth Token
+   * @param { Object } request
+   * @param { Object } response
+   * @returns { void }
+   */
+  static verify(request, response) {
+    const { token } = request.body;
+
+    if (!token) {
+      response.status(400).send({
+        error: 'Token not supplied'
+      });
+    }
+
+    // TODO: Complete token verification
   }
 }

@@ -6,16 +6,20 @@ import istanbul from 'gulp-istanbul';
 import jasmine from 'gulp-jasmine';
 import nodemon from 'gulp-nodemon';
 
-gulp.task('compile', () => gulp.src('server/**/*.js')
+gulp.task('compile', ['compile:test'], () => gulp.src('server/**/*.js')
   .pipe(babel())
   .pipe(gulp.dest('dist')));
+
+gulp.task('compile:test', () => gulp.src('__tests__/server/**/*.js')
+  .pipe(babel())
+  .pipe(gulp.dest('dist/__tests__')));
 
 gulp.task('test', ['compile'], (done) => {
   gulp.src(['dist/controllers/*.js', 'dist/helpers/*.js', 'dist/middleware/*.js'])
     .pipe(istanbul())
     .pipe(istanbul.hookRequire())
     .on('finish', () => {
-      gulp.src('./tests/**/*.js')
+      gulp.src('./__tests__/**/*.js')
         .pipe(babel())
         .pipe(injectModules())
         .pipe(jasmine({

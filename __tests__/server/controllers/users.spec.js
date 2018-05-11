@@ -190,19 +190,6 @@ describe('Users endpoints', () => {
     });
   });
 
-  // POST /v1/auth/logout
-  describe('POST /v1/auth/logout', () => {
-    it('clears the X-Auth header on logout', (done) => {
-      request
-        .post('/v1/auth/logout')
-        .expect(200)
-        .end((err, res) => {
-          expect(res.header['x-auth']).to.equal('');
-          done();
-        });
-    });
-  });
-
   // GET /v1/users route
   describe('GET /v1/users', () => {
     it('validates offset and limit query params', (done) => {
