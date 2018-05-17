@@ -13,7 +13,8 @@ import {
 } from '../helpers/helper';
 import {
   findByEmailAndPassword,
-  generateAuthToken
+  generateAuthToken,
+  verifyToken
 } from '../helpers/jwt';
 
 const { User } = models;
@@ -213,20 +214,27 @@ export default class AuthController {
   }
 
   /**
-   * Verify Auth Token
+   * Verify auth token
    * @param { Object } request
    * @param { Object } response
    * @returns { void }
    */
   static verify(request, response) {
-    const { token } = request.body;
+    const { body: { token } } = request;
 
     if (!token) {
-      response.status(400).send({
-        error: 'Token not supplied'
+      return response.status(400).send({
+        error: 'Token not supplied',
+        ok: false
       });
     }
 
-    // TODO: Complete token verification
+    const tokenStatus = verifyToken(token);
+
+    if (!tokenStatus.ok) {
+      return response.status(401).send(tokenStatus);
+    }
+
+    response.status(200).send(tokenStatus);
   }
 }

@@ -7,13 +7,15 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 
 import Root from './components/Root';
 import reducers from './reducers';
-import { AUTH_USER } from './actions/actionTypes';
+import { VERIFY_TOKEN } from './actions/actionTypes';
+import { getToken, persistToken } from './middleware';
 
 const logger = createLogger({
   // ...options
 });
 const middlewares = [
-  reduxThunk
+  reduxThunk,
+  persistToken
 ];
 
 if (process.env.NODE_ENV === 'development') {
@@ -25,11 +27,12 @@ const store = createStore(
   composeWithDevTools(applyMiddleware(...middlewares))
 );
 
-const user = JSON.parse(localStorage.getItem('cUser'));
+const authToken = getToken();
 
-if (user && user.accessToken) {
-  store.dispatch({ type: AUTH_USER });
+if (authToken) {
+  store.dispatch({ type: VERIFY_TOKEN });
 }
+
 
 render(
   <Root store={store} />,

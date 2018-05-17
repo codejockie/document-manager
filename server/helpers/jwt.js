@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 import models from '../models';
 
 const { User } = models;
@@ -39,7 +39,7 @@ export function findByEmailAndPassword(email, password) {
  */
 export function findByToken(token) {
   try {
-    const decoded = jwt.verify(token, process.env.SECRET);
+    const decoded = verify(token, process.env.SECRET);
     return User.findOne({
       where: {
         $or: [{
@@ -57,16 +57,50 @@ export function findByToken(token) {
 }
 
 /**
- * Generates jwt token for authentication
+ * Generates jsonwebtoken token for authentication
  * @param {string} id User's id stored in the database
  * @param {string} email User's email stored in the database
  * @param {string} username User's username stored in the database
- * @returns {string} jwt token
+ * @returns {string} jsonwebtoken token
  */
 export function generateAuthToken(id, email, username) {
-  return jwt.sign({
+  return sign({
     id,
     email,
     username
   }, process.env.SECRET, { expiresIn: '72 hours' });
+}
+
+/**
+ * Verify jsonwebtoken token to check if it is valid
+ * @param {string} token jsonwebtoken token
+ * @returns {Object} valid or not valid state
+ */
+export function verifyToken(token) {
+  const status = {
+    error: '',
+    ok: false
+  };
+
+  try {
+    const decoded = verify(token, process.env.SECRET);
+
+    if (decoded) {
+      status.ok = true;
+      return status;
+    }
+  } catch (error) {
+    const { name } = error;
+
+    switch (name) {
+      case 'TokenExpiredError':
+        status.error = 'Token expired';
+        return status;
+      case 'JsonWebTokenError':
+        status.error = 'Invalid token signature';
+        return status;
+      default:
+        return status;
+    }
+  }
 }

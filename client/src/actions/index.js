@@ -5,9 +5,10 @@ import {
   AUTH_USER,
   UNAUTH_USER
 } from './actionTypes';
+import { removeFromStorage, setToken } from '../middleware';
 
 /**
- *
+ * Handles error
  * @param {object} error Error object
  * @returns {object} action
  */
@@ -19,7 +20,7 @@ export function authError(error) {
 }
 
 /**
- *
+ * Handles user sign in
  * @param {object} userData User's email and password
  * @param {object} browserHistory Browser history
  * @returns {func} Function
@@ -30,11 +31,9 @@ export function signInUser(userData, browserHistory) {
   return dispatch => axios.post(url, userData)
     .then((response) => {
       dispatch({ type: AUTH_USER });
-      const user = {
-        ...response.data.user,
-        accessToken: response.data.token
-      };
-      localStorage.setItem('cUser', JSON.stringify(user));
+      const { user, token } = response.data;
+      setToken('authUser', JSON.stringify(user));
+      setToken('authToken', token);
       browserHistory.push('/');
     })
     .catch((error) => {
@@ -47,7 +46,7 @@ export function signInUser(userData, browserHistory) {
 }
 
 /**
- *
+ * Handles user sign up
  * @param {object} userData User's email, password,
  * username, firstname, and lastname
  * @param {object} browserHistory Browser history
@@ -58,11 +57,9 @@ export function signUpUser(userData, browserHistory) {
 
   return dispatch => axios.post(url, userData)
     .then((response) => {
-      const user = {
-        ...response.data.user,
-        accessToken: response.data.token
-      };
-      localStorage.setItem('cUser', JSON.stringify(user));
+      const { user, token } = response.data;
+      setToken('authUser', JSON.stringify(user));
+      setToken('authToken', token);
       browserHistory.push('/');
     })
     .catch((error) => {
@@ -75,12 +72,13 @@ export function signUpUser(userData, browserHistory) {
 }
 
 /**
- *
+ * Handles user sign out
  * @param {object} userData User's email and password
  * @returns {object} action
  */
 export function signOutUser() {
-  localStorage.removeItem('cUser');
+  removeFromStorage('authUser');
+  removeFromStorage('authToken');
 
   return { type: UNAUTH_USER };
 }
