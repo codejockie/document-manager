@@ -2,7 +2,6 @@
 [![Build Status](https://travis-ci.org/codejockie/document-manager.svg?branch=master)](https://travis-ci.org/codejockie/document-manager)
 [![Code Climate](https://codeclimate.com/github/codejockie/document-manager/badges/gpa.svg)](https://codeclimate.com/github/codejockie/document-manager)
 [![Coverage Status](https://coveralls.io/repos/github/codejockie/document-manager/badge.svg?branch=master)](https://coveralls.io/github/codejockie/document-manager?branch=master)
-
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/60ce4b40c146417286ed65d28132126d)](https://www.codacy.com/app/codejockie/document-manager?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=codejockie/document-manager&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/60ce4b40c146417286ed65d28132126d)](https://www.codacy.com/app/codejockie/document-manager?utm_source=github.com&utm_medium=referral&utm_content=codejockie/document-manager&utm_campaign=Badge_Coverage)
 [![CircleCI](https://circleci.com/gh/codejockie/document-manager.svg?style=svg)](https://circleci.com/gh/codejockie/document-manager)
@@ -18,7 +17,7 @@
    +  Create documents
    +  Delete documents, users
    +  Update documents, users
-+ App at [here](http://cjdocs.herokuapp.com)
++ Find app [here](http://cjdocs.herokuapp.com)
    
 ## Project Dependencies
 ### Dependencies

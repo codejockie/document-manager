@@ -16,7 +16,11 @@ export default (EnhancedComponent) => {
   class Authentication extends React.Component {
     static contextTypes = {
       router: PropTypes.object
-    }
+    };
+
+    static propTypes = {
+      authenticated: PropTypes.bool.isRequired
+    };
 
     /**
      * Check if a user is authenticated on component

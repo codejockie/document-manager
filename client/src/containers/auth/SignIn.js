@@ -22,7 +22,7 @@ import styles from '../../infrastructure/styles';
 
 /**
  * SignIn Component
-*/
+ */
 class SignIn extends React.Component {
   state = {
     email: '',
@@ -39,7 +39,7 @@ class SignIn extends React.Component {
     errorMessage: PropTypes.string,
     signInUser: PropTypes.func.isRequired,
     history: PropTypes.object
-  }
+  };
 
   /**
    * handleInputChange

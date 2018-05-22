@@ -19,7 +19,8 @@ import styles from '../infrastructure/styles';
  */
 class Header extends React.Component {
   static propTypes = {
-    classes: PropTypes.object.isRequired
+    classes: PropTypes.object.isRequired,
+    authenticated: PropTypes.bool.isRequired
   };
 
   /**

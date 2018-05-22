@@ -22,7 +22,7 @@ import styles from '../../infrastructure/styles';
 
 /**
  * SignUp Component
-*/
+ */
 class SignUp extends React.Component {
   state = {
     email: '',
@@ -54,7 +54,7 @@ class SignUp extends React.Component {
     errorMessage: PropTypes.string,
     signUpUser: PropTypes.func.isRequired,
     history: PropTypes.object
-  }
+  };
 
   /**
    * handleInputChange
