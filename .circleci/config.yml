@@ -34,9 +34,4 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!
-      - run: yarn run client:test
-
-      # upload coverage
-      - run:
-          name: coverage-report
-          command: cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage
+      - run: yarn run client:test:coverage

@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack",
     "client:test": "jest --coverage",
+    "client:test:coverage": "jest --coverage && cat ./coverage/lcov.info | codacy-coverage",
     "client:test:watch": "jest --coverage --watch",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "debug": "nodemon --inspect --exec babel-node -- server/server.js",
