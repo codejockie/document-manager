@@ -17,7 +17,7 @@ export const removeFromStorage = (key) => {
 };
 
 /* eslint-disable no-unused-vars */
-export const persistToken = store => next => (action) => {
+export const persistToken = ({ dispatch }) => next => (action) => {
   switch (action.type) {
     case VERIFY_TOKEN:
       axios({
@@ -28,17 +28,21 @@ export const persistToken = store => next => (action) => {
         }
       }).then(({ data: { error, ok } }) => {
         if (!ok) {
-          next({
+          return next({
             type: TOKEN_EXPIRED,
             error
           });
-          return;
         }
 
-        store.dispatch({ type: AUTH_USER });
-        next({
+        dispatch({ type: AUTH_USER });
+        return next({
           type: SAVE_TOKEN,
           token: getToken()
+        });
+      }).catch((error) => {
+        next({
+          type: TOKEN_EXPIRED,
+          error
         });
       });
       break;
@@ -48,7 +52,7 @@ export const persistToken = store => next => (action) => {
     case TOKEN_EXPIRED:
       removeFromStorage('authUser');
       removeFromStorage('authToken');
-      store.dispatch({ type: UNAUTH_USER, error: action.error });
+      dispatch({ type: UNAUTH_USER, error: action.error });
       break;
     default:
       break;
