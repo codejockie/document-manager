@@ -17,10 +17,10 @@ import styles from '../infrastructure/styles';
 /**
  * Header component
  */
-class Header extends React.Component {
+export class Header extends React.Component {
   static propTypes = {
-    classes: PropTypes.object.isRequired,
-    authenticated: PropTypes.bool.isRequired
+    authenticated: PropTypes.bool.isRequired,
+    classes: PropTypes.object.isRequired
   };
 
   /**
@@ -28,35 +28,34 @@ class Header extends React.Component {
    * @returns {HTMLElement} Links
    */
   renderLinks = () => {
-    if (this.props.authenticated) {
+    if (!this.props.authenticated) {
       return (
-        <Button
-          color="inherit"
-          component={Link}
-          to="/signout"
-        >
-          Sign Out
-        </Button>
+        <Fragment>
+          <Button
+            color="inherit"
+            component={Link}
+            to="/auth/signin"
+          >
+            Sign In
+          </Button>
+          <Button
+            color="inherit"
+            component={Link}
+            to="/auth/signup"
+          >
+            Sign Up
+          </Button>
+        </Fragment>
       );
     }
-
     return (
-      <Fragment>
-        <Button
-          color="inherit"
-          component={Link}
-          to="/auth/signin"
-        >
-          Sign In
-        </Button>
-        <Button
-          color="inherit"
-          component={Link}
-          to="/auth/signup"
-        >
-          Sign Up
-        </Button>
-      </Fragment>
+      <Button
+        color="inherit"
+        component={Link}
+        to="/signout"
+      >
+        Sign Out
+      </Button>
     );
   }
 
