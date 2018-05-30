@@ -92,7 +92,7 @@ export default class AuthController {
     }).then((user) => {
       if (user) {
         return response.status(422).send({
-          message: 'username and email must be unique'
+          message: 'Username and Email must be unique'
         });
       }
 
