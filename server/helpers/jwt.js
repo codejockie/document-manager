@@ -8,7 +8,7 @@ const { User } = models;
  * Finds a user by supplied credentials
  * @param {string} email The user's email
  * @param {string} password The user's password
- * @returns {Object} user
+ * @returns {Promise} resolved/rejected state
  */
 export function findByEmailAndPassword(email, password) {
   return User.findOne({
@@ -35,7 +35,7 @@ export function findByEmailAndPassword(email, password) {
 /**
  * Finds a user by token
  * @param {string} token The user's token stored in the database
- * @returns {Object} user
+ * @returns {Promise | Object} resolved/rejected
  */
 export function findByToken(token) {
   try {
@@ -60,14 +60,12 @@ export function findByToken(token) {
  * Generates jsonwebtoken token for authentication
  * @param {string} id User's id stored in the database
  * @param {string} email User's email stored in the database
- * @param {string} username User's username stored in the database
  * @returns {string} jsonwebtoken token
  */
-export function generateAuthToken(id, email, username) {
+export function generateAuthToken(id, email) {
   return sign({
     id,
-    email,
-    username
+    email
   }, process.env.SECRET, { expiresIn: '72 hours' });
 }
 
