@@ -12,7 +12,6 @@ import {
   sendMail
 } from '../helpers/helper';
 import {
-  findByEmailAndPassword,
   generateAuthToken,
   verifyToken
 } from '../helpers/jwt';
@@ -56,19 +55,12 @@ export default class AuthController {
    * @returns { Object } user
    */
   static signin(request, response) {
-    const { email, password } = request.body;
+    const { user } = request;
+    const { email, id } = user;
+    const token = generateAuthToken(id, email),
+      userData = generateUserObject(user);
 
-    findByEmailAndPassword(email, password)
-      .then((user) => {
-        const token = generateAuthToken(user.id, user.email, user.username);
-        response.header('X-Auth', token).send({
-          user: generateUserObject(user),
-          token
-        });
-      })
-      .catch(() => response.status(401).send({
-        message: 'Username or Password incorrect'
-      }));
+    response.send({ token, user: userData });
   }
 
   /**
@@ -106,9 +98,9 @@ export default class AuthController {
       })
         .then((newUser) => {
           const token = generateAuthToken(newUser.id, newUser.email, newUser.username);
-          response.header('X-Auth', token).status(201).send({
-            user: generateUserObject(newUser),
-            token
+          response.status(201).send({
+            token,
+            user: generateUserObject(newUser)
           });
         })
         .catch(() => response.status(500).send({
@@ -140,11 +132,11 @@ export default class AuthController {
         resetPasswordExpires.setHours(resetPasswordExpires.getHours() + 24);
 
         // Set password reset url
-        let url = 'http';
+        let url = 'https://';
         if (process.env.NODE_ENV === 'development') {
-          url += `://${hostname}:${process.env.PORT}/auth/reset-password?password-reset-token=${resetPasswordToken}`;
+          url = `${hostname}:${process.env.PORT}/auth/reset-password?password-reset-token=${resetPasswordToken}`;
         } else {
-          url += `s://${hostname}/auth/reset-password?password-reset-token=${resetPasswordToken}`;
+          url += `${hostname}/auth/reset-password?password-reset-token=${resetPasswordToken}`;
         }
 
         user.update({
