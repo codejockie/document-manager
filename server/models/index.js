@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 import Sequelize from 'sequelize';
-import conf from '../../server/config/config.json';
+import conf from '../../server/config/config';
 
 // loads the environment variables for the DB
 dotenv.config();
@@ -51,7 +51,10 @@ const operatorsAliases = {
 
 let sequelize;
 if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], { dialect: 'postgres', operatorsAliases });
+  sequelize = new Sequelize(
+    process.env[config.use_env_variable],
+    { dialect: config.dialect, operatorsAliases }
+  );
 } else {
   config.operatorsAliases = operatorsAliases;
   sequelize = new Sequelize(
