@@ -110,7 +110,7 @@ describe('Auth endpoints', () => {
         });
     });
 
-    it('given non-existing account details, it returns a 401 status', (done) => {
+    it('given non-existing account details, it returns a 500 status', (done) => {
       request
         .post('/v1/auth/signin')
         .send({
@@ -118,8 +118,8 @@ describe('Auth endpoints', () => {
           password: PASSWORD
         })
         .end((err, res) => {
-          expect(res.status).to.equal(401);
-          expect(res.body.message).to.equal('Username or Password incorrect');
+          expect(res.status).to.equal(500);
+          expect(res.text).contains('Username or Password incorrect');
           done();
         });
     });
@@ -151,19 +151,6 @@ describe('Auth endpoints', () => {
         });
     });
 
-    it('sets the token on the header with a key of  X-Auth', (done) => {
-      request
-        .post('/v1/auth/signin')
-        .send({
-          email: EMAIL,
-          password: PASSWORD
-        })
-        .end((err, res) => {
-          expect(res.header['x-auth']).to.equal(res.body.token);
-          done();
-        });
-    });
-
     it('given a wrong password, it throws an error', (done) => {
       request
         .post('/v1/auth/signin')
@@ -172,8 +159,8 @@ describe('Auth endpoints', () => {
           password: 'test'
         })
         .end((err, res) => {
-          expect(res.status).to.equal(401);
-          expect(res.body.message).to.equal('Username or Password incorrect');
+          expect(res.status).to.equal(500);
+          expect(res.text).contains('Username or Password incorrect');
           done();
         });
     });

@@ -57,7 +57,7 @@ describe('Users endpoints', () => {
     it('validates offset and limit query params', (done) => {
       request
         .get('/v1/users/?limit=cj&offset=0')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Limit must be an integer');
@@ -68,7 +68,7 @@ describe('Users endpoints', () => {
     it('given valid offset and limit, it returns correct data', (done) => {
       request
         .get('/v1/users/?limit=1&offset=0')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.metaData.pageSize).to.equal(1);
@@ -94,7 +94,7 @@ describe('Users endpoints', () => {
       request
         .get('/v1/users')
         .set('Accept', 'application/json')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.users).to.be.an('array');
@@ -108,7 +108,7 @@ describe('Users endpoints', () => {
       request
         .get('/v1/users')
         .set('Accept', 'application/json')
-        .set('X-Auth', TOKEN)
+        .set('Authorization', TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body.message).to.equal('The resource you are looking for does not exist');
@@ -122,7 +122,7 @@ describe('Users endpoints', () => {
     it('gets a user by id', (done) => {
       request
         .get('/v1/users/1')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.id).to.equal(1);
@@ -137,7 +137,7 @@ describe('Users endpoints', () => {
     it('returns a 404 status message for non-existing user', (done) => {
       request
         .get('/v1/users/10')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('User not found');
@@ -148,7 +148,7 @@ describe('Users endpoints', () => {
     it('returns a 400 status message for invalid param', (done) => {
       request
         .get('/v1/users/cj')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Param must be a number');
@@ -159,7 +159,7 @@ describe('Users endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .get('/v1/users/101243578787677')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
@@ -187,7 +187,7 @@ describe('Users endpoints', () => {
     it('returns error on invalid document id', (done) => {
       request
         .get('/v1/users/cj/documents')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Param must be a number');
@@ -198,7 +198,7 @@ describe('Users endpoints', () => {
     it('returns a 404 status for non-existing user', (done) => {
       request
         .get('/v1/users/10/documents')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('User not found');
@@ -209,7 +209,7 @@ describe('Users endpoints', () => {
     it('returns a 404 status if a document is not found for a user', (done) => {
       request
         .get('/v1/users/2/documents')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('No document found for this user');
@@ -220,7 +220,7 @@ describe('Users endpoints', () => {
     it('returns all documents belonging to the user', (done) => {
       request
         .get('/v1/users/1/documents')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.documents[0].title).to.equal('GET User Doc');
@@ -231,7 +231,7 @@ describe('Users endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .get('/v1/users/101243578787677678/documents')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
@@ -245,7 +245,7 @@ describe('Users endpoints', () => {
     it('returns a 400 status for invalid input param', (done) => {
       request
         .put('/v1/users/cj')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Param must be a number');
@@ -256,7 +256,7 @@ describe('Users endpoints', () => {
     it('returns a 404 status for non-existing user', (done) => {
       request
         .put('/v1/users/10')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('User not found');
@@ -267,7 +267,7 @@ describe('Users endpoints', () => {
     it('returns a 401 status for unauthorised user', (done) => {
       request
         .put('/v1/users/1')
-        .set('X-Auth', TOKEN)
+        .set('Authorization', TOKEN)
         .send({
           email: 'devjckennedy@gmail.com',
           username: 'acedcoder'
@@ -283,7 +283,7 @@ describe('Users endpoints', () => {
     it('returns a 422 status for duplicate email or username', (done) => {
       request
         .put('/v1/users/1')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .send({
           email: 'devjckennedy@gmail.com',
         })
@@ -297,7 +297,7 @@ describe('Users endpoints', () => {
     it('updates a user by id', (done) => {
       request
         .put('/v1/users/1')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .send({
           lastname: 'Nwaorgu',
         })
@@ -314,7 +314,7 @@ describe('Users endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .put('/v1/users/101243578787677678575')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
@@ -328,7 +328,7 @@ describe('Users endpoints', () => {
     it('returns a 400 status for invalid input param', (done) => {
       request
         .delete('/v1/users/cj')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Param must be a number');
@@ -339,7 +339,7 @@ describe('Users endpoints', () => {
     it('returns a 404 status for non-existing user', (done) => {
       request
         .put('/v1/users/10')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('User not found');
@@ -350,7 +350,7 @@ describe('Users endpoints', () => {
     it('returns a 401 status for unauthorised user', (done) => {
       request
         .delete('/v1/users/1')
-        .set('X-Auth', TOKEN)
+        .set('Authorization', TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body.message).to
@@ -362,7 +362,7 @@ describe('Users endpoints', () => {
     it('deletes a user by id', (done) => {
       request
         .delete('/v1/users/1')
-        .set('X-Auth', AUTH_TOKEN)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.message).to.equal('User deleted successfully');
@@ -373,7 +373,7 @@ describe('Users endpoints', () => {
     it('given a non-existing user id, it returns a 404 status', (done) => {
       request
         .delete('/v1/users/10')
-        .set('X-Auth', TOKEN)
+        .set('Authorization', TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('User not found');
@@ -384,7 +384,7 @@ describe('Users endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .delete('/v1/users/101243578787677678575')
-        .set('X-Auth', TOKEN)
+        .set('Authorization', TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');

@@ -1,35 +1,13 @@
+import passport from 'passport';
+
 import models from '../models';
 import { generateErrors } from '../helpers/helper';
-import { findByToken } from '../helpers/jwt';
+import '../services/passport';
 
 const { Document, Role, User } = models;
 
-/**
- * Checks if a user is authenticated
- * @param {Object} req
- * @param {Object} res
- * @param {callback} next
- * @returns {void}
- */
-const authenticate = (req, res, next) => {
-  const token = req.headers['x-auth'];
-
-  if (!token) {
-    return res.status(401).send({ message: 'Unauthorised user' });
-  }
-
-  findByToken(token)
-    .then((user) => {
-      if (!user) {
-        return Promise.reject();
-      }
-
-      req.user = user;
-      req.token = token;
-      next();
-    })
-    .catch(() => res.status(401).send({ error: 'Unauthorised user' }));
-};
+const authenticate = passport.authenticate('jwt', { session: false });
+const requireSignin = passport.authenticate('local', { session: false });
 
 /**
  * Checks if a document can be found by its id
@@ -265,6 +243,7 @@ export {
   findDocumentById,
   findRoleById,
   findUserById,
+  requireSignin,
   validateDocument,
   validateLimitAndOffset,
   validateLogin,

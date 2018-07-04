@@ -7,10 +7,12 @@ const { Document, Role, User } = models;
 
 const request = supertest.agent(app);
 
-const authToken = process.env.AUTH_TOKEN;
-const token = process.env.TOKEN;
-const invalidToken = process.env.INVALID_TOKEN;
-const nonUserToken = process.env.NON_USER_TOKEN;
+const {
+  AUTH_TOKEN,
+  INVALID_TOKEN,
+  NON_USER_TOKEN,
+  TOKEN
+} = process.env;
 const accessError = "Access field must be any of 'public' or 'private' or 'role'";
 
 const createDocuments = (done) => {
@@ -92,7 +94,7 @@ describe('Documents endpoints', () => {
       request
         .get('/v1/documents')
         .set('Accept', 'application/json')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.documents[0].title).to.equal('Data 1');
@@ -106,7 +108,7 @@ describe('Documents endpoints', () => {
       request
         .get('/v1/documents')
         .set('Accept', 'application/json')
-        .set('X-Auth', token)
+        .set('Authorization', TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.documents[0].title).to.equal('Data 4');
@@ -119,7 +121,7 @@ describe('Documents endpoints', () => {
     it('validates offset and limit query params', (done) => {
       request
         .get('/v1/documents/?limit=10&offset=cj')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Offset must be an integer');
@@ -130,7 +132,7 @@ describe('Documents endpoints', () => {
     it('given valid offset and limit, it returns correct data', (done) => {
       request
         .get('/v1/documents/?limit=2&offset=0')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.metaData.pageSize).to.equal(2);
@@ -150,7 +152,7 @@ describe('Documents endpoints', () => {
         request
           .get('/v1/documents')
           .set('Accept', 'application/json')
-          .set('X-Auth', authToken)
+          .set('Authorization', AUTH_TOKEN)
           .end((err, res) => {
             expect(res.status).to.equal(404);
             expect(res.body.message).to.equal('No document found');
@@ -160,13 +162,13 @@ describe('Documents endpoints', () => {
       });
     });
 
-    it('throws an error with an invalid token', (done) => {
+    it('throws an error with an invalid TOKEN', (done) => {
       request
         .get('/v1/documents/1')
-        .set('X-Auth', invalidToken)
+        .set('Authorization', INVALID_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(401);
-          expect(res.body.error).to.equal('Unauthorised user');
+          expect(res.text).to.equal('Unauthorized');
           done();
         });
     });
@@ -174,10 +176,10 @@ describe('Documents endpoints', () => {
     it('given a non existing user, it throws an error', (done) => {
       request
         .get('/v1/documents')
-        .set('X-Auth', nonUserToken)
+        .set('Authorization', NON_USER_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(401);
-          expect(res.body.error).to.equal('Unauthorised user');
+          expect(res.text).to.equal('Unauthorized');
           done();
         });
     });
@@ -192,7 +194,7 @@ describe('Documents endpoints', () => {
 
       request
         .post('/v1/documents')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .send(document)
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -211,7 +213,7 @@ describe('Documents endpoints', () => {
 
       request
         .post('/v1/documents')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .send(document)
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -233,7 +235,7 @@ describe('Documents endpoints', () => {
 
       request
         .post('/v1/documents')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .send(document)
         .end((err, res) => {
           expect(res.status).to.equal(422);
@@ -254,7 +256,7 @@ describe('Documents endpoints', () => {
 
       request
         .post('/v1/documents')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .send(document)
         .end((err, res) => {
           expect(res.status).to.equal(500);
@@ -269,7 +271,7 @@ describe('Documents endpoints', () => {
     it('should throw error for invalid id', (done) => {
       request
         .get('/v1/documents/sdfsfd')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to
@@ -281,7 +283,7 @@ describe('Documents endpoints', () => {
     it('should return 404 status if document is not found', (done) => {
       request
         .get('/v1/documents/10/')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to
@@ -293,7 +295,7 @@ describe('Documents endpoints', () => {
     it('should throw error for unauthorised user', (done) => {
       request
         .get('/v1/documents/1/')
-        .set('X-Auth', token)
+        .set('Authorization', TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body.message).to
@@ -305,7 +307,7 @@ describe('Documents endpoints', () => {
     it('should get a document a user has access to', (done) => {
       request
         .get('/v1/documents/1')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.title).to.equal('Data 1');
@@ -317,7 +319,7 @@ describe('Documents endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .get('/v1/documents/10124357878767767')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
@@ -339,7 +341,7 @@ describe('Documents endpoints', () => {
 
       request
         .put('/v1/documents/cj')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .send(document)
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -351,7 +353,7 @@ describe('Documents endpoints', () => {
     it('returns a 404 status if document is not found', (done) => {
       request
         .put('/v1/documents/20')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('Document not found');
@@ -362,7 +364,7 @@ describe('Documents endpoints', () => {
     it('returns a 401 status for unauthorised user', (done) => {
       request
         .put('/v1/documents/1')
-        .set('X-Auth', token)
+        .set('Authorization', TOKEN)
         .send({
           content: 'Whats up?'
         })
@@ -377,7 +379,7 @@ describe('Documents endpoints', () => {
     it('should update a document by id', (done) => {
       request
         .put('/v1/documents/1')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .send({
           title: 'Hello PUT',
           content: 'Tests Running',
@@ -392,7 +394,7 @@ describe('Documents endpoints', () => {
     it('returns a 422 status for duplicate title', (done) => {
       request
         .put('/v1/documents/1')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .send({
           title: 'Data 2',
         })
@@ -406,7 +408,7 @@ describe('Documents endpoints', () => {
     it('should throw an error with an invalid access type', (done) => {
       request
         .put('/v1/documents/1')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .send({
           access: 'invalid',
         })
@@ -420,7 +422,7 @@ describe('Documents endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .put('/v1/documents/10124357878767767857')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .send({
           access: 'public',
         })
@@ -437,7 +439,7 @@ describe('Documents endpoints', () => {
     it('returns error for invalid parameter', (done) => {
       request
         .delete('/v1/documents/cj/')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Param must be a number');
@@ -448,7 +450,7 @@ describe('Documents endpoints', () => {
     it('returns 404 status for non existing document', (done) => {
       request
         .delete('/v1/documents/10')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('Document not found');
@@ -459,7 +461,7 @@ describe('Documents endpoints', () => {
     it('returns a 401 status for unauthorised user', (done) => {
       request
         .delete('/v1/documents/1')
-        .set('X-Auth', token)
+        .set('Authorization', TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body.message).to
@@ -471,7 +473,7 @@ describe('Documents endpoints', () => {
     it('delete a single document', (done) => {
       request
         .delete('/v1/documents/3/')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.message).to
@@ -483,7 +485,7 @@ describe('Documents endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .delete('/v1/documents/1012435787876776785')
-        .set('X-Auth', authToken)
+        .set('Authorization', AUTH_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');

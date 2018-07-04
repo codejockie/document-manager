@@ -1,5 +1,6 @@
 import AuthController from '../controllers/AuthController';
 import {
+  requireSignin,
   validateLogin,
   validateUser
 } from '../middleware/middleware';
@@ -14,7 +15,7 @@ const {
 
 const auth = (router) => {
   router.route('/signin')
-    .post(validateLogin, signin);
+    .post(validateLogin, requireSignin, signin);
 
   router.route('/signup')
     .post(validateUser, signup);

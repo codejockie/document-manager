@@ -33,7 +33,7 @@ describe('Search endpoints', () => {
     it('returns a 400 status if query param is not supplied', (done) => {
       request
         .get('/v1/search/users?q=')
-        .set('X-Auth', authToken)
+        .set('Authorization', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Query param is required');
@@ -44,7 +44,7 @@ describe('Search endpoints', () => {
     it('returns an empty array if user is not found', (done) => {
       request
         .get('/v1/search/users?q=adeleke')
-        .set('X-Auth', authToken)
+        .set('Authorization', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.user).to.eqls([]);
@@ -55,7 +55,7 @@ describe('Search endpoints', () => {
     it('returns an array of users if found', (done) => {
       request
         .get('/v1/search/users?q=code')
-        .set('X-Auth', authToken)
+        .set('Authorization', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.users).to.have.lengthOf(1);
@@ -70,7 +70,7 @@ describe('Search endpoints', () => {
     it('returns a 400 status if query param is not supplied', (done) => {
       request
         .get('/v1/search/documents?q=')
-        .set('X-Auth', authToken)
+        .set('Authorization', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Query param is required');
@@ -81,7 +81,7 @@ describe('Search endpoints', () => {
     it('returns an empty array if document is not found', (done) => {
       request
         .get('/v1/search/documents/?q=oldsanden')
-        .set('X-Auth', authToken)
+        .set('Authorization', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.document).to.eqls([]);
@@ -117,7 +117,7 @@ describe('Search endpoints', () => {
 
       request
         .get('/v1/search/documents/?q=data')
-        .set('X-Auth', authToken)
+        .set('Authorization', authToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.documents).to.have.lengthOf(3);
