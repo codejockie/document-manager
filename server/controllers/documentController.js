@@ -11,55 +11,56 @@ import {
 
 const { Document } = models;
 
-export default {
+export default class DocumentController {
   /**
    * Creates a new document
-   * @param { Object } req
-   * @param { Object } res
+   * @param { Object } resquest
+   * @param { Object } response
    * @returns { Object } document
    */
-  createDocument(req, res) {
+  static createDocument(resquest, response) {
     Document.findOne({
       where: {
-        title: req.body.title
+        title: resquest.body.title
       }
     })
       .then((document) => {
         if (document) {
-          return res.status(422).send({
+          return response.status(422).send({
             message: 'A document exist with the same title',
           });
         }
 
         Document.create({
-          title: req.body.title,
-          author: req.user.fullName,
-          content: req.body.content,
-          access: req.body.access,
-          userId: req.user.id,
-          roleId: req.user.roleId
+          title: resquest.body.title,
+          author: resquest.user.fullName,
+          content: resquest.body.content,
+          access: resquest.body.access,
+          userId: resquest.user.id,
+          roleId: resquest.user.roleId
         })
-          .then(newDoc => res.status(201).send(generateDocumentObject(newDoc)))
-          .catch(() => res.status(500).send({
+          .then(newDoc => response.status(201).send(generateDocumentObject(newDoc)))
+          .catch(() => response.status(500).send({
             message: accessErrorMessage
           }));
       });
-  },
+  }
+
   /**
    * Retrieves all documents
-   * @param { Object } req
-   * @param { Object } res
+   * @param { Object } resquest
+   * @param { Object } response
    * @returns { Array } documents
    */
-  getDocuments(req, res) {
+  static getDocuments(resquest, response) {
     const options = {
       attributes: {
         exclude: ['roleId']
       }
     };
 
-    const currentUser = req.user.id;
-    const role = req.user.roleId;
+    const currentUser = resquest.user.id;
+    const role = resquest.user.roleId;
 
     if (role === 1) {
       options.where = {};
@@ -83,117 +84,120 @@ export default {
       };
     }
 
-    options.offset = req.query.offset || 0;
-    options.limit = req.query.limit || 10;
+    options.offset = resquest.query.offset || 0;
+    options.limit = resquest.query.limit || 10;
 
     Document.findAll(options)
       .then((documents) => {
         if (documents.length === 0) {
-          return res.status(404).send({
+          return response.status(404).send({
             message: 'No document found'
           });
         }
 
-        return res.status(200).send({
+        return response.status(200).send({
           metaData: paginate(options.limit, options.offset, documents.length),
           documents: documents.map(document => (generateDocumentObject(document)))
         });
       })
-      .catch(() => res.status(500).send({
+      .catch(() => response.status(500).send({
         message: serverErrorMessage
       }));
-  },
+  }
+
   /**
    * Retrieves a document
-   * @param { Object } req
-   * @param { Object } res
+   * @param { Object } resquest
+   * @param { Object } response
    * @returns { Object } document
    */
-  getDocument(req, res) {
-    Document.findById(req.params.id)
+  static getDocument(resquest, response) {
+    Document.findById(resquest.params.id)
       .then((document) => {
         // Checks if the document owner's ID is
         // equal to the logged in user's ID
-        if (!isUser(document.userId, req.user.id)) {
-          return res.status(401).send({
+        if (!isUser(document.userId, resquest.user.id)) {
+          return response.status(401).send({
             message: "Unauthorised user. You don't have permission to access this document"
           });
         }
 
-        return res.status(200).send(generateDocumentObject(document));
+        return response.status(200).send(generateDocumentObject(document));
       })
-      .catch(() => res.status(500).send({
+      .catch(() => response.status(500).send({
         message: serverErrorMessage
       }));
-  },
+  }
+
   /**
    * Updates a document
-   * @param { Object } req
-   * @param { Object } res
+   * @param { Object } resquest
+   * @param { Object } response
    * @returns { Object } document
    */
-  updateDocument(req, res) {
-    Document.findById(req.params.id)
+  static updateDocument(resquest, response) {
+    Document.findById(resquest.params.id)
       .then((document) => {
-        if (!isUser(document.userId, req.user.id)) {
-          return res.status(401).send({
+        if (!isUser(document.userId, resquest.user.id)) {
+          return response.status(401).send({
             message: "Unauthorised user. You don't have permission to update this document"
           });
         }
 
         Document.findAll({
           where: {
-            title: req.body.title
+            title: resquest.body.title
           }
         })
           .then((existingDocument) => {
             if (existingDocument.length !== 0
-              && (existingDocument[0].dataValues.id !== parseInt(req.params.id, 10))) {
-              return res.status(422).send({
+              && (existingDocument[0].dataValues.id !== parseInt(resquest.params.id, 10))) {
+              return response.status(422).send({
                 message: 'A document exist with the same title'
               });
             }
 
 
             return document.update({
-              title: req.body.title || document.title,
-              content: req.body.content || document.content,
-              author: req.user.fullName || document.author,
-              access: req.body.access || document.access,
+              title: resquest.body.title || document.title,
+              content: resquest.body.content || document.content,
+              author: resquest.user.fullName || document.author,
+              access: resquest.body.access || document.access,
               userId: document.userId,
               roleId: document.roleId,
               createdAt: document.createdAt,
               updatedAt: document.updatedAt
             })
-              .then(() => res.status(201).send({
+              .then(() => response.status(201).send({
                 document: generateDocumentObject(document)
               }))
-              .catch(() => res.status(500).send({
+              .catch(() => response.status(500).send({
                 message: accessErrorMessage
               }));
           });
       });
-  },
+  }
+
   /**
    * Deletes a document
-   * @param { Object } req
-   * @param { Object } res
+   * @param { Object } resquest
+   * @param { Object } response
    * @returns { Object } message
    */
-  deleteDocument(req, res) {
-    Document.findById(req.params.id)
+  static deleteDocument(resquest, response) {
+    Document.findById(resquest.params.id)
       .then((document) => {
-        if (!isUser(document.userId, req.user.id)) {
-          return res.status(401).send({
+        if (!isUser(document.userId, resquest.user.id)) {
+          return response.status(401).send({
             message: "Unauthorised user. You don't have permission to delete this document"
           });
         }
 
         return document.destroy()
-          .then(() => res.status(200).send({
+          .then(() => response.status(200).send({
             message: 'Document deleted successfully'
           }));
       })
-      .catch(() => res.status(500).send({ message: serverErrorMessage }));
+      .catch(() => response.status(500).send({ message: serverErrorMessage }));
   }
-};
+}
