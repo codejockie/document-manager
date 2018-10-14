@@ -1,104 +1,30 @@
 import { expect } from 'chai';
-import supertest from 'supertest';
+import { agent } from 'supertest';
 import app from '../../../dist/server';
-import models from '../../../server/models';
 
-const { Document, Role, User } = models;
-
-const request = supertest.agent(app);
+const request = agent(app);
+const TEXT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
 
 const {
-  AUTH_TOKEN,
+  ADMIN_TOKEN,
   INVALID_TOKEN,
-  NON_USER_TOKEN,
-  TOKEN
+  NON_ADMIN_TOKEN,
+  NON_USER_TOKEN
 } = process.env;
-const accessError = "Access field must be any of 'public' or 'private' or 'role'";
-
-const createDocuments = (done) => {
-  Document.bulkCreate([{
-    title: 'Data 1',
-    content: 'Running Tests',
-    author: 'John Kennedy',
-    access: 'private',
-    userId: 1,
-    roleId: 1
-  }, {
-    title: 'Data 2',
-    content: 'Tests Running',
-    author: 'John Kennedy',
-    access: 'private',
-    userId: 1,
-    roleId: 1,
-  }, {
-    title: 'Data 3',
-    content: 'Tests Running!!!',
-    author: 'John Kennedy',
-    access: 'private',
-    userId: 1,
-    roleId: 1,
-  }, {
-    title: 'Data 4',
-    content: 'Running Tests',
-    author: 'John Kennedy',
-    access: 'role',
-    userId: 1,
-    roleId: 2
-  }, {
-    title: 'Data 5',
-    content: 'Tests Running',
-    author: 'John Kennedy',
-    access: 'public',
-    userId: 1,
-    roleId: 1,
-  }]).then(() => done());
-};
+const ACCESS_ERROR = "Access field must be any of 'public' or 'private' or 'role'";
 
 describe('Documents endpoints', () => {
-  before((done) => {
-    models.sequelize.sync({ force: true })
-      .then(() => {
-        Role.bulkCreate([
-          { name: 'admin' },
-          { name: 'user' }
-        ]);
-
-        User.create({
-          username: process.env.USERNAME,
-          firstname: process.env.FIRSTNAME,
-          lastname: process.env.LASTNAME,
-          password: process.env.PASSWORD,
-          email: process.env.EMAIL,
-          roleId: 1
-        })
-          .then(() => {
-            User
-              .create({
-                username: 'acedcoder',
-                firstname: process.env.FIRSTNAME,
-                lastname: process.env.LASTNAME,
-                password: 'test',
-                email: 'devjckennedy@gmail.com',
-                roleId: 2
-              })
-              .then(() => {
-                createDocuments(done);
-              });
-          });
-      });
-  });
-
   // GET /v1/documents route
   describe('GET /v1/documents', () => {
     it('given an admin, it retrieves all documents', (done) => {
       request
         .get('/v1/documents')
         .set('Accept', 'application/json')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.documents[0].title).to.equal('Data 1');
-          expect(res.body.documents[1].title).to.equal('Data 2');
+          expect(res.body.documents[0].title).to.equal('Lorem');
+          expect(res.body.documents[1].title).to.equal('Lorem Ipsum');
           expect(res.body.documents).to.have.lengthOf(5);
           done();
         });
@@ -108,11 +34,11 @@ describe('Documents endpoints', () => {
       request
         .get('/v1/documents')
         .set('Accept', 'application/json')
-        .set('Authorization', TOKEN)
+        .set('Authorization', NON_ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.documents[0].title).to.equal('Data 4');
-          expect(res.body.documents[1].title).to.equal('Data 5');
+          expect(res.body.documents[0].title).to.equal('Lorem Ipsum 3');
+          expect(res.body.documents[1].title).to.equal('Lorem Ipsum 4');
           expect(res.body.documents).to.have.lengthOf(2);
           done();
         });
@@ -121,7 +47,7 @@ describe('Documents endpoints', () => {
     it('validates offset and limit query params', (done) => {
       request
         .get('/v1/documents/?limit=10&offset=cj')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Offset must be an integer');
@@ -132,39 +58,19 @@ describe('Documents endpoints', () => {
     it('given valid offset and limit, it returns correct data', (done) => {
       request
         .get('/v1/documents/?limit=2&offset=0')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.metaData.pageSize).to.equal(2);
           expect(res.body.metaData.totalCount).to.equal(2);
-          expect(res.body.documents[0].title).to.equal('Data 1');
+          expect(res.body.documents[0].title).to.equal('Lorem');
           done();
         });
     });
 
-    it('returns 404 status message if no document is found', (done) => {
-      Document.destroy({
-        where: {},
-        truncate: true,
-        cascade: false,
-        restartIdentity: true
-      }).then(() => {
-        request
-          .get('/v1/documents')
-          .set('Accept', 'application/json')
-          .set('Authorization', AUTH_TOKEN)
-          .end((err, res) => {
-            expect(res.status).to.equal(404);
-            expect(res.body.message).to.equal('No document found');
-          });
-
-        createDocuments(done);
-      });
-    });
-
-    it('throws an error with an invalid TOKEN', (done) => {
+    it('throws an error with an invalid token', (done) => {
       request
-        .get('/v1/documents/1')
+        .get('/v1/documents')
         .set('Authorization', INVALID_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(401);
@@ -194,7 +100,7 @@ describe('Documents endpoints', () => {
 
       request
         .post('/v1/documents')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .send(document)
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -213,7 +119,7 @@ describe('Documents endpoints', () => {
 
       request
         .post('/v1/documents')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .send(document)
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -235,7 +141,7 @@ describe('Documents endpoints', () => {
 
       request
         .post('/v1/documents')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .send(document)
         .end((err, res) => {
           expect(res.status).to.equal(422);
@@ -256,11 +162,11 @@ describe('Documents endpoints', () => {
 
       request
         .post('/v1/documents')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .send(document)
         .end((err, res) => {
           expect(res.status).to.equal(500);
-          expect(res.body.message).to.equal(accessError);
+          expect(res.body.message).to.equal(ACCESS_ERROR);
           done();
         });
     });
@@ -271,7 +177,7 @@ describe('Documents endpoints', () => {
     it('should throw error for invalid id', (done) => {
       request
         .get('/v1/documents/sdfsfd')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to
@@ -283,7 +189,7 @@ describe('Documents endpoints', () => {
     it('should return 404 status if document is not found', (done) => {
       request
         .get('/v1/documents/10/')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to
@@ -295,7 +201,7 @@ describe('Documents endpoints', () => {
     it('should throw error for unauthorised user', (done) => {
       request
         .get('/v1/documents/1/')
-        .set('Authorization', TOKEN)
+        .set('Authorization', NON_ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body.message).to
@@ -307,11 +213,11 @@ describe('Documents endpoints', () => {
     it('should get a document a user has access to', (done) => {
       request
         .get('/v1/documents/1')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.title).to.equal('Data 1');
-          expect(res.body.content).to.equal('Running Tests');
+          expect(res.body.title).to.equal('Lorem');
+          expect(res.body.content).to.equal(TEXT);
           done();
         });
     });
@@ -319,7 +225,7 @@ describe('Documents endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .get('/v1/documents/10124357878767767')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
@@ -341,7 +247,7 @@ describe('Documents endpoints', () => {
 
       request
         .put('/v1/documents/cj')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .send(document)
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -353,7 +259,7 @@ describe('Documents endpoints', () => {
     it('returns a 404 status if document is not found', (done) => {
       request
         .put('/v1/documents/20')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('Document not found');
@@ -364,7 +270,7 @@ describe('Documents endpoints', () => {
     it('returns a 401 status for unauthorised user', (done) => {
       request
         .put('/v1/documents/1')
-        .set('Authorization', TOKEN)
+        .set('Authorization', NON_ADMIN_TOKEN)
         .send({
           content: 'Whats up?'
         })
@@ -379,7 +285,7 @@ describe('Documents endpoints', () => {
     it('should update a document by id', (done) => {
       request
         .put('/v1/documents/1')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .send({
           title: 'Hello PUT',
           content: 'Tests Running',
@@ -394,10 +300,8 @@ describe('Documents endpoints', () => {
     it('returns a 422 status for duplicate title', (done) => {
       request
         .put('/v1/documents/1')
-        .set('Authorization', AUTH_TOKEN)
-        .send({
-          title: 'Data 2',
-        })
+        .set('Authorization', ADMIN_TOKEN)
+        .send({ title: 'Lorem Ipsum 2' })
         .end((err, res) => {
           expect(res.status).to.equal(422);
           expect(res.body.message).to.equal('A document exist with the same title');
@@ -408,13 +312,13 @@ describe('Documents endpoints', () => {
     it('should throw an error with an invalid access type', (done) => {
       request
         .put('/v1/documents/1')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .send({
           access: 'invalid',
         })
         .end((err, res) => {
           expect(res.status).to.equal(500);
-          expect(res.body.message).to.equal(accessError);
+          expect(res.body.message).to.equal(ACCESS_ERROR);
           done();
         });
     });
@@ -422,7 +326,7 @@ describe('Documents endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .put('/v1/documents/10124357878767767857')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .send({
           access: 'public',
         })
@@ -439,7 +343,7 @@ describe('Documents endpoints', () => {
     it('returns error for invalid parameter', (done) => {
       request
         .delete('/v1/documents/cj/')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Param must be a number');
@@ -450,7 +354,7 @@ describe('Documents endpoints', () => {
     it('returns 404 status for non existing document', (done) => {
       request
         .delete('/v1/documents/10')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('Document not found');
@@ -461,7 +365,7 @@ describe('Documents endpoints', () => {
     it('returns a 401 status for unauthorised user', (done) => {
       request
         .delete('/v1/documents/1')
-        .set('Authorization', TOKEN)
+        .set('Authorization', NON_ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body.message).to
@@ -473,7 +377,7 @@ describe('Documents endpoints', () => {
     it('delete a single document', (done) => {
       request
         .delete('/v1/documents/3/')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.message).to
@@ -485,7 +389,7 @@ describe('Documents endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .delete('/v1/documents/1012435787876776785')
-        .set('Authorization', AUTH_TOKEN)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
