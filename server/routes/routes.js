@@ -1,6 +1,6 @@
 import DocumentController from '../controllers/DocumentController';
 import RoleController from '../controllers/RoleController';
-import searchController from '../controllers/searchController';
+import SearchController from '../controllers/SearchController';
 import userController from '../controllers/userController';
 import {
   findDocumentById,
@@ -33,7 +33,7 @@ const {
 const {
   searchDocument,
   searchUser
-} = searchController;
+} = SearchController;
 
 const {
   deleteUser,
