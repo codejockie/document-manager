@@ -1,4 +1,4 @@
-import documentController from '../controllers/documentController';
+import DocumentController from '../controllers/DocumentController';
 import roleController from '../controllers/roleController';
 import searchController from '../controllers/searchController';
 import userController from '../controllers/userController';
@@ -20,7 +20,7 @@ const {
   getDocument,
   getDocuments,
   updateDocument
-} = documentController;
+} = DocumentController;
 
 const {
   createRole,

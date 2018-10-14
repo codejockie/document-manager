@@ -7,6 +7,7 @@ before_script:
 - yarn global add gulp-cli
 - psql -c 'create database doc_man_test;' -U postgres
 - NODE_ENV=test sequelize db:migrate
+- NODE_ENV=test sequelize db:seed:all
 after_success:
 - yarn global add codeclimate-test-reporter
 - codeclimate-test-reporter < ./coverage/lcov.info

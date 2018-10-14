@@ -1,43 +1,29 @@
 import { expect } from 'chai';
-import supertest from 'supertest';
+import { agent } from 'supertest';
 import isEmpty from 'lodash/isEmpty';
 import app from '../../../dist/server';
-import models from '../../../server/models';
 
-const { Role } = models;
-const request = supertest.agent(app);
+const request = agent(app);
 
 const {
-  EMAIL,
   FIRSTNAME,
   INVALID_TOKEN,
   LASTNAME,
-  PASSWORD,
-  TOKEN,
-  USERNAME
+  NEW_USER_EMAIL,
+  NEW_USER_USERNAME,
+  NON_ADMIN_EMAIL,
+  NON_ADMIN_TOKEN,
+  PASSWORD
 } = process.env;
 
 describe('Auth endpoints', () => {
-  let user;
-  before((done) => {
-    models.sequelize.sync({ force: true })
-      .then(() => {
-        Role.bulkCreate([
-          { name: 'admin' },
-          { name: 'user' }
-        ]);
-        done();
-      });
-
-    user = {
-      username: USERNAME,
-      firstname: FIRSTNAME,
-      lastname: LASTNAME,
-      password: PASSWORD,
-      email: EMAIL,
-      roleId: 1
-    };
-  });
+  const user = {
+    username: NEW_USER_USERNAME,
+    firstname: FIRSTNAME,
+    lastname: LASTNAME,
+    password: PASSWORD,
+    email: NEW_USER_EMAIL
+  };
 
   // POST /v1/auth/signup route
   describe('POST /v1/auth/signup', () => {
@@ -47,7 +33,7 @@ describe('Auth endpoints', () => {
         firstname: '',
         lastname: '',
         password: '',
-        email: EMAIL,
+        email: NON_ADMIN_EMAIL,
       };
 
       request
@@ -65,17 +51,16 @@ describe('Auth endpoints', () => {
         });
     });
 
-    it('should post a valid user data', (done) => {
-      request
+    it('should post a valid user data', async () => {
+      await request
         .post('/v1/auth/signup')
         .send(user)
-        .end((err, res) => {
+        .then((res) => {
           expect(res.status).to.equal(201);
           expect(res.body).to.have.property('user');
           expect(res.body).to.have.property('token');
-          expect(res.body.user.email).to.equal(EMAIL);
-          expect(res.body.user.username).to.equal(USERNAME);
-          done();
+          expect(res.body.user.email).to.equal(NEW_USER_EMAIL);
+          expect(res.body.user.username).to.equal(NEW_USER_USERNAME);
         });
     });
 
@@ -128,7 +113,7 @@ describe('Auth endpoints', () => {
       request
         .post('/v1/auth/signin')
         .send({
-          email: EMAIL,
+          email: NON_ADMIN_EMAIL,
           password: PASSWORD
         })
         .end((err, res) => {
@@ -141,7 +126,7 @@ describe('Auth endpoints', () => {
       request
         .post('/v1/auth/signin')
         .send({
-          email: EMAIL,
+          email: NON_ADMIN_EMAIL,
           password: PASSWORD
         })
         .end((err, res) => {
@@ -155,7 +140,7 @@ describe('Auth endpoints', () => {
       request
         .post('/v1/auth/signin')
         .send({
-          email: EMAIL,
+          email: NON_ADMIN_EMAIL,
           password: 'test'
         })
         .end((err, res) => {
@@ -199,7 +184,7 @@ describe('Auth endpoints', () => {
       request
         .post('/v1/auth/verify')
         .send({
-          token: TOKEN
+          token: NON_ADMIN_TOKEN
         })
         .then((res) => {
           expect(res.status).to.equal(200);

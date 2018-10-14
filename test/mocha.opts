@@ -1,4 +1,5 @@
 --exit
---require @babel/register
+--compiler @babel/register
+--require @babel/polyfill
 --ui bdd
 --timeout 90000
