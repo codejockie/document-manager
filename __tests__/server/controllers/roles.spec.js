@@ -1,51 +1,18 @@
 import { expect } from 'chai';
-import supertest from 'supertest';
+import { agent } from 'supertest';
 import app from '../../../dist/server';
-import { hashPassword } from '../../../server/helpers/helper';
-import models from '../../../server/models';
 
-const { Role, User } = models;
-const request = supertest.agent(app);
-const authToken = process.env.AUTH_TOKEN;
-const token = process.env.TOKEN;
-const adminRole = 'admin';
-const userRole = 'user';
-const editorRole = 'editor';
-const publisherRole = 'publisher';
-
-const createUsers = (done) => {
-  User.bulkCreate([{
-    username: process.env.USERNAME,
-    firstname: process.env.FIRSTNAME,
-    lastname: process.env.LASTNAME,
-    password: hashPassword(process.env.PASSWORD, true),
-    email: process.env.EMAIL,
-    roleId: 1
-  }, {
-    username: 'acedcoder',
-    firstname: 'Kennedy',
-    lastname: 'John',
-    password: hashPassword('test', true),
-    email: 'devjckennedy@gmail.com',
-    roleId: 2
-  }]).then(() => {
-    done();
-  });
-};
+const request = agent(app);
+const {
+  ADMIN_TOKEN,
+  NON_ADMIN_TOKEN
+} = process.env;
+const ADMIN_ROLE = 'Admin';
+const USER_ROLE = 'User';
+const PUBLISHER_ROLE = 'Publisher';
+const TESTER_ROLE = 'Tester';
 
 describe('Roles endpoints', () => {
-  before((done) => {
-    models.sequelize.sync({ force: true })
-      .then(() => {
-        Role.bulkCreate([
-          { name: adminRole },
-          { name: userRole }
-        ]);
-
-        createUsers(done);
-      });
-  });
-
   // POST /v1/roles route
   describe('POST /v1/roles', () => {
     it('should validate request', (done) => {
@@ -55,7 +22,7 @@ describe('Roles endpoints', () => {
 
       request
         .post('/v1/roles')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .send(role)
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -71,7 +38,7 @@ describe('Roles endpoints', () => {
 
       request
         .post('/v1/roles')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .send(role)
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -82,12 +49,12 @@ describe('Roles endpoints', () => {
 
     it('should check role uniqueness', (done) => {
       const role = {
-        name: adminRole,
+        name: ADMIN_ROLE,
       };
 
       request
         .post('/v1/roles')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .send(role)
         .end((err, res) => {
           expect(res.status).to.equal(422);
@@ -98,16 +65,16 @@ describe('Roles endpoints', () => {
 
     it('should create a new role', (done) => {
       const role = {
-        name: editorRole
+        name: PUBLISHER_ROLE
       };
 
       request
         .post('/v1/roles')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .send(role)
         .end((err, res) => {
           expect(res.status).to.equal(201);
-          expect(res.body.name).to.equal(editorRole);
+          expect(res.body.name).to.equal(PUBLISHER_ROLE);
           done();
         });
     });
@@ -119,12 +86,12 @@ describe('Roles endpoints', () => {
       request
         .get('/v1/roles')
         .set('Accept', 'application/json')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.roles).to.be.an('array');
-          expect(res.body.roles[0].name).to.equal(adminRole);
-          expect(res.body.roles[1].name).to.equal(userRole);
+          expect(res.body.roles[0].name).to.equal(ADMIN_ROLE);
+          expect(res.body.roles[1].name).to.equal(USER_ROLE);
           done();
         });
     });
@@ -132,7 +99,7 @@ describe('Roles endpoints', () => {
     it('should return 403 status for non admins', (done) => {
       request
         .get('/v1/roles')
-        .set('Authorization', token)
+        .set('Authorization', NON_ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body.message).to.equal('The resource you are looking for does not exist');
@@ -146,11 +113,11 @@ describe('Roles endpoints', () => {
     it('retrieves a role by id', (done) => {
       request
         .get('/v1/roles/1')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.id).to.equal(1);
-          expect(res.body.name).to.equal(adminRole);
+          expect(res.body.name).to.equal(ADMIN_ROLE);
           done();
         });
     });
@@ -158,7 +125,7 @@ describe('Roles endpoints', () => {
     it('returns a 404 status message for non-existing role', (done) => {
       request
         .get('/v1/roles/20')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('Role not found');
@@ -169,7 +136,7 @@ describe('Roles endpoints', () => {
     it('returns a 400 status message for invalid param', (done) => {
       request
         .get('/v1/roles/cj')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Param must be a number');
@@ -180,7 +147,7 @@ describe('Roles endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .get('/v1/roles/10124357878767767857')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
@@ -194,7 +161,7 @@ describe('Roles endpoints', () => {
     it('returns a 400 status for invalid input param', (done) => {
       request
         .put('/v1/roles/cj')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Param must be a number');
@@ -205,7 +172,7 @@ describe('Roles endpoints', () => {
     it('returns a 404 status for non-existing role', (done) => {
       request
         .put('/v1/roles/10')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('Role not found');
@@ -216,9 +183,9 @@ describe('Roles endpoints', () => {
     it('returns a 422 status for duplicate role', (done) => {
       request
         .put('/v1/roles/1')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .send({
-          name: userRole,
+          name: USER_ROLE,
         })
         .end((err, res) => {
           expect(res.status).to.equal(422);
@@ -230,13 +197,13 @@ describe('Roles endpoints', () => {
     it('updates a role by id', (done) => {
       request
         .put('/v1/roles/3')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .send({
-          name: publisherRole,
+          name: TESTER_ROLE,
         })
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body.name).to.equal(publisherRole);
+          expect(res.body.name).to.equal(TESTER_ROLE);
           done();
         });
     });
@@ -244,7 +211,7 @@ describe('Roles endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .put('/v1/roles/6900795794579575')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
@@ -258,7 +225,7 @@ describe('Roles endpoints', () => {
     it('returns a 400 status for invalid input param', (done) => {
       request
         .delete('/v1/roles/cj')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.message).to.equal('Param must be a number');
@@ -269,7 +236,7 @@ describe('Roles endpoints', () => {
     it('returns a 404 status for non-existing role', (done) => {
       request
         .put('/v1/roles/10')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('Role not found');
@@ -280,7 +247,7 @@ describe('Roles endpoints', () => {
     it('deletes a role by id', (done) => {
       request
         .delete('/v1/roles/3')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body.message).to.equal('Role deleted successfully');
@@ -291,7 +258,7 @@ describe('Roles endpoints', () => {
     it('given a non-existing role id, it returns a 404 status', (done) => {
       request
         .delete('/v1/roles/10')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body.message).to.equal('Role not found');
@@ -302,7 +269,7 @@ describe('Roles endpoints', () => {
     it('given an invalid id, it returns a 500 status', (done) => {
       request
         .delete('/v1/roles/101243578787677678575')
-        .set('Authorization', authToken)
+        .set('Authorization', ADMIN_TOKEN)
         .end((err, res) => {
           expect(res.status).to.equal(500);
           expect(res.body.message).to.equal('Invalid ID');
