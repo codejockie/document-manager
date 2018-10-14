@@ -46,8 +46,6 @@ export function findByToken(token) {
           id: decoded.id
         }, {
           email: decoded.email
-        }, {
-          username: decoded.username
         }]
       }
     });
