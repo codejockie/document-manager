@@ -11,17 +11,20 @@ import {
 
 const { Document } = models;
 
+/**
+ * @class DocumentController
+ */
 export default class DocumentController {
   /**
    * Creates a new document
-   * @param { Object } resquest
+   * @param { Object } request
    * @param { Object } response
    * @returns { Object } document
    */
-  static createDocument(resquest, response) {
+  static createDocument(request, response) {
     Document.findOne({
       where: {
-        title: resquest.body.title
+        title: request.body.title
       }
     })
       .then((document) => {
@@ -32,12 +35,12 @@ export default class DocumentController {
         }
 
         Document.create({
-          title: resquest.body.title,
-          author: resquest.user.fullName,
-          content: resquest.body.content,
-          access: resquest.body.access,
-          userId: resquest.user.id,
-          roleId: resquest.user.roleId
+          title: request.body.title,
+          author: request.user.fullName,
+          content: request.body.content,
+          access: request.body.access,
+          userId: request.user.id,
+          roleId: request.user.roleId
         })
           .then(newDoc => response.status(201).send(generateDocumentObject(newDoc)))
           .catch(() => response.status(500).send({
@@ -48,19 +51,19 @@ export default class DocumentController {
 
   /**
    * Retrieves all documents
-   * @param { Object } resquest
+   * @param { Object } request
    * @param { Object } response
    * @returns { Array } documents
    */
-  static getDocuments(resquest, response) {
+  static getDocuments(request, response) {
     const options = {
       attributes: {
         exclude: ['roleId']
       }
     };
 
-    const currentUser = resquest.user.id;
-    const role = resquest.user.roleId;
+    const currentUser = request.user.id;
+    const role = request.user.roleId;
 
     if (role === 1) {
       options.where = {};
@@ -84,8 +87,8 @@ export default class DocumentController {
       };
     }
 
-    options.offset = resquest.query.offset || 0;
-    options.limit = resquest.query.limit || 10;
+    options.offset = request.query.offset || 0;
+    options.limit = request.query.limit || 10;
 
     Document.findAll(options)
       .then((documents) => {
@@ -107,16 +110,16 @@ export default class DocumentController {
 
   /**
    * Retrieves a document
-   * @param { Object } resquest
+   * @param { Object } request
    * @param { Object } response
    * @returns { Object } document
    */
-  static getDocument(resquest, response) {
-    Document.findById(resquest.params.id)
+  static getDocument(request, response) {
+    Document.findById(request.params.id)
       .then((document) => {
         // Checks if the document owner's ID is
         // equal to the logged in user's ID
-        if (!isUser(document.userId, resquest.user.id)) {
+        if (!isUser(document.userId, request.user.id)) {
           return response.status(401).send({
             message: "Unauthorised user. You don't have permission to access this document"
           });
@@ -131,14 +134,14 @@ export default class DocumentController {
 
   /**
    * Updates a document
-   * @param { Object } resquest
+   * @param { Object } request
    * @param { Object } response
    * @returns { Object } document
    */
-  static updateDocument(resquest, response) {
-    Document.findById(resquest.params.id)
+  static updateDocument(request, response) {
+    Document.findById(request.params.id)
       .then((document) => {
-        if (!isUser(document.userId, resquest.user.id)) {
+        if (!isUser(document.userId, request.user.id)) {
           return response.status(401).send({
             message: "Unauthorised user. You don't have permission to update this document"
           });
@@ -146,12 +149,12 @@ export default class DocumentController {
 
         Document.findAll({
           where: {
-            title: resquest.body.title
+            title: request.body.title
           }
         })
           .then((existingDocument) => {
             if (existingDocument.length !== 0
-              && (existingDocument[0].dataValues.id !== parseInt(resquest.params.id, 10))) {
+              && (existingDocument[0].dataValues.id !== parseInt(request.params.id, 10))) {
               return response.status(422).send({
                 message: 'A document exist with the same title'
               });
@@ -159,10 +162,10 @@ export default class DocumentController {
 
 
             return document.update({
-              title: resquest.body.title || document.title,
-              content: resquest.body.content || document.content,
-              author: resquest.user.fullName || document.author,
-              access: resquest.body.access || document.access,
+              title: request.body.title || document.title,
+              content: request.body.content || document.content,
+              author: request.user.fullName || document.author,
+              access: request.body.access || document.access,
               userId: document.userId,
               roleId: document.roleId,
               createdAt: document.createdAt,
@@ -180,14 +183,14 @@ export default class DocumentController {
 
   /**
    * Deletes a document
-   * @param { Object } resquest
+   * @param { Object } request
    * @param { Object } response
    * @returns { Object } message
    */
-  static deleteDocument(resquest, response) {
-    Document.findById(resquest.params.id)
+  static deleteDocument(request, response) {
+    Document.findById(request.params.id)
       .then((document) => {
-        if (!isUser(document.userId, resquest.user.id)) {
+        if (!isUser(document.userId, request.user.id)) {
           return response.status(401).send({
             message: "Unauthorised user. You don't have permission to delete this document"
           });
