@@ -12,7 +12,7 @@ const { User } = models;
 const jwtOptions = {
   // Extract JWT from the request header called authorization
   jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-  secretOrKey: process.env.SECRET
+  secretOrKey: process.env.JWT_SECRET
 };
 const localOptions = { usernameField: 'email' };
 
