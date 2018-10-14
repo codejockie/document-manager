@@ -4,14 +4,17 @@ import { serverErrorMessage } from '../helpers/messages';
 
 const { User, Document } = models;
 
-export default {
+/**
+ * @class SearchController
+ */
+export default class SearchController {
   /**
    * Searches for occurrences of a user
    * @param { Object } req
    * @param { Object } res
    * @returns { Array } users
    */
-  searchUser(req, res) {
+  static searchUser(req, res) {
     const query = req.query.q.trim();
 
     User.findAll({
@@ -46,14 +49,15 @@ export default {
         });
       })
       .catch(() => res.status(500).send({ message: serverErrorMessage }));
-  },
+  }
+
   /**
    * Searches for occurrences of a document
    * @param { Object } req
    * @param { Object } res
    * @returns { Array } documents
    */
-  searchDocument(req, res) {
+  static searchDocument(req, res) {
     const query = req.query.q.trim();
 
     Document.findAll({
@@ -77,4 +81,4 @@ export default {
       })
       .catch(() => res.status(500).send({ message: serverErrorMessage }));
   }
-};
+}
