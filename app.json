@@ -7,7 +7,7 @@
     "DATABASE_URL": {
       "required": true
     },
-    "SECRET": {
+    "JWT_SECRET": {
       "required": true
     },
     "MAILER_CLIENT_ID": {

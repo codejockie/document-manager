@@ -1,7 +1,7 @@
-import documentController from '../controllers/documentController';
-import roleController from '../controllers/roleController';
-import searchController from '../controllers/searchController';
-import userController from '../controllers/userController';
+import DocumentController from '../controllers/DocumentController';
+import RoleController from '../controllers/RoleController';
+import SearchController from '../controllers/SearchController';
+import UserController from '../controllers/UserController';
 import {
   findDocumentById,
   findRoleById,
@@ -20,7 +20,7 @@ const {
   getDocument,
   getDocuments,
   updateDocument
-} = documentController;
+} = DocumentController;
 
 const {
   createRole,
@@ -28,12 +28,12 @@ const {
   getRole,
   getRoles,
   updateRole
-} = roleController;
+} = RoleController;
 
 const {
   searchDocument,
   searchUser
-} = searchController;
+} = SearchController;
 
 const {
   deleteUser,
@@ -41,7 +41,7 @@ const {
   getUserDocuments,
   getUsers,
   updateUser
-} = userController;
+} = UserController;
 
 const routes = (router) => {
   // Document routes

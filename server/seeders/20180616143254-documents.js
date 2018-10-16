@@ -5,17 +5,41 @@ module.exports = {
     title: 'Lorem',
     content: lorem1500s,
     author: 'Lorem',
-    access: 'public',
+    access: 'private',
     userId: 1,
-    roleId: 2,
+    roleId: 1,
     createdAt: new Date()
   }, {
     title: 'Lorem Ipsum',
     content: lorem1500s,
     author: 'Lorem Ipsum',
-    access: 'public',
+    access: 'private',
+    userId: 1,
+    roleId: 1,
+    createdAt: new Date()
+  }, {
+    title: 'Lorem Ipsum 2',
+    content: lorem1500s,
+    author: 'Lorem Ipsum',
+    access: 'private',
+    userId: 1,
+    roleId: 1,
+    createdAt: new Date()
+  }, {
+    title: 'Lorem Ipsum 3',
+    content: lorem1500s,
+    author: 'Lorem Ipsum',
+    access: 'role',
     userId: 1,
     roleId: 2,
+    createdAt: new Date()
+  }, {
+    title: 'Lorem Ipsum 4',
+    content: lorem1500s,
+    author: 'Lorem Ipsum',
+    access: 'public',
+    userId: 1,
+    roleId: 1,
     createdAt: new Date()
   }], {}),
 

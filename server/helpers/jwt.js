@@ -3,6 +3,7 @@ import { sign, verify } from 'jsonwebtoken';
 import models from '../models';
 
 const { User } = models;
+const { JWT_SECRET } = process.env;
 
 /**
  * Finds a user by supplied credentials
@@ -39,16 +40,10 @@ export function findByEmailAndPassword(email, password) {
  */
 export function findByToken(token) {
   try {
-    const decoded = verify(token, process.env.SECRET);
+    const decoded = verify(token, JWT_SECRET);
     return User.findOne({
       where: {
-        $or: [{
-          id: decoded.id
-        }, {
-          email: decoded.email
-        }, {
-          username: decoded.username
-        }]
+        email: decoded.email
       }
     });
   } catch (error) {
@@ -66,7 +61,7 @@ export function generateAuthToken(id, email) {
   return sign({
     id,
     email
-  }, process.env.SECRET, { expiresIn: '72 hours' });
+  }, JWT_SECRET, { expiresIn: '72 hours' });
 }
 
 /**
@@ -81,7 +76,7 @@ export function verifyToken(token) {
   };
 
   try {
-    const decoded = verify(token, process.env.SECRET);
+    const decoded = verify(token, JWT_SECRET);
 
     if (decoded) {
       status.ok = true;

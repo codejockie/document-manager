@@ -4,14 +4,17 @@ import { serverErrorMessage } from '../helpers/messages';
 
 const { Role } = models;
 
-export default {
+/**
+ * @class RoleController
+ */
+export default class RoleController {
   /**
    * Creates a new role
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } role
    */
-  createRole(req, res) {
+  static createRole(req, res) {
     Role.findOne({
       where: {
         name: req.body.name
@@ -33,14 +36,15 @@ export default {
       .catch(() => res.status(500).send({
         message: serverErrorMessage
       }));
-  },
+  }
+
   /**
    * Retrieves all roles
    * @param { Object } req
    * @param { Object } res
    * @returns { Array } roles
    */
-  getRoles(req, res) {
+  static getRoles(req, res) {
     Role
       .all()
       .then(roles => res.status(200).send({
@@ -49,27 +53,29 @@ export default {
       .catch(() => res.status(500).send({
         message: serverErrorMessage
       }));
-  },
+  }
+
   /**
    * Retrieves a role
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } role
    */
-  getRole(req, res) {
+  static getRole(req, res) {
     Role.findById(req.params.id)
       .then(role => res.status(200).send(generateRoleObject(role)))
       .catch(() => res.status(500).send({
         message: serverErrorMessage
       }));
-  },
+  }
+
   /**
    * Updates a role
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } role
    */
-  updateRole(req, res) {
+  static updateRole(req, res) {
     return Role
       .findById(req.params.id)
       .then((role) => {
@@ -95,14 +101,15 @@ export default {
       .catch(() => res.status(500).send({
         message: serverErrorMessage
       }));
-  },
+  }
+
   /**
    * Deletes a role
    * @param { Object } req
    * @param { Object } res
    * @returns { Object } message
    */
-  deleteRole(req, res) {
+  static deleteRole(req, res) {
     Role.findById(req.params.id)
       .then((role) => {
         role
@@ -115,4 +122,4 @@ export default {
         message: serverErrorMessage
       }));
   }
-};
+}
