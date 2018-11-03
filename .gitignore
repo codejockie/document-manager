@@ -9,6 +9,7 @@ package-lock.json
 coverage/
 
 # Project generated files
-index.html
+client/assets/index.html
+client/assets/style.css
 bundle.js
 bundle.min.js
