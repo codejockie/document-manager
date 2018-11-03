@@ -5,17 +5,21 @@ import PropTypes from 'prop-types';
 import { isAlpha, isEmail, isEmpty } from 'validator';
 
 // Material-UI component imports
-import Button from 'material-ui/Button';
-import Card, { CardContent } from 'material-ui/Card';
-import { FormControl, FormHelperText } from 'material-ui/Form';
-import Grid from 'material-ui/Grid';
-import IconButton from 'material-ui/IconButton';
-import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
-import Snackbar from 'material-ui/Snackbar';
-import { withStyles } from 'material-ui/styles';
-import Typography from 'material-ui/Typography';
-import Visibility from 'material-ui-icons/Visibility';
-import VisibilityOff from 'material-ui-icons/VisibilityOff';
+import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import Input from '@material-ui/core/Input';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import InputLabel from '@material-ui/core/InputLabel';
+import Snackbar from '@material-ui/core/Snackbar';
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 import * as actions from '../../actions';
 import styles from '../../infrastructure/styles';
@@ -384,7 +388,7 @@ class SignUp extends React.Component {
                 </FormControl>
                 <FormControl>
                   <Button
-                    variant="raised"
+                    variant="contained"
                     color="primary"
                     className={classes.button}
                     type="submit"

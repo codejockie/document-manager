@@ -4,13 +4,11 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 // Material-UI imports
-import { withStyles } from 'material-ui/styles';
-import AppBar from 'material-ui/AppBar';
-import Toolbar from 'material-ui/Toolbar';
-import Typography from 'material-ui/Typography';
-import Button from 'material-ui/Button';
-import IconButton from 'material-ui/IconButton';
-import MenuIcon from 'material-ui-icons/Menu';
+import { withStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 
 import styles from '../infrastructure/styles';
 
@@ -19,7 +17,7 @@ import styles from '../infrastructure/styles';
  */
 export class Header extends React.Component {
   static propTypes = {
-    authenticated: PropTypes.bool.isRequired,
+    authenticated: PropTypes.bool,
     classes: PropTypes.object.isRequired
   };
 
@@ -69,16 +67,13 @@ export class Header extends React.Component {
       <AppBar position="sticky" className={classes.appBar}>
         <nav>
           <Toolbar>
-            <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
-              <MenuIcon />
-            </IconButton>
             <Typography
               className={classes.flex}
               color="inherit"
               component={Link}
               to="/" variant="title"
             >
-              CJDocs
+              Docs
             </Typography>
             {this.renderLinks()}
           </Toolbar>
