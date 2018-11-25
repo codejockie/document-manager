@@ -86,6 +86,7 @@
     "react-router-dom": "^4.2.2",
     "redux": "^3.7.2",
     "redux-devtools-extension": "^2.13.2",
+    "redux-form": "^7.4.2",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "sass-loader": "^6.0.6",
@@ -119,5 +120,8 @@
     "redux-mock-store": "^1.5.1",
     "sequelize-cli": "^5.2.0",
     "supertest": "^3.3.0"
+  },
+  "optionalDependencies": {
+    "fsevents": "^1.2.4"
   }
 }
