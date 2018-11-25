@@ -1,8 +1,11 @@
 import React from 'react';
 
+// Material UI
+import Typography from '@material-ui/core/Typography';
+
 const Home = () => (
   <div>
-    <h1>Welcome to the CJDocs Home!</h1>
+    <Typography variant="h2" component="h2">Welcome to the Docs Home!</Typography>
   </div>
 );
 
