@@ -36,9 +36,10 @@ export function signInUser(userData, browserHistory) {
       setToken('authToken', token);
       browserHistory.push('/');
     })
-    .catch((error) => {
-      if (error.response) {
-        dispatch(authError(error.response.data.message));
+    .catch(({ response }) => {
+      if (response) {
+        const { data: { message } } = response;
+        dispatch(authError(message || 'Username or Password incorrect'));
       } else {
         dispatch(authError('Bad Login Info'));
       }
