@@ -285,7 +285,7 @@ class SignUp extends React.Component {
         >
           <Card className={classes.card}>
             <CardContent>
-              <Typography variant="display2" component="h2">
+              <Typography variant="h2" component="h2">
                 Sign up
               </Typography>
               <form

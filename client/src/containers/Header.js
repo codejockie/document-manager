@@ -71,7 +71,7 @@ export class Header extends React.Component {
               className={classes.flex}
               color="inherit"
               component={Link}
-              to="/" variant="title"
+              to="/" variant="h6"
             >
               Docs
             </Typography>
