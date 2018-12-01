@@ -1,7 +1,10 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { configure, mount } from 'enzyme';
 import { BrowserRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
+import Adapter from 'enzyme-adapter-react-16';
+
+configure({ adapter: new Adapter() });
 
 const middleware = [];
 
