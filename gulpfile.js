@@ -4,7 +4,6 @@ import exit from 'gulp-exit';
 import injectModules from 'gulp-inject-modules';
 import istanbul from 'gulp-istanbul';
 import jasmine from 'gulp-jasmine';
-import nodemon from 'gulp-nodemon';
 
 gulp.task('compile', ['compile:test'], () => gulp.src('server/**/*.js')
   .pipe(babel())
@@ -30,15 +29,4 @@ gulp.task('test', ['compile'], (done) => {
         .on('end', done)
         .pipe(exit());
     });
-});
-
-gulp.task('watch', ['compile'], () => {
-  nodemon({
-    script: 'dist/server.js',
-    ext: 'js',
-    env: { NODE_ENV: 'development' },
-    ignore: ['README.md', 'node_modules/**', '.DS_Store', 'LICENSE', '.*.yml'],
-    tasks: ['compile'],
-    watch: ['server']
-  });
 });

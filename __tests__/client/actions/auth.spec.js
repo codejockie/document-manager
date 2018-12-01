@@ -2,11 +2,14 @@ import configureMockStore from 'redux-mock-store';
 import moxios from 'moxios';
 import thunk from 'redux-thunk';
 
-import * as actions from '../../../client/src/actions';
+import * as actions from '../../../client/src/actions/auth';
 import * as actionTypes from '../../../client/src/actions/actionTypes';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
+
+const EMAIL = 'jk@jk.com';
+const PASSWORD = 'testing';
 
 describe('Auth Actions', () => {
   beforeEach(() => {
@@ -39,7 +42,7 @@ describe('Auth Actions', () => {
 
       const store = mockStore({ auth: {} });
 
-      return store.dispatch(actions.signInUser({ email: 'jd@jd.com', password: 'testing' })).then(() => {
+      return store.dispatch(actions.signInUser({ email: EMAIL, password: PASSWORD })).then(() => {
         expect(store.getActions()).toEqual(expectedActions);
       });
     });
@@ -54,12 +57,12 @@ describe('Auth Actions', () => {
       });
 
       const expectedActions = [
-        { type: actionTypes.AUTH_ERROR }
+        { payload: 'Username or Password incorrect', type: actionTypes.AUTH_ERROR }
       ];
 
       const store = mockStore({ auth: {} });
 
-      return store.dispatch(actions.signInUser({ email: 'jd@jd.com', password: 'testing' })).then(() => {
+      return store.dispatch(actions.signInUser({ email: EMAIL, password: PASSWORD })).then(() => {
         expect(store.getActions()).toEqual(expectedActions);
       });
     });
@@ -86,7 +89,7 @@ describe('Auth Actions', () => {
 
       const store = mockStore({ auth: {} });
 
-      return store.dispatch(actions.signUpUser({ email: 'jd@jd.com', password: 'testing' })).then(() => {
+      return store.dispatch(actions.signUpUser({ email: EMAIL, password: PASSWORD })).then(() => {
         expect(store.getActions()).toEqual(expectedActions);
       });
     });
@@ -106,7 +109,7 @@ describe('Auth Actions', () => {
 
       const store = mockStore({ auth: {} });
 
-      return store.dispatch(actions.signUpUser({ email: 'jd@jd.com', password: 'testing' })).then(() => {
+      return store.dispatch(actions.signUpUser({ email: EMAIL, password: PASSWORD })).then(() => {
         expect(store.getActions()).toEqual(expectedActions);
       });
     });
