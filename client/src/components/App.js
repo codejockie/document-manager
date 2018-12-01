@@ -1,13 +1,13 @@
 import React, { Fragment } from 'react';
 
-import Main from './Main';
-import Header from '../containers/Header';
+import Main from './Routes';
+import ConnectedHeader from '../containers/Header';
 
 import '../styles/App.scss';
 
 const App = () => (
   <Fragment>
-    <Header />
+    <ConnectedHeader />
     <Main />
   </Fragment>
 );
