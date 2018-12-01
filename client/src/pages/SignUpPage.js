@@ -7,18 +7,18 @@ import { withRouter } from 'react-router-dom';
 import Snackbar from '@material-ui/core/Snackbar';
 
 import * as actions from '../actions/auth';
-import SignInForm from '../containers/auth/SignInForm';
+import SignUpForm from '../containers/auth/SignUpForm';
 import SnackbarContentProps from '../ui/SnackbarContentProps';
 
 /**
  * SignIn Page
  * @returns {void}
  */
-export class SignInPage extends React.PureComponent {
+export class SignUpPage extends React.PureComponent {
   static propTypes = {
     errorMessage: PropTypes.string,
     history: PropTypes.object,
-    signInUser: PropTypes.func.isRequired
+    signUpUser: PropTypes.func.isRequired
   };
 
   state = {
@@ -39,18 +39,30 @@ export class SignInPage extends React.PureComponent {
    * @returns {HTMLElement} Sign In Form
    */
   submit = (values) => {
-    const { email, password } = values;
+    const {
+      email,
+      firstname,
+      lastname,
+      password,
+      username
+    } = values;
     this.setState({ open: true }); // Set open to true to reveal snack bar in case of error
-    this.props.signInUser({ email, password }, this.props.history);
+    this.props.signUpUser({
+      email,
+      firstname,
+      lastname,
+      password,
+      username
+    }, this.props.history);
   }
 
   /**
    * handleClose
-   * @param {object} event Event object
+   * @param {object} _ Event object
    * @param {string} reason The cause of the event
    * @returns {void}
    */
-  handleClose = (event, reason) => {
+  handleClose = (_, reason) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -73,7 +85,7 @@ export class SignInPage extends React.PureComponent {
           horizontal: 'center',
         }}
         open={this.state.open}
-        autoHideDuration={5000}
+        autoHideDuration={10000}
         onClose={this.handleClose}
       >
         <SnackbarContentProps
@@ -92,7 +104,7 @@ export class SignInPage extends React.PureComponent {
   render() {
     return (
       <React.Fragment>
-        <SignInForm
+        <SignUpForm
           isPasswordVisible={this.state.showPassword}
           onSubmit={this.submit}
           showPasssword={this.showPasssword}
@@ -113,4 +125,4 @@ function mapStateToProps(state) {
   return { errorMessage: state.auth.error };
 }
 
-export default withRouter(connect(mapStateToProps, actions)(SignInPage));
+export default withRouter(connect(mapStateToProps, actions)(SignUpPage));
