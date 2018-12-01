@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-// Material-UI imports
+// Material UI
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -12,13 +12,16 @@ import Button from '@material-ui/core/Button';
 
 import styles from '../infrastructure/styles';
 
+import * as actions from '../actions/auth';
+
 /**
  * Header component
  */
 export class Header extends React.Component {
   static propTypes = {
     authenticated: PropTypes.bool,
-    classes: PropTypes.object.isRequired
+    classes: PropTypes.object.isRequired,
+    signOutUser: PropTypes.func.isRequired
   };
 
   /**
@@ -49,8 +52,7 @@ export class Header extends React.Component {
     return (
       <Button
         color="inherit"
-        component={Link}
-        to="/signout"
+        onClick={() => this.props.signOutUser()}
       >
         Sign Out
       </Button>
@@ -95,4 +97,4 @@ function mapStateToProps({ auth: { authenticated } }) {
   };
 }
 
-export default connect(mapStateToProps)(withStyles(styles)(Header));
+export default connect(mapStateToProps, actions)(withStyles(styles)(Header));
