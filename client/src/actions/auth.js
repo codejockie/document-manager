@@ -74,7 +74,6 @@ export function signUpUser(userData, browserHistory) {
 
 /**
  * Handles user sign out
- * @param {object} userData User's email and password
  * @returns {object} action
  */
 export function signOutUser() {
