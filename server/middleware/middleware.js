@@ -170,7 +170,7 @@ const validateLogin = (req, res, next) => {
  * @returns {json} json response containing the errors if any
  */
 const validateParam = (req, res, next) => {
-  if (isNaN(req.params.id)) {
+  if (Number.isNaN((Number(req.params.id)))) {
     return res.status(400).send({
       message: 'Param must be a number'
     });

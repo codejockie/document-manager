@@ -54,6 +54,7 @@ const SignInForm = ({
               <Field
                 name="password"
                 component={TextField}
+                label="Password"
                 type={isPasswordVisible ? 'text' : 'password'}
                 endAdornment={
                   <InputAdornment position="end">
