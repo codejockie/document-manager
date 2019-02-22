@@ -5,15 +5,21 @@ import injectModules from 'gulp-inject-modules';
 import istanbul from 'gulp-istanbul';
 import jasmine from 'gulp-jasmine';
 
-gulp.task('compile', ['compile:test'], () => gulp.src('server/**/*.js')
-  .pipe(babel())
-  .pipe(gulp.dest('dist')));
+const compile = (cb) => {
+  gulp.src('server/**/*.js')
+    .pipe(babel())
+    .pipe(gulp.dest('dist'));
+  cb();
+};
 
-gulp.task('compile:test', () => gulp.src('__tests__/server/**/*.js')
-  .pipe(babel())
-  .pipe(gulp.dest('dist/__tests__')));
+const compileTest = (cb) => {
+  gulp.src('__tests__/server/**/*.js')
+    .pipe(babel())
+    .pipe(gulp.dest('dist/__tests__'));
+  cb();
+};
 
-gulp.task('test', ['compile'], (done) => {
+const test = (cb) => {
   gulp.src(['dist/controllers/*.js', 'dist/helpers/*.js', 'dist/middleware/*.js'])
     .pipe(istanbul())
     .pipe(istanbul.hookRequire())
@@ -26,7 +32,10 @@ gulp.task('test', ['compile'], (done) => {
         }))
         .pipe(istanbul.writeReports())
         .pipe(istanbul.enforceThresholds({ thresholds: { global: 85 } }))
-        .on('end', done)
+        .on('end', cb)
         .pipe(exit());
     });
-});
+  cb();
+};
+
+exports.build = gulp.series(test, gulp.parallel(compile, compileTest));
