@@ -10,21 +10,19 @@ import reducers from './reducers';
 import { VERIFY_TOKEN } from './actions/actionTypes';
 import { getToken, persistToken } from './middleware';
 
-const logger = createLogger({
-  // ...options
-});
-const middlewares = [
+const middleware = [
   reduxThunk,
   persistToken
 ];
 
 if (process.env.NODE_ENV === 'development') {
-  middlewares.push(logger);
+  const logger = createLogger({ /* ...options  */ });
+  middleware.push(logger);
 }
 
 const store = createStore(
   reducers,
-  composeWithDevTools(applyMiddleware(...middlewares))
+  composeWithDevTools(applyMiddleware(...middleware))
 );
 
 const authToken = getToken();
@@ -32,7 +30,6 @@ const authToken = getToken();
 if (authToken) {
   store.dispatch({ type: VERIFY_TOKEN });
 }
-
 
 render(
   <Root store={store} />,
