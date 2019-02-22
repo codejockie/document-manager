@@ -1,11 +1,11 @@
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    queryInterface.addColumn('Users', 'resetPasswordToken', Sequelize.STRING);
-    queryInterface.addColumn('Users', 'resetPasswordExpires', Sequelize.DATE);
-  },
+  up: (queryInterface, Sequelize) => (
+    queryInterface.addColumn('Users', 'resetPasswordToken', Sequelize.STRING)
+      .then(() => queryInterface.addColumn('Users', 'resetPasswordExpires', Sequelize.DATE))
+  ),
 
-  down: (queryInterface) => {
-    queryInterface.removeColumn('Users', 'resetPasswordToken');
-    queryInterface.removeColumn('Users', 'resetPasswordExpires');
-  }
+  down: queryInterface => (
+    queryInterface.removeColumn('Users', 'resetPasswordToken')
+      .then(() => queryInterface.removeColumn('Users', 'resetPasswordExpires'))
+  )
 };
