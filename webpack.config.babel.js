@@ -1,23 +1,54 @@
 import path from 'path';
-import autoprefixer from 'autoprefixer';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import webpack from 'webpack';
+import WebpackMd5Hash from 'webpack-md5-hash';
 
-const appName = 'bundle';
-const entry = [
-  'webpack-hot-middleware/client?reload=truepath=//localhost:4200/__webpack_hmr',
-  './client/src/index.js'
-];
-const { NODE_ENV, WEBPACK_ENV } = process.env;
 const DEVELOPMENT_ENV = 'development';
 const PRODUCTION_ENV = 'production';
-const resolve = dir => path.resolve(__dirname, dir);
-const outputPath = resolve('client/assets');
-const extractTextPlugin = new ExtractTextPlugin('style.css');
+const resolvePath = dir => path.resolve(__dirname, dir);
+const outputPath = resolvePath('client/assets');
+const getEntry = ({ mode }) => {
+  if (mode === DEVELOPMENT_ENV) {
+    return [
+      'webpack-hot-middleware/client?reload=truepath=//localhost:4200/__webpack_hmr',
+      './client/src/index.js'
+    ];
+  }
+  return { main: './client/src/index.js' };
+};
+const getEnvPlugins = ({ mode }) => {
+  if (mode === PRODUCTION_ENV) {
+    return [
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify(PRODUCTION_ENV)
+        }
+      })
+    ];
+  }
+  // Excluding hot module in production fixes
+  // EventSource's response has a MIME type ('text/html')
+  // that is not 'text/event-stream'. Aborting the connection. error
+  return [
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify(DEVELOPMENT_ENV)
+      }
+    })
+  ];
+};
+const getFileName = ({ mode }) => {
+  if (mode === DEVELOPMENT_ENV) {
+    return '[name].[hash].js';
+  }
+  return '[name].[chunkhash].js';
+};
 
-const config = {
-  entry,
+export default (_, argv) => ({
+  devtool: argv.mode === DEVELOPMENT_ENV ? 'cheap-module-eval-sourcemap' : 'source-map',
+  entry: getEntry(argv),
   externals: {
     'react/addons': 'react',
     'react/lib/ExecutionEnvironment': 'react',
@@ -25,14 +56,15 @@ const config = {
   },
   output: {
     path: outputPath,
-    filename: appName,
-    publicPath: '/',
+    filename: getFileName(argv),
+    publicPath: '/'
   },
+  mode: argv.mode,
   module: {
     rules: [
       {
         test: /(\.js$)/,
-        include: resolve('client/src'),
+        include: resolvePath('client/src'),
         use: [
           {
             loader: 'babel-loader',
@@ -41,27 +73,22 @@ const config = {
             }
           }
         ]
-      }, {
+      },
+      {
         test: /\.css$/,
-        use: extractTextPlugin.extract({
-          use: [
-            {
-              loader: 'css-loader',
-              options: { importLoaders: 1 }
-            },
-            {
-              loader: 'postcss-loader',
-              options: { plugins: [autoprefixer()] }
-            }
-          ]
-        })
-      }, {
+        use: ['style-loader', MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader']
+      },
+      {
         test: /\.scss$/,
-        use: extractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: ['css-loader', 'sass-loader']
-        })
-      }, {
+        use: [
+          'style-loader',
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader',
+          'sass-loader'
+        ]
+      },
+      {
         test: /\.(gif|jpe?g|png|svg)(\?v=\d+\.\d+\.\d+)?$/,
         use: {
           loader: 'file-loader',
@@ -69,7 +96,8 @@ const config = {
             name: 'client/assets/images/[name].[ext]'
           }
         }
-      }, {
+      },
+      {
         test: /\.(eot|ttf|woff2?)(\?v=\d+\.\d+\.\d+)?$/,
         use: {
           loader: 'file-loader',
@@ -77,7 +105,8 @@ const config = {
             name: 'client/assets/fonts/[name].[ext]'
           }
         }
-      }, {
+      },
+      {
         test: /\.(aac|flac|mkv|mp3|mp4|ogg|wma|wmv)(\?v=\d+\.\d+\.\d+)?$/,
         use: {
           loader: 'file-loader',
@@ -90,40 +119,17 @@ const config = {
   },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new HtmlWebpackPlugin({
-      title: 'Document Manager',
-      template: 'client/assets/template.html'
+    new MiniCssExtractPlugin({
+      filename: 'style.[contenthash].css'
     }),
-    extractTextPlugin,
+    new HtmlWebpackPlugin({
+      inject: false,
+      hash: true,
+      title: 'Document Manager',
+      template: 'client/template.html'
+    }),
+    new WebpackMd5Hash(),
+    ...getEnvPlugins(argv)
   ]
-};
-
-if (WEBPACK_ENV === PRODUCTION_ENV || NODE_ENV === PRODUCTION_ENV) {
-  const { UglifyJsPlugin } = webpack.optimize;
-
-  // Removing hot module from the entry array in production fixes
-  // EventSource's response has a MIME type ('text/html')
-  // that is not 'text/event-stream'. Aborting the connection. error
-  config.entry = entry.slice(1);
-  config.plugins.push(new UglifyJsPlugin({ minimize: true }));
-  config.plugins.push(new webpack.DefinePlugin({
-    'process.env': {
-      NODE_ENV: JSON.stringify(PRODUCTION_ENV)
-    }
-  }));
-
-  config.devtool = 'source-map';
-  config.output.filename += '.min.js';
-} else {
-  config.plugins.push(new webpack.DefinePlugin({
-    'process.env': {
-      NODE_ENV: JSON.stringify(DEVELOPMENT_ENV)
-    }
-  }));
-  config.devtool = 'cheap-module-eval-sourcemap';
-  config.output.filename += '.js';
-}
-
-export default config;
+});

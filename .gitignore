@@ -13,3 +13,8 @@ client/assets/index.html
 client/assets/style.css
 bundle.js
 bundle.min.js
+main.**
+main.**.js
+main.**.js.map
+style.**.css
+style.**.css.map
