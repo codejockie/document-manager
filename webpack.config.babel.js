@@ -57,6 +57,7 @@ export default (_, argv) => ({
   output: {
     path: outputPath,
     filename: getFileName(argv),
+    chunkFilename: getFileName(argv),
     publicPath: '/'
   },
   mode: argv.mode,
@@ -93,7 +94,7 @@ export default (_, argv) => ({
         use: {
           loader: 'file-loader',
           options: {
-            name: 'client/assets/images/[name].[ext]'
+            name: 'client/assets/images/[name].[hash:4].[ext]'
           }
         }
       },
@@ -102,7 +103,7 @@ export default (_, argv) => ({
         use: {
           loader: 'file-loader',
           options: {
-            name: 'client/assets/fonts/[name].[ext]'
+            name: 'client/assets/fonts/[name].[hash:4].[ext]'
           }
         }
       },
@@ -111,7 +112,7 @@ export default (_, argv) => ({
         use: {
           loader: 'file-loader',
           options: {
-            name: 'client/assets/media/[name].[ext]'
+            name: 'client/assets/media/[name].[hash:4].[ext]'
           }
         }
       }
