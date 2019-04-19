@@ -116,12 +116,12 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.6.1",
     "jest": "^24.7.1",
-    "mocha": "^6.1.2",
+    "mocha": "^6.1.4",
     "moxios": "^0.4.0",
-    "nyc": "^13.3.0",
+    "nyc": "^14.0.0",
     "redux-mock-store": "^1.5.1",
-    "sequelize-cli": "^5.2.0",
-    "supertest": "^3.3.0"
+    "sequelize-cli": "^5.4.0",
+    "supertest": "^4.0.2"
   },
   "optionalDependencies": {
     "fsevents": "^1.2.4"
