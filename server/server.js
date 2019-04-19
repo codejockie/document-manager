@@ -8,7 +8,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
 import { authenticate } from './middleware/middleware';
-import config from '../webpack.config.babel';
+import webpackConfig from '../webpack.config.babel';
 import routes from './routes';
 
 // Configure dotenv to load environment variables
@@ -18,11 +18,12 @@ const app = express();
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const PORT = process.env.PORT || 4200;
 const router = express.Router();
+const config = webpackConfig(undefined, { mode: 'development' });
 
 // Set static directory and webpack config
-const distDir = path.join(__dirname, '../client/assets'),
-  htmlFile = path.join(distDir, 'index.html'),
-  compiler = webpack(config);
+const distDir = path.join(__dirname, '../client/assets');
+const htmlFile = path.join(distDir, 'index.html');
+const compiler = webpack(config);
 
 // Configure middleware
 app.use(urlencoded({ extended: true }));
