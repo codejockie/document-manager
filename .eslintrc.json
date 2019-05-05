@@ -12,7 +12,7 @@
     "node": true
   },
   "globals": {
-    "window": "readable"
+    "window": "readonly"
   },
   "parser": "babel-eslint",
   "parserOptions": {
@@ -38,6 +38,12 @@
       "allow": ["req", "res", "err"]
     }],
     "no-restricted-imports": ["error", { "paths": ["lodash"] }],
+    "object-curly-newline": ["error", {
+      "ObjectExpression": "always",
+      "ObjectPattern": "never",
+      "ImportDeclaration": { "multiline": true, "minProperties": 5, "consistent": true },
+      "ExportDeclaration": { "multiline": true, "minProperties": 5, "consistent": true }
+    }],
     "one-var": 0,
     "one-var-declaration-per-line": 0,
     "react/jsx-uses-vars": [2],
