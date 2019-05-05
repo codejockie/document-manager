@@ -3,7 +3,9 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import webpack from 'webpack';
 import WebpackMd5Hash from 'webpack-md5-hash';
 
-import { getEntry, getEnvPlugins, getFileName, resolvePath } from './webpackHelpers';
+import {
+  getEntry, getEnvPlugins, getFileName, resolvePath
+} from './webpackHelpers';
 
 const DEVELOPMENT_ENV = 'development';
 

@@ -1,0 +1,6 @@
+nyc_output
+dist
+node_modules
+client/assets
+public
+server/models/index.js

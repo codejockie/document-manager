@@ -48,4 +48,6 @@ const getFileName = ({ mode }) => {
   return '[name].[chunkhash].js';
 };
 
-export { getEntry, getEnvPlugins, getFileName, resolvePath };
+export {
+  getEntry, getEnvPlugins, getFileName, resolvePath
+};

@@ -14,9 +14,9 @@ const TextField = ({
 }) => (
   <Fragment>
     <Input {...input} type={type} {...custom} />
-    { touched &&
-      ((<FormHelperText id={`${label}-helper-text`}>{error}</FormHelperText>) ||
-      (<FormHelperText id={`${label}-helper-text`}>{error}</FormHelperText>))
+    { touched
+      && ((<FormHelperText id={`${label}-helper-text`}>{error}</FormHelperText>)
+      || (<FormHelperText id={`${label}-helper-text`}>{error}</FormHelperText>))
     }
   </Fragment>
 );

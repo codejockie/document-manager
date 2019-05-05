@@ -13,6 +13,7 @@
     "debug": "nodemon --inspect --exec babel-node -- server/server.js",
     "gulp:compile": "gulp --require @babel/register build",
     "heroku-postbuild": "yarn gulp:compile && yarn build",
+    "lint": "eslint ./",
     "migrate": "sequelize db:migrate && yarn seed",
     "seed": "sequelize db:seed:all",
     "server:test": "NODE_ENV=test PORT=4000 nyc mocha",
