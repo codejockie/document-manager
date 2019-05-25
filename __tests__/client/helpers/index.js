@@ -5,7 +5,7 @@ import configureStore from 'redux-mock-store';
 import Adapter from 'enzyme-adapter-react-16';
 import { withStyles } from '@material-ui/core/styles';
 
-import styles from './styles';
+import styles from '../../../client/src/infrastructure/styles';
 
 configure({ adapter: new Adapter() });
 
