@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 
-import Main from './Routes';
+import Routes from './Routes';
 import ConnectedHeader from '../containers/Header';
 
 import '../styles/App.scss';
@@ -8,7 +8,7 @@ import '../styles/App.scss';
 const App = () => (
   <Fragment>
     <ConnectedHeader />
-    <Main />
+    <Routes />
   </Fragment>
 );
 
