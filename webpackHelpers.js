@@ -1,10 +1,12 @@
 import path from 'path';
 import webpack from 'webpack';
 
-const DEVELOPMENT_ENV = 'development';
-const PRODUCTION_ENV = 'production';
+export const DEVELOPMENT_ENV = 'development';
+export const PRODUCTION_ENV = 'production';
 
 const resolvePath = dir => path.resolve(__dirname, dir);
+
+const getDevTool = ({ mode }) => (mode === DEVELOPMENT_ENV ? 'cheap-module-eval-sourcemap' : 'source-map');
 
 const getEntry = ({ mode }) => {
   if (mode === DEVELOPMENT_ENV) {
@@ -48,6 +50,37 @@ const getFileName = ({ mode }) => {
   return '[name].[chunkhash].js';
 };
 
+const getOptimisers = ({ mode }) => {
+  if (mode !== PRODUCTION_ENV) {
+    return {
+      optimization: {
+        minimize: false
+      }
+    };
+  }
+
+  return {
+    optimization: {
+      minimize: true,
+      runtimeChunk: false,
+      splitChunks: {
+        cacheGroups: {
+          commons: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      }
+    }
+  };
+};
+
 export {
-  getEntry, getEnvPlugins, getFileName, resolvePath
+  getDevTool,
+  getEntry,
+  getEnvPlugins,
+  getFileName,
+  getOptimisers,
+  resolvePath
 };

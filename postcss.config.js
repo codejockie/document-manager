@@ -1,6 +1,5 @@
+const autoprefixer = require('autoprefixer');
+
 module.exports = {
-  plugins: [
-    // eslint-disable-next-line global-require
-    require('autoprefixer')
-  ]
+  plugins: [autoprefixer]
 };
