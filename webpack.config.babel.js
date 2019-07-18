@@ -1,16 +1,13 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import webpack from 'webpack';
-import WebpackMd5Hash from 'webpack-md5-hash';
 
 import {
-  getEntry, getEnvPlugins, getFileName, resolvePath
+  getDevTool, getEntry, getEnvPlugins, getFileName, getOptimisers, resolvePath
 } from './webpackHelpers';
 
-const DEVELOPMENT_ENV = 'development';
-
 export default (_, argv) => ({
-  devtool: argv.mode === DEVELOPMENT_ENV ? 'cheap-module-eval-sourcemap' : 'source-map',
+  devtool: getDevTool(argv),
   entry: getEntry(argv),
   externals: {
     'react/addons': 'react',
@@ -44,13 +41,7 @@ export default (_, argv) => ({
       },
       {
         test: /\.scss$/,
-        use: [
-          'style-loader',
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-          'postcss-loader',
-          'sass-loader'
-        ]
+        use: ['style-loader', MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader']
       },
       {
         test: /\.(gif|jpe?g|png|svg)(\?v=\d+\.\d+\.\d+)?$/,
@@ -81,11 +72,28 @@ export default (_, argv) => ({
       }
     ]
   },
+  ...getOptimisers(argv),
+  resolve: {
+    alias: {
+      actions: resolvePath(__dirname, './client/src/actions/'),
+      components: resolvePath(__dirname, './client/src/components/'),
+      containers: resolvePath(__dirname, './client/src/containers/'),
+      context: resolvePath(__dirname, './client/src/context/'),
+      infrastructure: resolvePath(__dirname, './client/src/infrastructure/'),
+      middlewares: resolvePath(__dirname, './client/src/middlewares/'),
+      pages: resolvePath(__dirname, './client/src/pages/'),
+      reducers: resolvePath(__dirname, './client/src/reducers/'),
+      ui: resolvePath(__dirname, './client/src/ui/'),
+    },
+    extensions: ['.js', 'json', 'jsx'],
+    modules: [__dirname, 'client/src', 'node_modules'],
+  },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'style.[contenthash].css'
+      filename: '[name].[hash].css',
+      chunkFilename: '[id].[hash].css'
     }),
     new HtmlWebpackPlugin({
       inject: false,
@@ -93,7 +101,6 @@ export default (_, argv) => ({
       title: 'Document Manager',
       template: 'client/template.html'
     }),
-    new WebpackMd5Hash(),
     ...getEnvPlugins(argv)
   ]
 });
