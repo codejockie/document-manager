@@ -85,7 +85,7 @@ export default (_, argv) => ({
       reducers: resolvePath(__dirname, './client/src/reducers/'),
       ui: resolvePath(__dirname, './client/src/ui/'),
     },
-    extensions: ['.js', 'json', 'jsx'],
+    extensions: ['.js', '.json', '.jsx'],
     modules: [__dirname, 'client/src', 'node_modules'],
   },
   plugins: [
