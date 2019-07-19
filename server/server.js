@@ -1,29 +1,27 @@
 import path from 'path';
 import dotenv from 'dotenv';
 import express from 'express';
-import { json, urlencoded } from 'body-parser';
-import validator from 'express-validator';
 import webpack from 'webpack';
+import validator from 'express-validator';
+import { json, urlencoded } from 'body-parser';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
-import { authenticate } from './middleware/middleware';
+import enableRoutes from './routes';
 import webpackConfig from '../webpack.config.babel';
-import routes from './routes';
+import { authenticate } from './middleware/middleware';
 
 // Configure dotenv to load environment variables
 dotenv.config();
 
 const app = express();
-const NODE_ENV = process.env.NODE_ENV || 'development';
-const PORT = process.env.PORT || 4200;
 const router = express.Router();
-const config = webpackConfig(undefined, { mode: 'development' });
+const PORT = process.env.PORT || 4200;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Set static directory and webpack config
 const distDir = path.join(__dirname, '../client/assets');
 const htmlFile = path.join(distDir, 'index.html');
-const compiler = webpack(config);
 
 // Configure middleware
 app.use(urlencoded({ extended: true }));
@@ -31,6 +29,8 @@ app.use(json());
 app.use(validator());
 
 if (NODE_ENV === 'development') {
+  const config = webpackConfig(undefined, { mode: 'development' });
+  const compiler = webpack(config);
   // Configure webpack middleware for bundling
   app.use(webpackDevMiddleware(compiler, {
     publicPath: config.output.publicPath
@@ -50,7 +50,7 @@ app.use((request, response, next) => {
 });
 
 // Configure routes
-routes(router);
+enableRoutes(router);
 app.use('/v1/auth', router);
 app.use('/v1', authenticate, router);
 
