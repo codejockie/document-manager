@@ -1,9 +1,9 @@
+import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import webpack from 'webpack';
 
 import {
-  getDevTool, getEntry, getEnvPlugins, getFileName, getOptimisers, resolvePath
+  getDevTool, getEntry, getEnvPlugins, getFileName, getOptimisers, getStyleLoaders, resolvePath
 } from './webpackHelpers';
 
 export default (_, argv) => ({
@@ -25,6 +25,7 @@ export default (_, argv) => ({
     rules: [
       {
         test: /(\.js$)/,
+        exclude: /node_modules/,
         include: resolvePath('client/src'),
         use: [
           {
@@ -36,12 +37,8 @@ export default (_, argv) => ({
         ]
       },
       {
-        test: /\.css$/,
-        use: ['style-loader', MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader']
-      },
-      {
-        test: /\.scss$/,
-        use: ['style-loader', MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader']
+        test: /\.(c|sa|sc)ss$/,
+        use: getStyleLoaders(argv),
       },
       {
         test: /\.(gif|jpe?g|png|svg)(\?v=\d+\.\d+\.\d+)?$/,
@@ -74,17 +71,6 @@ export default (_, argv) => ({
   },
   ...getOptimisers(argv),
   resolve: {
-    alias: {
-      actions: resolvePath(__dirname, './client/src/actions/'),
-      components: resolvePath(__dirname, './client/src/components/'),
-      containers: resolvePath(__dirname, './client/src/containers/'),
-      context: resolvePath(__dirname, './client/src/context/'),
-      infrastructure: resolvePath(__dirname, './client/src/infrastructure/'),
-      middlewares: resolvePath(__dirname, './client/src/middlewares/'),
-      pages: resolvePath(__dirname, './client/src/pages/'),
-      reducers: resolvePath(__dirname, './client/src/reducers/'),
-      ui: resolvePath(__dirname, './client/src/ui/'),
-    },
     extensions: ['.js', '.json', '.jsx'],
     modules: [__dirname, 'client/src', 'node_modules'],
   },

@@ -10,17 +10,17 @@ module.exports = (api) => {
           './**/*.js',
           'node_modules/jest-runtime'
         ]
-      }
+      },
+      development: {
+        plugins: ['@babel/plugin-transform-react-jsx-source', '@babel/plugin-transform-react-display-name'],
+      },
     },
     presets: [
       [
         '@babel/preset-env',
         {
           targets: {
-            browsers: [
-              'last 2 versions',
-              'safari 7'
-            ],
+            browsers: ['last 2 versions', 'safari 7'],
             node: 'current'
           },
           debug: false
@@ -28,6 +28,8 @@ module.exports = (api) => {
       ]
     ],
     plugins: [
+      '@babel/plugin-transform-spread',
+      '@babel/plugin-syntax-dynamic-import',
       '@babel/plugin-proposal-object-rest-spread',
       '@babel/plugin-proposal-export-default-from',
       ['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true }],

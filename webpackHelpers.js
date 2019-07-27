@@ -1,14 +1,20 @@
 import path from 'path';
 import webpack from 'webpack';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
 export const DEVELOPMENT_ENV = 'development';
 export const PRODUCTION_ENV = 'production';
 
-const resolvePath = dir => path.resolve(__dirname, dir);
+export const resolvePath = dir => path.resolve(__dirname, dir);
+export const getDevTool = ({ mode }) => (mode === DEVELOPMENT_ENV ? 'cheap-module-eval-sourcemap' : 'source-map');
+export const getStyleLoaders = ({ mode }) => {
+  if (mode === DEVELOPMENT_ENV) {
+    return ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'];
+  }
+  return [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader'];
+};
 
-const getDevTool = ({ mode }) => (mode === DEVELOPMENT_ENV ? 'cheap-module-eval-sourcemap' : 'source-map');
-
-const getEntry = ({ mode }) => {
+export const getEntry = ({ mode }) => {
   if (mode === DEVELOPMENT_ENV) {
     return [
       'webpack-hot-middleware/client?reload=truepath=//localhost:4200/__webpack_hmr',
@@ -20,7 +26,7 @@ const getEntry = ({ mode }) => {
   };
 };
 
-const getEnvPlugins = ({ mode }) => {
+export const getEnvPlugins = ({ mode }) => {
   if (mode === PRODUCTION_ENV) {
     return [
       new webpack.DefinePlugin({
@@ -43,14 +49,14 @@ const getEnvPlugins = ({ mode }) => {
   ];
 };
 
-const getFileName = ({ mode }) => {
+export const getFileName = ({ mode }) => {
   if (mode === DEVELOPMENT_ENV) {
     return '[name].[hash].js';
   }
   return '[name].[chunkhash].js';
 };
 
-const getOptimisers = ({ mode }) => {
+export const getOptimisers = ({ mode }) => {
   if (mode !== PRODUCTION_ENV) {
     return {
       optimization: {
@@ -74,13 +80,4 @@ const getOptimisers = ({ mode }) => {
       }
     }
   };
-};
-
-export {
-  getDevTool,
-  getEntry,
-  getEnvPlugins,
-  getFileName,
-  getOptimisers,
-  resolvePath
 };
