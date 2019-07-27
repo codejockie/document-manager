@@ -19,9 +19,11 @@ const router = express.Router();
 const PORT = process.env.PORT || 4200;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// Set static directory and webpack config
+// Set static directory
 const distDir = path.join(__dirname, '../client/assets');
 const htmlFile = path.join(distDir, 'index.html');
+const docsDir = path.resolve(__dirname, '../public');
+const docsHtmlFile = path.join(docsDir, 'index.html');
 
 // Configure middleware
 app.use(urlencoded({ extended: true }));
@@ -40,6 +42,9 @@ if (NODE_ENV === 'development') {
 } else {
   // Set public directory
   app.use(express.static(distDir));
+  app.use(express.static(docsDir));
+
+  app.get('/docs', (request, response) => response.sendFile(docsHtmlFile));
 }
 
 // Enable CORS

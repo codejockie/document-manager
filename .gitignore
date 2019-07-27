@@ -16,5 +16,8 @@ bundle.min.js
 main.**
 main.**.js
 main.**.js.map
+vendors.**
+vendors.**.js
+vendors.**.js.map
 style.**.css
 style.**.css.map

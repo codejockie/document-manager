@@ -82,7 +82,7 @@ export default (_, argv) => ({
       chunkFilename: '[id].[hash].css'
     }),
     new HtmlWebpackPlugin({
-      inject: false,
+      inject: true,
       hash: true,
       title: 'Document Manager',
       template: 'client/template.html'
