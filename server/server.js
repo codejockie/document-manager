@@ -63,6 +63,6 @@ app.get('*', (request, response) => {
   response.status(200).sendFile(htmlFile);
 });
 
-app.listen(PORT, () => { console.info(`🚀 App listening on ${PORT}`) });
+app.listen(PORT, () => { console.info(`🚀 App listening on ${PORT}`); });
 
 export default app;
