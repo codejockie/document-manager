@@ -123,6 +123,7 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.6.1",
+    "husky": "^3.0.8",
     "jest": "^24.9.0",
     "mocha": "^6.1.4",
     "moxios": "^0.4.0",
@@ -133,5 +134,10 @@
   },
   "optionalDependencies": {
     "fsevents": "^1.2.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn test:local && yarn client:test"
+    }
   }
 }
