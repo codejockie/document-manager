@@ -6,21 +6,21 @@ const styles = theme => ({
     width: '100%',
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   card: {
     maxWidth: 500,
   },
   close: {
-    width: theme.spacing.unit * 4,
-    height: theme.spacing.unit * 4,
+    width: theme.spacing(4),
+    height: theme.spacing(4),
   },
   flex: {
     flex: 1,
     textDecoration: 'none',
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   grid: {
     margin: '17rem -12px'
@@ -56,7 +56,7 @@ const styles = theme => ({
   },
   iconVariant: {
     opacity: 0.9,
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   message: {
     display: 'flex',
