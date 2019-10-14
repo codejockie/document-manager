@@ -30,7 +30,7 @@ const SignInForm = ({
   <Fragment>
     <Grid
       container
-      spacing={24}
+      spacing={4}
       direction="column"
       alignContent="center"
       alignItems="center"
