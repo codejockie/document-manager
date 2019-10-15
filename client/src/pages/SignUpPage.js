@@ -10,6 +10,11 @@ import * as actions from '../actions/auth';
 import SignUpForm from '../containers/auth/SignUpForm';
 import SnackbarContentProps from '../ui/SnackbarContentProps';
 
+const anchorOrigin = {
+  vertical: 'bottom',
+  horizontal: 'center',
+};
+
 /**
  * SignIn Page
  * @returns {void}
@@ -39,21 +44,9 @@ export class SignUpPage extends React.PureComponent {
    * @returns {HTMLElement} Sign In Form
    */
   submit = (values) => {
-    const {
-      email,
-      firstname,
-      lastname,
-      password,
-      username
-    } = values;
+    const { email, firstname, lastname, password, username } = values;
     this.setState({ open: true }); // Set open to true to reveal snack bar in case of error
-    this.props.signUpUser({
-      email,
-      firstname,
-      lastname,
-      password,
-      username
-    }, this.props.history);
+    this.props.signUpUser({ email, firstname, lastname, password, username }, this.props.history);
   }
 
   /**
@@ -79,20 +72,8 @@ export class SignUpPage extends React.PureComponent {
    */
   renderAlert = () => (
     <div>
-      <Snackbar
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        open={this.state.open}
-        autoHideDuration={10000}
-        onClose={this.handleClose}
-      >
-        <SnackbarContentProps
-          onClose={this.handleClose}
-          variant="error"
-          message={this.props.errorMessage}
-        />
+      <Snackbar anchorOrigin={anchorOrigin} open={this.state.open} autoHideDuration={10000} onClose={this.handleClose}>
+        <SnackbarContentProps onClose={this.handleClose} variant="error" message={this.props.errorMessage} />
       </Snackbar>
     </div>
   );
@@ -104,11 +85,7 @@ export class SignUpPage extends React.PureComponent {
   render() {
     return (
       <React.Fragment>
-        <SignUpForm
-          isPasswordVisible={this.state.showPassword}
-          onSubmit={this.submit}
-          showPasssword={this.showPasssword}
-        />;
+        <SignUpForm isPasswordVisible={this.state.showPassword} onSubmit={this.submit} showPasssword={this.showPasssword} />;
         { this.props.errorMessage && this.renderAlert() }
       </React.Fragment>
     );

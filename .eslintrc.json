@@ -31,6 +31,7 @@
     "curly": ["error", "multi-line"],
     "import/extensions": "off",
     "import/no-unresolved": "off",
+    "max-len": ["error", { "code": 150, "tabWidth": 2 }],
     "new-cap": 0,
     "no-console": ["error", { "allow": ["error", "info", "warn"] }],
     "no-param-reassign": 0,
@@ -38,6 +39,7 @@
       "allow": ["req", "res", "err"]
     }],
     "no-restricted-imports": ["error", { "paths": ["lodash"] }],
+    "object-curly-newline": "off",
     "one-var": 0,
     "one-var-declaration-per-line": 0,
     "react/jsx-uses-vars": [2],

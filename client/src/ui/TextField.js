@@ -5,13 +5,7 @@ import React, { Fragment } from 'react';
 import Input from '@material-ui/core/Input';
 import FormHelperText from '@material-ui/core/FormHelperText';
 
-const TextField = ({
-  input,
-  label,
-  type,
-  meta: { touched, error },
-  ...custom
-}) => (
+const TextField = ({ input, label, type, meta: { touched, error }, ...custom }) => (
   <Fragment>
     <Input {...input} type={type} {...custom} />
     { touched
