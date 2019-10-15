@@ -20,31 +20,13 @@ import styles from '../../infrastructure/styles';
 import TextField from '../../ui/TextField';
 import validate from '../../infrastructure/Validate';
 
-const SignUpForm = ({
-  classes,
-  handleSubmit,
-  isPasswordVisible,
-  showPasssword,
-  submitting
-}) => (
+const SignUpForm = ({ classes, handleSubmit, isPasswordVisible, showPasssword, submitting }) => (
   <Fragment>
-    <Grid
-      container
-      spacing={4}
-      direction="column"
-      alignContent="center"
-      alignItems="center"
-      className={classes.grid}
-    >
+    <Grid container spacing={4} direction="column" alignContent="center" alignItems="center" className={classes.grid}>
       <Card className={classes.card}>
         <CardContent>
-          <Typography variant="h2" component="h2">
-            Sign up
-          </Typography>
-          <form
-            className={classes.root}
-            onSubmit={handleSubmit}
-          >
+          <Typography variant="h2" component="h2">Sign up</Typography>
+          <form className={classes.root} onSubmit={handleSubmit}>
             <FormControl fullWidth className={classes.formControl}>
               <InputLabel htmlFor="email">Email</InputLabel>
               <Field name="email" component={TextField} type="email" label="Email" />
@@ -70,10 +52,7 @@ const SignUpForm = ({
                 label="Password"
                 endAdornment={
                   <InputAdornment position="end">
-                    <IconButton
-                      onClick={showPasssword}
-                      onMouseDown={(event) => { event.preventDefault(); }}
-                    >
+                    <IconButton onClick={showPasssword} onMouseDown={(event) => { event.preventDefault(); }}>
                       {isPasswordVisible ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
@@ -84,13 +63,7 @@ const SignUpForm = ({
               <Field name="confirmPassword" component={TextField} type="password" label="ConfirmPassword" />
             </FormControl>
             <FormControl>
-              <Button
-                variant="contained"
-                color="primary"
-                className={classes.button}
-                type="submit"
-                disabled={submitting}
-              >
+              <Button variant="contained" color="primary" className={classes.button} type="submit" disabled={submitting}>
                 Sign Up
               </Button>
             </FormControl>

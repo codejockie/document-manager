@@ -10,6 +10,11 @@ import * as actions from '../actions/auth';
 import SignInForm from '../containers/auth/SignInForm';
 import SnackbarContentProps from '../ui/SnackbarContentProps';
 
+const anchorOrigin = {
+  vertical: 'bottom',
+  horizontal: 'center',
+};
+
 /**
  * SignIn Page
  * @returns {void}
@@ -67,20 +72,8 @@ export class SignInPage extends React.PureComponent {
    */
   renderAlert = () => (
     <div>
-      <Snackbar
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        open={this.state.open}
-        autoHideDuration={5000}
-        onClose={this.handleClose}
-      >
-        <SnackbarContentProps
-          onClose={this.handleClose}
-          variant="error"
-          message={this.props.errorMessage}
-        />
+      <Snackbar anchorOrigin={anchorOrigin} open={this.state.open} autoHideDuration={5000} onClose={this.handleClose}>
+        <SnackbarContentProps onClose={this.handleClose} variant="error" message={this.props.errorMessage} />
       </Snackbar>
     </div>
   );
@@ -92,11 +85,7 @@ export class SignInPage extends React.PureComponent {
   render() {
     return (
       <React.Fragment>
-        <SignInForm
-          isPasswordVisible={this.state.showPassword}
-          onSubmit={this.submit}
-          showPasssword={this.showPasssword}
-        />;
+        <SignInForm isPasswordVisible={this.state.showPassword} onSubmit={this.submit} showPasssword={this.showPasssword} />;
         { this.props.errorMessage && this.renderAlert() }
       </React.Fragment>
     );

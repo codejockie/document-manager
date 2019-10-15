@@ -27,21 +27,21 @@ export default (EnhancedComponent) => {
      * mounting
      * @returns {void}
      */
-    componentWillMount() {
+    componentDidMount() {
       if (!this.props.authenticated) {
-        this.context.router.history.push('/auth/signin');
+        this.context.router.history.push('/signin');
       }
     }
 
     /**
      * Check if a user is authenticated on component's
      * next update
-     * @param {object} nextProps New incoming props
+     * @param {object} prevProps Outgoing props
      * @returns {void}
      */
-    componentWillUpdate(nextProps) {
-      if (!nextProps.authenticated) {
-        this.context.router.history.push('/auth/signin');
+    componentDidUpdate() {
+      if (!this.props.authenticated) {
+        this.context.router.history.push('/signin');
       }
     }
 

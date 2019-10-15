@@ -32,30 +32,13 @@ export class Header extends React.Component {
     if (!this.props.authenticated) {
       return (
         <Fragment>
-          <Button
-            color="inherit"
-            component={Link}
-            to="/auth/signin"
-          >
-            Sign In
-          </Button>
-          <Button
-            color="inherit"
-            component={Link}
-            to="/auth/signup"
-          >
-            Sign Up
-          </Button>
+          <Button color="inherit" component={Link} to="/signin">Sign In</Button>
+          <Button color="inherit" component={Link} to="/signup">Sign Up</Button>
         </Fragment>
       );
     }
     return (
-      <Button
-        color="inherit"
-        onClick={() => this.props.signOutUser()}
-      >
-        Sign Out
-      </Button>
+      <Button color="inherit" onClick={() => this.props.signOutUser()}>Sign Out</Button>
     );
   }
 
@@ -69,12 +52,7 @@ export class Header extends React.Component {
       <AppBar position="sticky" className={classes.appBar}>
         <nav>
           <Toolbar>
-            <Typography
-              className={classes.flex}
-              color="inherit"
-              component={Link}
-              to="/" variant="h6"
-            >
+            <Typography className={classes.flex} color="inherit" component={Link} to="/" variant="h6">
               Docs
             </Typography>
             {this.renderLinks()}

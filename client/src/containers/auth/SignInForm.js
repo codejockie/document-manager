@@ -20,31 +20,13 @@ import styles from '../../infrastructure/styles';
 import TextField from '../../ui/TextField';
 import validate from '../../infrastructure/Validate';
 
-const SignInForm = ({
-  classes,
-  handleSubmit,
-  isPasswordVisible,
-  showPasssword,
-  submitting
-}) => (
+const SignInForm = ({ classes, handleSubmit, isPasswordVisible, showPasssword, submitting }) => (
   <Fragment>
-    <Grid
-      container
-      spacing={4}
-      direction="column"
-      alignContent="center"
-      alignItems="center"
-      className={classes.grid}
-    >
+    <Grid container spacing={4} direction="column" alignContent="center" alignItems="center" className={classes.grid}>
       <Card className={classes.card}>
         <CardContent>
-          <Typography variant="h2" component="h2">
-            Sign in
-          </Typography>
-          <form
-            className={classes.root}
-            onSubmit={handleSubmit}
-          >
+          <Typography variant="h2" component="h2">Sign in</Typography>
+          <form className={classes.root} onSubmit={handleSubmit}>
             <FormControl fullWidth className={classes.formControl}>
               <InputLabel htmlFor="email">Email</InputLabel>
               <Field name="email" component={TextField} type="email" label="Email" />
@@ -58,23 +40,15 @@ const SignInForm = ({
                 type={isPasswordVisible ? 'text' : 'password'}
                 endAdornment={
                   <InputAdornment position="end">
-                    <IconButton
-                      onClick={showPasssword}
-                      onMouseDown={(event) => { event.preventDefault(); }}
-                    >
+                    <IconButton onClick={showPasssword} onMouseDown={(event) => { event.preventDefault(); }}>
                       {isPasswordVisible ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
-                } />
+                }
+              />
             </FormControl>
             <FormControl>
-              <Button
-                variant="contained"
-                color="primary"
-                className={classes.button}
-                type="submit"
-                disabled={submitting}
-              >
+              <Button variant="contained" color="primary" className={classes.button} type="submit" disabled={submitting}>
                 Sign In
               </Button>
             </FormControl>

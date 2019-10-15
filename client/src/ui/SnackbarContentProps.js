@@ -14,43 +14,32 @@ import SnackbarContent from '@material-ui/core/SnackbarContent';
 import styles from '../infrastructure/styles';
 
 const variantIcon = {
-  success: CheckCircleIcon,
-  warning: WarningIcon,
   error: ErrorIcon,
   info: InfoIcon,
+  success: CheckCircleIcon,
+  warning: WarningIcon,
 };
 
-const SnackbarContentProps = ({
-  classes,
-  className,
-  message,
-  onClose,
-  variant,
-  ...other
-}) => {
+const SnackbarContentProps = ({ classes, className, message, onClose, variant, ...other }) => {
   const Icon = variantIcon[variant];
+  const Action = (
+    <IconButton key="close" aria-label="Close" color="inherit" className={classes.close} onClick={onClose}>
+      <CloseIcon className={classes.icon} />
+    </IconButton>
+  );
+  const Message = (
+    <span id="client-snackbar" className={classes.message}>
+      <Icon className={classNames(classes.icon, classes.iconVariant)} />
+      {message}
+    </span>
+  );
 
   return (
     <SnackbarContent
       className={classNames(classes[variant], className)}
       aria-describedby="client-snackbar"
-      message={
-        <span id="client-snackbar" className={classes.message}>
-          <Icon className={classNames(classes.icon, classes.iconVariant)} />
-          {message}
-        </span>
-      }
-      action={[
-        <IconButton
-          key="close"
-          aria-label="Close"
-          color="inherit"
-          className={classes.close}
-          onClick={onClose}
-        >
-          <CloseIcon className={classes.icon} />
-        </IconButton>,
-      ]}
+      message={Message}
+      action={[Action]}
       {...other}
     />
   );
