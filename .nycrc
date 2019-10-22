@@ -1,0 +1,20 @@
+{
+  "require": [
+      "@babel/register"
+    ],
+  "exclude": [
+      "server",
+      "__tests__",
+      "dist/models/index.js",
+      "dist/routes",
+      "dist/server.js",
+      ".mocharc.js",
+      "babel.config.js",
+      "webpack.config.babel.js"
+    ],
+    "reporter": [
+      "lcov",
+      "html",
+      "text"
+    ]
+}

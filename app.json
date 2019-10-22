@@ -1,0 +1,34 @@
+{
+  "name": "document-manager",
+  "description": "",
+  "scripts": {
+  },
+  "env": {
+    "DATABASE_URL": {
+      "required": true
+    },
+    "JWT_SECRET": {
+      "required": true
+    },
+    "MAILER_CLIENT_ID": {
+      "required": true
+    },
+    "MAILER_CLIENT_SECRET": {
+      "required": true
+    },
+    "MAILER_ACCESS_TOKEN": {
+      "required": true
+    },
+    "MAILER_REFRESH_TOKEN": {
+      "required": true
+    }
+  },
+  "formation": {
+  },
+  "addons": [],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}

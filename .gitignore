@@ -4,5 +4,20 @@ node_modules/
 .vscode/
 .env
 package-lock.json
-build/
+/dist/
+.nyc_output/
 coverage/
+
+# Project generated files
+client/assets/index.html
+client/assets/style.css
+bundle.js
+bundle.min.js
+main.**
+main.**.js
+main.**.js.map
+vendors.**
+vendors.**.js
+vendors.**.js.map
+style.**.css
+style.**.css.map

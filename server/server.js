@@ -1,38 +1,68 @@
-import dotenv from 'dotenv';
 import path from 'path';
+import dotenv from 'dotenv';
 import express from 'express';
-import bodyParser from 'body-parser';
+import webpack from 'webpack';
 import validator from 'express-validator';
+import { json, urlencoded } from 'body-parser';
+import webpackDevMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
 
-import users from './routes/users';
-import search from './routes/search';
-import documents from './routes/documents';
-import { authenticate } from './helpers/middleware';
+import enableRoutes from './routes';
+import webpackConfig from '../webpack.config.babel';
+import { authenticate } from './middleware/middleware';
 
+// Configure dotenv to load environment variables
 dotenv.config();
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 const app = express();
+const router = express.Router();
+const PORT = process.env.PORT || 4200;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
-app.use(express.static(path.resolve(`${__dirname}./../public`)));
+// Set static directory
+const distDir = path.join(__dirname, '../client/assets');
+const htmlFile = path.join(distDir, 'index.html');
+const docsDir = path.resolve(__dirname, '../public');
+const docsHtmlFile = path.join(docsDir, 'index.html');
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// Configure middleware
+app.use(urlencoded({ extended: true }));
+app.use(json());
 app.use(validator());
 
+if (NODE_ENV === 'development') {
+  const config = webpackConfig(undefined, { mode: 'development' });
+  const compiler = webpack(config);
+  // Configure webpack middleware for bundling
+  app.use(webpackDevMiddleware(compiler, {
+    publicPath: config.output.publicPath
+  }));
 
-app.use('/v1/users', users);
-app.use('/v1/search', search);
-app.use('/v1/documents', authenticate, documents);
+  app.use(webpackHotMiddleware(compiler));
+} else {
+  // Set public directory
+  app.use(express.static(distDir));
+  app.use(express.static(docsDir));
 
-app.get('/', (req, res) => {
-  res.sendFile('index.html');
+  app.get('/docs', (request, response) => response.sendFile(docsHtmlFile));
+}
+
+// Enable CORS
+app.use((request, response, next) => {
+  response.header('Access-Control-Allow-Origin', '*');
+  response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
 });
 
-app.get('/v1', (req, res) => {
-  res.redirect(302, '/');
+// Configure routes
+enableRoutes(router);
+app.use('/v1/auth', router);
+app.use('/v1', authenticate, router);
+
+app.get('*', (request, response) => {
+  response.status(200).sendFile(htmlFile);
 });
 
-app.listen(process.env.PORT || '4200');
+app.listen(PORT, () => { console.info(`🚀 App listening on ${PORT}`); });
 
 export default app;

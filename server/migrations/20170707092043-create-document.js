@@ -22,7 +22,7 @@ module.exports = {
     access: {
       allowNull: false,
       type: Sequelize.ENUM,
-      values: ['private', 'public']
+      values: ['private', 'public', 'role']
     },
     userId: {
       type: Sequelize.INTEGER,
@@ -35,7 +35,6 @@ module.exports = {
     },
     roleId: {
       type: Sequelize.INTEGER,
-      onDelete: 'CASCADE',
       defaultValue: 2,
       references: {
         model: 'Roles',
