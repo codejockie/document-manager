@@ -124,20 +124,17 @@ const validateDocument = (req, res, next) => {
  * @returns {json} json error response
  */
 const validateLimitAndOffset = (req, res, next) => {
-  if (req.query.limit) {
-    if (!Number.isInteger(Number(req.query.limit))) {
-      return res.status(400).send({
-        message: 'Limit must be an integer'
-      });
-    }
+  const { limit, offset } = req.query;
+  if (limit && !Number.isInteger(Number(limit))) {
+    return res.status(400).send({
+      message: 'Limit must be an integer'
+    });
   }
 
-  if (req.query.offset) {
-    if (!Number.isInteger(Number(req.query.offset))) {
-      return res.status(400).send({
-        message: 'Offset must be an integer'
-      });
-    }
+  if (offset && !Number.isInteger(Number(offset))) {
+    return res.status(400).send({
+      message: 'Offset must be an integer'
+    });
   }
 
   next();
@@ -186,7 +183,8 @@ const validateParam = (req, res, next) => {
  * @returns {json} json response containing the errors if any
  */
 const validateQuery = (req, res, next) => {
-  if (req.query.q === undefined || req.query.q === '') {
+  const { q } = req.query;
+  if (q === undefined || q === '') {
     return res.status(400).send({
       message: 'Query param is required'
     });
