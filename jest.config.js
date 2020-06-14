@@ -1,8 +1,13 @@
 module.exports = {
-  setupFiles: [
-    '<rootDir>/__mocks__/localStorage.js'
-  ],
+  coverageReporters: ['html', 'json', 'lcov', 'text'],
+  moduleNameMapper: {
+    '^@/(.*)': '<rootDir>/client/src/$1',
+  },
+  setupFiles: ['<rootDir>/__mocks__/localStorage.js'],
   testMatch: ['**/__tests__/client/**/*.spec.js?(x)'],
+  transform: {
+    '^.+\\.jsx?$': 'babel-jest',
+  },
   verbose: true,
-  testURL: 'http://localhost'
+  testURL: 'http://localhost',
 };

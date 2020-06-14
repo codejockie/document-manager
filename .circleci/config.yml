@@ -35,3 +35,5 @@ jobs:
 
       # run tests!
       - run: yarn run client:test:coverage
+      # upload test coverage to codacy
+      - run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Javascript -r ./coverage/lcov.info
