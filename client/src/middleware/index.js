@@ -9,14 +9,9 @@ import {
 } from '../actions/actionTypes';
 
 export const getToken = () => localStorage.getItem('authToken');
-export const setToken = (key, token) => {
-  localStorage.setItem(key, token);
-};
-export const removeFromStorage = (key) => {
-  localStorage.removeItem(key);
-};
+export const removeFromStorage = key => localStorage.removeItem(key);
+export const setToken = (key, token) => localStorage.setItem(key, token);
 
-/* eslint-disable no-unused-vars */
 export const persistToken = ({ dispatch }) => next => (action) => {
   switch (action.type) {
     case VERIFY_TOKEN:
@@ -26,24 +21,11 @@ export const persistToken = ({ dispatch }) => next => (action) => {
         data: {
           token: getToken()
         }
-      }).then(({ data: { error, ok } }) => {
-        if (!ok) {
-          return next({
-            type: TOKEN_EXPIRED,
-            error
-          });
-        }
-
+      }).then(() => {
         dispatch({ type: AUTH_USER });
-        return next({
-          type: SAVE_TOKEN,
-          token: getToken()
-        });
+        next({ type: SAVE_TOKEN, token: getToken() });
       }).catch((error) => {
-        next({
-          type: TOKEN_EXPIRED,
-          error
-        });
+        next({ error, type: TOKEN_EXPIRED });
       });
       break;
     case SAVE_TOKEN:

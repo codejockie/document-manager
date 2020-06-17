@@ -6,9 +6,9 @@ import { withRouter } from 'react-router-dom';
 // Material UI
 import Snackbar from '@material-ui/core/Snackbar';
 
-import * as actions from '../actions/auth';
-import SignUpForm from '../containers/auth/SignUpForm';
-import SnackbarContentProps from '../ui/SnackbarContentProps';
+import * as actions from 'actions/auth';
+import authForm from 'components/AuthForm';
+import SnackbarContentProps from 'common/SnackbarContentProps';
 
 const anchorOrigin = {
   vertical: 'bottom',
@@ -19,23 +19,13 @@ const anchorOrigin = {
  * SignIn Page
  * @returns {void}
  */
-export class SignUpPage extends React.PureComponent {
+export class AuthForm extends React.PureComponent {
   static propTypes = {
     errorMessage: PropTypes.string,
     history: PropTypes.object,
+    isRegistration: PropTypes.bool,
+    signInUser: PropTypes.func.isRequired,
     signUpUser: PropTypes.func.isRequired
-  };
-
-  state = {
-    showPassword: false
-  };
-
-  /**
-   * showPasssword
-   * @returns {void}
-   */
-  showPasssword = () => {
-    this.setState({ showPassword: !this.state.showPassword });
   };
 
   /**
@@ -43,19 +33,23 @@ export class SignUpPage extends React.PureComponent {
    * @param {object} values
    * @returns {HTMLElement} Sign In Form
    */
-  submit = (values) => {
-    const { email, firstname, lastname, password, username } = values;
+  handleSubmit = (values) => {
     this.setState({ open: true }); // Set open to true to reveal snack bar in case of error
-    this.props.signUpUser({ email, firstname, lastname, password, username }, this.props.history);
+    if (this.props.isRegistration) {
+      this.props.signUpUser(values, this.props.history);
+      return;
+    }
+    const { email, password } = values;
+    this.props.signInUser({ email, password }, this.props.history);
   }
 
   /**
    * handleClose
-   * @param {object} _ Event object
+   * @param {object} event Event object
    * @param {string} reason The cause of the event
    * @returns {void}
    */
-  handleClose = (_, reason) => {
+  handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -72,7 +66,7 @@ export class SignUpPage extends React.PureComponent {
    */
   renderAlert = () => (
     <div>
-      <Snackbar anchorOrigin={anchorOrigin} open={this.state.open} autoHideDuration={10000} onClose={this.handleClose}>
+      <Snackbar anchorOrigin={anchorOrigin} open={this.state.open} autoHideDuration={5000} onClose={this.handleClose}>
         <SnackbarContentProps onClose={this.handleClose} variant="error" message={this.props.errorMessage} />
       </Snackbar>
     </div>
@@ -83,23 +77,23 @@ export class SignUpPage extends React.PureComponent {
    * @returns {HTMLElement} Sign In Form
    */
   render() {
+    const { errorMessage, isRegistration } = this.props;
+    const formName = isRegistration ? 'signup' : 'signin';
+    // TODO: Find a better name for this
+    const AuthenticationForm = authForm(formName);
     return (
-      <React.Fragment>
-        <SignUpForm isPasswordVisible={this.state.showPassword} onSubmit={this.submit} showPasssword={this.showPasssword} />;
-        { this.props.errorMessage && this.renderAlert() }
-      </React.Fragment>
+      <>
+        <AuthenticationForm
+          isRegistration={isRegistration}
+          onSubmit={this.handleSubmit}
+        />
+        { errorMessage && this.renderAlert() }
+      </>
     );
   }
 }
 
-/**
-   * mapStateToProps - Maps redux state date to props
-   * for SignIn component
-   * @param {object} state Redux state
-   * @returns {object} state.errorMessage
-   */
-function mapStateToProps(state) {
-  return { errorMessage: state.auth.error };
-}
-
-export default withRouter(connect(mapStateToProps, actions)(SignUpPage));
+const ConnectedAuthForm = connect(state => ({
+  errorMessage: state.auth.error
+}), actions)(AuthForm);
+export default withRouter(ConnectedAuthForm);
