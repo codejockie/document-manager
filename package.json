@@ -92,7 +92,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "sass-loader": "^7.1.0",
-    "sequelize": "^4.2.1",
+    "sequelize": "^6.1.0",
     "style-loader": "^0.23.1",
     "validator": "^9.4.0",
     "webpack": "^4.43.0",
