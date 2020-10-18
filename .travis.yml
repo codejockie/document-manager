@@ -7,7 +7,6 @@ before_script:
 - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
 - chmod +x ./cc-test-reporter
 - ./cc-test-reporter before-build --debug
-- yarn global add gulp-cli
 - psql -c 'create database doc_man_test;' -U postgres
 - NODE_ENV=test sequelize db:migrate
 - NODE_ENV=test sequelize db:seed:all

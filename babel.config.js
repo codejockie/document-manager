@@ -4,12 +4,9 @@ module.exports = (api) => {
   return {
     env: {
       test: {
+        only: ['./**/*.js', 'node_modules/jest-runtime'],
         presets: ['@babel/preset-env', '@babel/preset-react'],
-        plugins: ['transform-export-extensions'],
-        only: [
-          './**/*.js',
-          'node_modules/jest-runtime'
-        ]
+        plugins: ['transform-export-extensions', '@babel/plugin-transform-runtime'],
       },
       development: {
         plugins: ['@babel/plugin-transform-react-jsx-source', '@babel/plugin-transform-react-display-name'],
@@ -21,11 +18,11 @@ module.exports = (api) => {
         {
           targets: {
             browsers: ['last 2 versions', 'safari 7'],
-            node: 'current'
+            node: 'current',
           },
-          debug: false
-        }
-      ]
+          debug: false,
+        },
+      ],
     ],
     plugins: [
       '@babel/plugin-transform-spread',
@@ -35,6 +32,6 @@ module.exports = (api) => {
       '@babel/plugin-proposal-export-namespace-from',
       ['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true }],
       ['@babel/plugin-proposal-class-properties', { loose: true }],
-    ]
+    ],
   };
 };

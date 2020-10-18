@@ -6,6 +6,8 @@ checks:
   complex-logic:
     config:
       threshold: 4
+  fatal:
+    enabled: false
   file-lines:
     config:
       threshold: 350

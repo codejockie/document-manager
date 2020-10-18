@@ -3,6 +3,7 @@ import amber from '@material-ui/core/colors/amber';
 
 const styles = theme => ({
   appBar: {
+    flexGrow: 1,
     width: '100%',
   },
   button: {
@@ -23,14 +24,13 @@ const styles = theme => ({
     margin: theme.spacing(1),
   },
   grid: {
-    margin: '17rem -12px'
+    margin: '8rem -12px'
   },
   input: {
     display: 'none',
   },
   menuButton: {
-    marginLeft: -12,
-    marginRight: 20,
+    marginRight: theme.spacing(2),
   },
   root: {
     display: 'flex',
@@ -61,7 +61,11 @@ const styles = theme => ({
   message: {
     display: 'flex',
     alignItems: 'center',
-  }
+  },
+  title: {
+    flexGrow: 1,
+    textDecoration: 'none',
+  },
 });
 
 export default styles;

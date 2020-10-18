@@ -1,24 +1,17 @@
 import moxios from 'moxios';
 
-import { persistToken } from '../../../client/src/middleware';
-import {
-  AUTH_USER,
-  SAVE_TOKEN,
-  TOKEN_EXPIRED,
-  UNAUTH_USER,
-  VERIFY_TOKEN
-} from '../../../client/src/actions/actionTypes';
+import { persistToken } from '@/middleware';
+import { AUTH_USER, SAVE_TOKEN, TOKEN_EXPIRED, UNAUTH_USER, VERIFY_TOKEN } from '@/actions/actionTypes';
+
+const next = jest.fn();
+const dispatch = jest.fn();
+const getState = jest.fn(() => ({}));
 
 const create = () => {
-  const store = {
-    getState: jest.fn(() => ({})),
-    dispatch: jest.fn(),
-  };
-  const next = jest.fn();
-
+  const store = { dispatch, getState };
   const invoke = action => persistToken(store)(next)(action);
 
-  return { store, next, invoke };
+  return { invoke };
 };
 
 describe('persistToken Middleware', () => {
@@ -27,18 +20,21 @@ describe('persistToken Middleware', () => {
   });
 
   afterEach(() => {
+    next.mockReset();
+    dispatch.mockReset();
+    getState.mockReset();
     moxios.uninstall();
   });
 
   it('passes through non-function action', () => {
-    const { next, invoke } = create();
+    const { invoke } = create();
     const action = { type: 'TEST' };
     invoke(action);
     expect(next).toHaveBeenCalledWith(action);
   });
 
   it('saves the token', () => {
-    const { invoke, next } = create();
+    const { invoke } = create();
     const token = 'test_token001';
     const action = { type: SAVE_TOKEN, token };
     invoke(action);
@@ -52,21 +48,16 @@ describe('persistToken Middleware', () => {
     moxios.stubRequest('/v1/auth/verify', {
       status: 200,
       response: {
-        data: {
-          error: '',
-          ok: true
-        }
-      }
+        data: { error: '', ok: true },
+      },
     });
 
-    const { invoke, next, store } = create();
-    const action = { type: VERIFY_TOKEN, token };
-    invoke(action);
+    const action = { token, type: VERIFY_TOKEN };
+    persistToken({ dispatch })(next)(action);
 
     moxios.wait(() => {
       expect(next).toHaveBeenCalledWith(action);
-      expect(store.dispatch).toHaveBeenCalledWith({ type: AUTH_USER });
-      expect(next).toHaveBeenCalledWith({ type: SAVE_TOKEN, token });
+      expect(dispatch).toHaveBeenCalledWith({ type: AUTH_USER });
     });
   });
 
@@ -76,18 +67,18 @@ describe('persistToken Middleware', () => {
       response: {
         data: {
           error: 'Invalid Token',
-          ok: false
-        }
-      }
+          ok: false,
+        },
+      },
     });
 
-    const { invoke, next, store } = create();
+    const { invoke } = create();
     const action = { type: VERIFY_TOKEN };
     invoke(action);
 
     moxios.wait(() => {
       expect(next).toHaveBeenCalledWith(action);
-      expect(store.dispatch).toHaveBeenCalledWith({ type: TOKEN_EXPIRED });
+      expect(dispatch).toHaveBeenCalledWith({ type: TOKEN_EXPIRED });
     });
   });
 
@@ -99,17 +90,17 @@ describe('persistToken Middleware', () => {
         response: {
           data: {
             error: 'Token Expired',
-            ok: false
-          }
+            ok: false,
+          },
         },
       });
     });
 
-    const { invoke, next, store } = create();
+    const { invoke } = create();
     const error = 'Token Expired';
     const action = { type: TOKEN_EXPIRED, error };
     invoke(action);
     expect(next).toHaveBeenCalledWith(action);
-    expect(store.dispatch).toHaveBeenCalledWith({ type: UNAUTH_USER, error });
+    expect(dispatch).toHaveBeenCalledWith({ type: UNAUTH_USER, error });
   });
 });

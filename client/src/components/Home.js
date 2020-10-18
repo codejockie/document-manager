@@ -1,12 +1,14 @@
 import React from 'react';
 
 // Material UI
-import Typography from '@material-ui/core/Typography';
+import { Container, Typography } from '@material-ui/core';
 
 const Home = () => (
-  <div>
-    <Typography variant="h2" component="h2">Welcome to the Docs Home!</Typography>
-  </div>
+  <Container maxWidth="xl">
+    <Typography variant="h2" component="h2">
+      Welcome to the Docs!
+    </Typography>
+  </Container>
 );
 
 export default Home;
