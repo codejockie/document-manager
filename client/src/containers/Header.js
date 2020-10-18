@@ -30,7 +30,7 @@ export class Header extends React.Component {
    * @param {Event} event
    * @returns {void}
    */
-  handleMenu = (event) => {
+  handleMenuClick = (event) => {
     this.setState({ anchorEl: event.currentTarget });
   };
 
@@ -62,7 +62,7 @@ export class Header extends React.Component {
               className={classes.menuButton}
               color="inherit"
               aria-label="menu"
-              onClick={this.handleMenu}
+              onClick={this.handleMenuClick}
             >
               <MenuIcon />
             </IconButton>
@@ -101,7 +101,7 @@ export class Header extends React.Component {
                 aria-label="account of current user"
                 aria-controls="profile-appbar"
                 aria-haspopup="true"
-                onClick={this.handleMenu}
+                onClick={this.handleMenuClick}
                 color="inherit"
               >
                 <AccountCircle />

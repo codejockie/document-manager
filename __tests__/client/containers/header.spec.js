@@ -1,6 +1,6 @@
 import { MenuItem } from '@material-ui/core';
-import { createMatchMedia, setup } from '../helpers';
 import ConnectedHeader, { Header } from '@/containers/Header';
+import { createMatchMedia, setup } from '../helpers';
 
 const initialState = {
   auth: { authenticated: false }
