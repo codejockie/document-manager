@@ -126,18 +126,15 @@ export default class AuthController {
           });
         }
 
-        // Generates reset password token using crypto buffer to hex
-        const resetPasswordToken = crypto.randomBytes(10).toString('hex');
+        const isDev = process.env.NODE_ENV === 'development';
         const resetPasswordExpires = new Date();
         resetPasswordExpires.setHours(resetPasswordExpires.getHours() + 24);
-
+        // Generate reset password token
+        const resetPasswordToken = crypto.randomBytes(15).toString('hex');
+        // Set expiry to 24 hours from now
+        const host = isDev ? `${hostname}:${process.env.PORT}` : `https://${hostname}`;
         // Set password reset url
-        let url = 'https://';
-        if (process.env.NODE_ENV === 'development') {
-          url = `${hostname}:${process.env.PORT}/auth/reset-password?password-reset-token=${resetPasswordToken}`;
-        } else {
-          url += `${hostname}/auth/reset-password?password-reset-token=${resetPasswordToken}`;
-        }
+        const url = `${host}/reset-password/${resetPasswordToken}`;
 
         user.update({
           resetPasswordToken,
