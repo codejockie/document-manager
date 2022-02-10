@@ -72,7 +72,7 @@
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^0.8.0",
     "moment": "^2.18.1",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "nodemailer": "^6.4.16",
     "nodemailer-express-handlebars": "^4.0.0",
     "passport": "^0.4.0",
